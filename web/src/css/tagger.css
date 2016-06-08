@@ -1,0 +1,58 @@
+.form-group {
+    margin: 0;
+}
+.list-group-item {
+    border-color: rgba(0,0,0,0.6) !important;
+    padding-top: 1em;
+    padding-bottom: 1.3em;
+}
+.fade-bottom,
+.list-group-item-text {
+    overflow-y: auto;
+    max-height: 5.2em;
+    margin-bottom: 0.5em;
+}
+
+.fade-bottom:after {
+    background-image: linear-gradient(to bottom, rgba(50, 56, 62, 0), rgba(50, 56, 62, 1));
+    position: absolute;
+    bottom: 0.5em;
+    right: 0;
+    left: 0;
+    height: 1.8em;
+    content: '';
+}
+
+.new-tag {
+    margin-left: 0.2em;
+}
+
+.fb-sources-icon {
+    width: 1.5em;
+    height: auto;
+    margin-right: 0.5em;
+}
+
+.fb-sources-text {
+    vertical-align: middle;
+    line-height: 1.5em;
+}
+
+.fb-icon {
+    margin: auto;
+    width: 100%;
+}
+
+.fb-icon-col {
+    padding: 0;
+    margin: 0 0 0.7rem;
+}
+
+.fb-main {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+}
+
+.controls {
+    margin-top: 0.5em;
+}

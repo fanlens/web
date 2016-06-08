@@ -1,0 +1,129 @@
+
+
+#content {
+    padding-top: 65px;
+}
+
+#main {
+    margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+    #sidebar {
+        padding-right: 0 !important;
+    }
+
+    #infobar {
+        padding-left: 0 !important;
+    }
+}
+
+#alerts {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 999999;
+}
+
+footer {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.navbar-brand {
+    padding: 5px;
+    wdith: 30em;
+}
+
+.navbar-brand > span {
+    position: relative;
+    top: 0.1em;
+}
+.navbar-brand > img {
+    height: 100%;
+    border-radius: 0.7em;
+    border: 2px solid black;
+    display: inline;
+}
+
+.nav {
+    max-height: 32px;
+}
+
+.list-group,
+.panel-body {
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.list-group-item:first-child,
+.list-group-item {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    border: 0;
+}
+
+.list-group-item {
+    border-top: 1px solid #ddd;
+}
+
+.btn-ellipsis, .ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.btn-ellipsis {
+    width: 95%;
+}
+
+.btn:focus, .btn:active:focus, .btn.active:focus,
+.btn.focus, .btn:active.focus, .btn.active.focus {
+    outline: none;
+}
+
+.tabbable > ul > li > a {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 15em;
+}
+
+pre.prettyprint {
+    border: 0;
+    background: #32383e !important;
+    margin-left: 1px;
+    margin-right: 1px;
+    border-radius: 0;
+}
+
+div.horizontal-slide {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+.list-group > .active {
+    background: inherit;
+    font-weight: bold;
+}
+
+.panel-title {
+    color: white;
+    text-decoration: none !important;
+}
+
+.panel-title.collapsed {
+    color: lightgrey;
+}
+
+.panel-group .panel + .panel {
+    margin-top: 15px;
+}
+
+.tabbable > .nav > li > a {
+    padding: 0.1em 0.5em;
+}
