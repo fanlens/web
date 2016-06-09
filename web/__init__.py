@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """base module for web guis"""
-
-import logging
+# todo oy vey, this file is a shit show atm
 
 from flask import Flask, g
 from flask_bootstrap import Bootstrap, StaticCDN, WebCDN
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from flask_mail import Mail
+from flask_wtf.csrf import CsrfProtect
+from celery import Celery
 
 from db import DB
 from config.db import Config
@@ -19,7 +20,13 @@ from web.routes.index import index
 from web.routes.tagger import tagger
 from web.routes.meta import meta
 
-from celery import Celery
+web_config = Config('web')
+env = Environment()
+
+app = Flask(__name__)
+app.register_blueprint(index, url_prefix='/')
+app.register_blueprint(tagger, url_prefix='/tagger')
+app.register_blueprint(meta, url_prefix='/meta')
 
 
 def make_celery(app):
@@ -39,25 +46,17 @@ def make_celery(app):
 
 
 worker_config = Config('worker')
-web_config = Config('web')
-env = Environment()
-
-app = Flask(__name__)
-app.register_blueprint(index, url_prefix='/')
-app.register_blueprint(tagger, url_prefix='/tagger')
-app.register_blueprint(meta, url_prefix='/meta')
-
 app.config['CELERY_BACKEND'] = worker_config['backend']
 app.config['CELERY_BROKER_URL'] = worker_config['broker']
 app.config['CELERY_ALWAYS_EAGER'] = False  # important so it doesn't get executed locally!
+app.config['CELERY_TASK_SERIALIZER'] = 'msgpack'
+app.config['CELERY_RESULT_SERIALIZER'] = 'msgpack'
+app.config['CELERY_ACCEPT_CONTENT'] = ['msgpack']
 celery = make_celery(app)
 
 Bootstrap(app)
 app.extensions['bootstrap']['cdns']['bootstrap'] = StaticCDN()
 app.extensions['bootstrap']['cdns']['jquery'] = WebCDN('/static/js/')
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 
 # todo turn off "allow less secure apps!"
 app.config['MAIL_SERVER'] = web_config['web']['server']
@@ -72,12 +71,17 @@ app.config['SECRET_KEY'] = web_config['secret_key']
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(username)s:%(password)s@%(host)s:%(port)s/%(database)s' % \
                                         env['DB']
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
-app.config['SECURITY_PASSWORD_SALT'] = web_config['salt']
+app.config['SECURITY_PASSWORD_SALT'] = web_config['salt']  # unnecessary but required
 app.config['SECURITY_URL_PREFIX'] = '/user'
 app.config['SECURITY_CONFIRMABLE'] = True
 app.config['SECURITY_REGISTERABLE'] = True
 app.config['SECURITY_RECOVERABLE'] = True
 app.config['SECURITY_CHANGEABLE'] = True
+
+CsrfProtect(app)
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 # Define models
 roles_users = db.Table('roles_users',

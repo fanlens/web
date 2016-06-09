@@ -41,9 +41,11 @@ render(
   document.getElementById('alerts')
 );
 
-//TODO wtf? refactor!
 store.dispatch(fetchSources())
-  .then(_.chain(store.getState().tagger.sources).filter('active').map('id').each(source => {
-    store.dispatch(fetchStats(source))
-  }).value())
-  .then(store.dispatch(fetchRandomComments(5, _.chain(store.getState().tagger.sources).filter('active').map('id').value())));
+  .then(() => {
+      store.dispatch(fetchRandomComments(5, _.chain(store.getState().tagger.sources).filter('active').map('id').value()));
+      _.chain(store.getState().tagger.sources).filter('active').map('id').each(source => {
+        store.dispatch(fetchStats(source))
+      }).value();
+    }
+  );

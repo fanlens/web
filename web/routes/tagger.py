@@ -41,6 +41,7 @@ def get(obj_id: str):
 
 @tagger.route('/<string:obj_id>', methods=['PATCH'])
 def add_tag(obj_id: str):
+    print(request.headers)
     patch = request.json
     add = set(patch.get('add', set()))
     remove = set(patch.get('remove', set()))

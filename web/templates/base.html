@@ -28,10 +28,13 @@
 
 {% block scripts %}
 {{super()}}
-<script type="application/javascript">
+<script type="text/javascript">
     $('#app').tooltip({
         selector: "a[rel=tooltip]"
     })
+</script>
+<script type="text/javascript">
+    var CSRFToken = "{{ csrf_token() }}";
 </script>
 {% endblock %}
 

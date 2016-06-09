@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch'
 import keyMirror from 'keymirror'
 import _ from 'lodash'
+import jsonheaders from '../utils/jsonheaders'
 
 export const TaggerActionType = keyMirror({
   TAGGER_RECEIVE_TAGS: null,
@@ -15,12 +16,7 @@ export const TaggerActionType = keyMirror({
 });
 
 const BASE_URI = '/tagger/';
-const jsonHeaders = () => {
-  const headers = new Headers();
-  headers.append("Content-Type", "application/json");
-  headers.append("Accept", "application/json");
-  return headers;
-}
+
 
 const receiveTags = (id, tags) => {
   return {type: TaggerActionType.TAGGER_RECEIVE_TAGS, id, tags};
@@ -56,7 +52,7 @@ export function fetchSources() {
   }
   return (dispatch) => {
     fetch(BASE_URI + '_sources', {
-      headers: jsonHeaders(),
+      headers: jsonheaders(),
       credentials: 'include'
     }).then(response => response.json())
       .then(json => dispatch(receiveSources(json.sources)));
@@ -71,7 +67,7 @@ export function fetchRandomComments(count, sources = [], withEntity = true, with
         with_suggestion: withSuggestion,
         sources: _.values(sources).join()
       }), {
-      headers: jsonHeaders(),
+      headers: jsonheaders(),
       credentials: 'include'
     }).then(response => response.json())
       .then(json => dispatch(receiveComments(json.comments)));
@@ -86,7 +82,7 @@ export function toggleCommentTag(id, currentTags, tag) {
         add: _.difference([tag], currentTags),
         remove: _.intersection(currentTags, [tag])
       }),
-      headers: jsonHeaders(),
+      headers: jsonheaders(),
       credentials: 'include'
     }).then(response => response.json())
       .then(({id, tags}) => dispatch(receiveTags(id, tags)));
@@ -99,7 +95,7 @@ export function resetCommentTags(id, tags) {
     fetch(BASE_URI + id, {
       method: 'PATCH',
       body: JSON.stringify({remove: tags}),
-      headers: jsonHeaders(),
+      headers: jsonheaders(),
       credentials: 'include'
     }).then(response => response.json())
       .then(({id, tags}) => dispatch(receiveTags(id, tags)));
@@ -109,7 +105,7 @@ export function resetCommentTags(id, tags) {
 export function fetchStats(source) {
   return (dispatch) => {
     fetch(`/meta/_stats/${source}`, {
-      headers: jsonHeaders(),
+      headers: jsonheaders(),
       credentials: 'include'
     }).then(response => response.json())
       .then(stats => dispatch(receiveStats(source, stats)));
