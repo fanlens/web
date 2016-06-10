@@ -1,5 +1,5 @@
 #app {
-    padding-top: 65px;
+    padding-top: 70px;
 }
 
 #main {
@@ -48,24 +48,6 @@ footer {
     max-height: 32px;
 }
 
-.list-group,
-.panel-body {
-    padding: 0;
-    margin-bottom: 0;
-}
-
-.list-group-item:first-child,
-.list-group-item {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0;
-    border: 0;
-}
-
-.list-group-item {
-    border-top: 1px solid #ddd;
-}
-
 .btn-ellipsis, .ellipsis {
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -81,47 +63,31 @@ footer {
     outline: none;
 }
 
-.tabbable > ul > li > a {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    max-width: 15em;
+.panel {
+    margin-bottom: 15px !important;
 }
-
-pre.prettyprint {
-    border: 0;
-    background: #32383e !important;
-    margin-left: 1px;
-    margin-right: 1px;
-    border-radius: 0;
-}
-
-div.horizontal-slide {
-    margin: 0;
+.list-group,
+.panel-body {
     padding: 0;
-    width: 100%;
-    white-space: nowrap;
-    overflow-x: auto;
+    margin-bottom: 0;
 }
 
-.list-group > .active {
-    background: inherit;
-    font-weight: bold;
+.list-group-item {
+     border-color: #ccc !important;
 }
 
-.panel-title {
-    color: white;
-    text-decoration: none !important;
+.panel-body > .list-group > .list-group-item:first-child,
+.panel-body > .list-group > .list-group-item {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    border: 0;
 }
 
-.panel-title.collapsed {
-    color: lightgrey;
+.panel-body > .list-group > .list-group-item {
+    border-top: 1px solid #ecf0f1 !important;
 }
 
-.panel-group .panel + .panel {
-    margin-top: 15px;
-}
 
-.tabbable > .nav > li > a {
-    padding: 0.1em 0.5em;
-}
+
+
