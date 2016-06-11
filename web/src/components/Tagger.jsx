@@ -111,8 +111,7 @@ const Tagger = ({id, user, page, message, tags, tagSet, suggestion, onDuplicate,
         <h4 className="list-group-item-heading">
           <a href={"https://facebook.com/" + user.id}> {user.name} </a>
         </h4>
-        <p className="list-group-item-text" onScroll={() => adjustFade(id)}
-           id={'tagger-message-' + id}>
+        <p className="list-group-item-text" id={'tagger-message-' + id}>
           <UrlText text={message}/>
         </p>
       </div>
