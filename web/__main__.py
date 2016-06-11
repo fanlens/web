@@ -20,4 +20,20 @@ parser.add_argument('-b', '--bind', type=str, help='the address to bind to', req
 parser.add_argument('-p', '--port', type=int, help='the port to bind to', required=False)
 args = parser.parse_args()
 
-app.run(host=args.bind, port=args.port, debug=args.d)
+extra_dirs = [os.path.join(os.getcwd(), 'web/web/templates')]
+extra_files = extra_dirs[:]
+
+
+def walk_dir(extra_dir):
+    for dirname, dirs, files in os.walk(extra_dir):
+        for filename in files:
+            filename = os.path.join(dirname, filename)
+            if os.path.isfile(filename):
+                extra_files.append(filename)
+        for dir in dirs:
+            walk_dir(dir)
+
+
+for extra_dir in extra_dirs:
+    walk_dir(extra_dir)
+app.run(host=args.bind, port=args.port, debug=args.d, extra_files=extra_files)

@@ -19,7 +19,7 @@ const InfoBar = () => (
 )
 
 const TaggerApp = ({count}) => (
-  <div className="container-fluid" id="content">
+  <div className="container-fluid">
     <div className="row">
       <aside className="col-sm-2" id="sidebar">
         <Sidebar />

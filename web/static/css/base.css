@@ -1,5 +1,5 @@
-#app {
-    padding-top: 70px;
+#content {
+    padding-top: 50px;
 }
 
 #main {
@@ -94,7 +94,3 @@ footer {
 .panel-body > .list-group > .list-group-item {
     border-top: 1px solid #ecf0f1 !important;
 }
-
-
-
-

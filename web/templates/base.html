@@ -1,4 +1,5 @@
 {% extends "bootstrap/base.html" %}
+{% import 'variables.jinja' as variables %}
 
 {% block html_attribs %} lang="en" {% endblock %}
 
@@ -10,7 +11,7 @@
     <meta name="author" content="@chjdev">
 {% endblock %}
 
-{% block title %} FanLens {% endblock %}
+{% block title %} {{ variables.company }} {% endblock %}
 
 {% import "bootstrap/fixes.html" as fixes %}
 
@@ -52,7 +53,7 @@
                             </button>
                             <a class="navbar-brand" href="/" rel="home"><img
                                     src="{{ url_for('static', filename='img/logo.png') }}" alt="src"/>
-                                <span>FanLens.ai</span></a>
+                                <span>{{ variables.company }}</span></a>
                         </div>
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav">
@@ -94,21 +95,21 @@
 {% endblock %}
 
 {% block content %}
-    <div id="app">
-        {% block app %}
-        {% endblock %}
-    </div>
-    <div class="container-fluid" id="alerts">
-        {% block alerts %}
-        {% endblock %}
+    <div id="content">
+        <div id="app">
+            {% block app %}
+            {% endblock %}
+        </div>
+        <div class="container-fluid" id="alerts">
+            {% block alerts %}
+            {% endblock %}
+        </div>
     </div>
 {% endblock %}
 
 {% block body %}
     {{ super() }}
     <footer>
-        {% block footer %}
-            &copy; 2016 <a href="https://twitter.com/chjdev">@chjdev</a>
-        {% endblock %}
+        {% block footer %} {% endblock %}
     </footer>
 {% endblock %}

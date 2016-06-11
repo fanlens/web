@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+
 {% block navbar %}
     <header>
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -14,7 +19,7 @@
                             </button>
                             <a class="navbar-brand" href="/" rel="home"><img
                                     src="{{ url_for('static', filename='img/logo.png') }}" alt="src"/>
-                                <span>FanLens.ai</span></a>
+                                <span>{{ variables.company }}</span></a>
                         </div>
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav navbar-right">
@@ -40,5 +45,74 @@
 {% endblock %}
 
 {% block app %}
-    Hello
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                hello
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                goodbye
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="termsModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Terms of Service</h4>
+                </div>
+                <div class="modal-body">
+                    {% include 'landing/terms.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="noticeModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Legal Notice</h4>
+                </div>
+                <div class="modal-body">
+                    {% include 'landing/notice.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6 text-right">
+                <ul class="list-unstyled">
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#support">Support</a></li>
+                </ul>
+            </div>
+            <div class="col-md-6 text-left">
+                <ul class="list-unstyled">
+                    <li><a href="#legal" data-toggle="modal" data-target="#noticeModal">Legal Notice</a></li>
+                    <li><a href="#terms" data-toggle="modal" data-target="#termsModal">Terms of Service</a></li>
+                    <li><a href="#jobs">Jobs</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="row text-center">
+            Fanlens &copy; 2016 All rights reserved
+        </div>
+    </div>
 {% endblock %}
