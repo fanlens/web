@@ -37,6 +37,7 @@ footer {
     position: relative;
     top: 0.1em;
 }
+
 .navbar-brand > img {
     height: 100%;
     border-radius: 0.7em;
@@ -63,9 +64,15 @@ footer {
     outline: none;
 }
 
+.btn-default {
+    background-color: #555;
+    border-color: #333
+}
+
 .panel {
     margin-bottom: 15px !important;
 }
+
 .list-group,
 .panel-body {
     padding: 0;
@@ -73,7 +80,7 @@ footer {
 }
 
 .list-group-item {
-     border-color: #ccc !important;
+    border-color: #ccc !important;
 }
 
 .panel-body > .list-group > .list-group-item:first-child,
