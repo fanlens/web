@@ -38,30 +38,39 @@ const dismissStats = (source) => {
   return {type: TaggerActionType.TAGGER_DISMISS_STATS, source};
 }
 
-export const toggleSource = (id) => {
-  return {type: TaggerActionType.TAGGER_TOGGLE_SOURCE, id};
-}
+export const toggleSource = (id) => ({type: TaggerActionType.TAGGER_TOGGLE_SOURCE, id});
 
 export const toggleTagSet = (id) => {
   return {type: TaggerActionType.TAGGER_TOGGLE_TAGSET, id};
 }
 
-export function fetchSources() {
-  if (!_.isEmpty(sessionStorage.getItem('tagger_sources'))) {
-    return (dispatch) => Promise.resolve()
+export function initApp() {
+  return (dispatch, getState) => {
+    return dispatch(fetchSources()).then(() => {
+      const activeSources = _.chain(getState().tagger.sources).filter('active').map('id').value();
+      dispatch(fetchRandomComments(5, activeSources));
+      _.each(activeSources, (source) => dispatch(fetchStats(source)));
+    });
   }
-  return (dispatch) => {
-    fetch(BASE_URI + '_sources', {
-      headers: jsonheaders(),
-      credentials: 'include'
-    }).then(response => response.json())
-      .then(json => dispatch(receiveSources(json.sources)));
+}
+
+export function fetchSources(force = false) {
+  return (dispatch, getState) => {
+    if (!force && !_.isEmpty(getState().tagger.sources)) {
+      return Promise.resolve();
+    } else {
+      return fetch(BASE_URI + '_sources', {
+        headers: jsonheaders(),
+        credentials: 'include'
+      }).then(response => response.json())
+        .then(json => dispatch(receiveSources(json.sources)));
+    }
   }
 }
 
 export function fetchRandomComments(count, sources = [], withEntity = true, withSuggestion = true) {
   return (dispatch) => {
-    fetch(BASE_URI + '?' + $.param({
+    return fetch(BASE_URI + '?' + $.param({
         count: count,
         with_entity: withEntity,
         with_suggestion: withSuggestion,
@@ -76,7 +85,7 @@ export function fetchRandomComments(count, sources = [], withEntity = true, with
 
 export function toggleCommentTag(id, currentTags, tag) {
   return (dispatch) => {
-    fetch(BASE_URI + id, {
+    return fetch(BASE_URI + id, {
       method: 'PATCH',
       body: JSON.stringify({
         add: _.difference([tag], currentTags),
@@ -86,13 +95,12 @@ export function toggleCommentTag(id, currentTags, tag) {
       credentials: 'include'
     }).then(response => response.json())
       .then(({id, tags}) => dispatch(receiveTags(id, tags)));
-
   }
 }
 
 export function resetCommentTags(id, tags) {
   return (dispatch) => {
-    fetch(BASE_URI + id, {
+    return fetch(BASE_URI + id, {
       method: 'PATCH',
       body: JSON.stringify({remove: tags}),
       headers: jsonheaders(),
@@ -104,7 +112,7 @@ export function resetCommentTags(id, tags) {
 
 export function fetchStats(source) {
   return (dispatch) => {
-    fetch(`/meta/_stats/${source}`, {
+    return fetch(`/meta/_stats/${source}/tags`, {
       headers: jsonheaders(),
       credentials: 'include'
     }).then(response => response.json())

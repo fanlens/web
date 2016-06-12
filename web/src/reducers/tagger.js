@@ -18,21 +18,24 @@ const comments = (state = {}, action) => {
 }
 
 const sources = (state = JSON.parse(sessionStorage.getItem('tagger_sources')) || {}, action) => {
+  let newState = null;
   switch (action.type) {
     case TaggerActionType.TAGGER_RECEIVE_SOURCES:
-      return _.chain(action.sources).uniq().map(source => [source, {id: source, active: true}]).fromPairs().value();
+      newState = _.chain(action.sources).uniq().map(source => [source, {id: source, active: true}]).fromPairs().value();
+      break;
     case TaggerActionType.TAGGER_TOGGLE_SOURCE:
-      let newState = _.defaults({
+      newState = _.defaults({
         [action.id]: _.defaults({active: !state[action.id].active}, state[action.id])
       }, state);
       if (_.every(newState, ['active', false])) {
         newState = _.mapValues(newState, source => _.defaults({active: true}, source));
       }
-      sessionStorage.setItem('tagger_sources', JSON.stringify(newState));
-      return newState;
+      break;
     default:
-      return state;
+      newState = state;
   }
+  sessionStorage.setItem('tagger_sources', JSON.stringify(newState));
+  return newState;
 }
 
 const tagSets = (state = JSON.parse(sessionStorage.getItem('tagger_tagSets')) || {

@@ -4,6 +4,7 @@ footer div.text-left {
 
 #app {
     color: white;
+    padding-top: 0;
 }
 
 .modal {

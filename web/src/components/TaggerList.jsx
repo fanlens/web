@@ -20,14 +20,14 @@ const TaggerList = ({comments, sources, onReload, onReset}) => (
     <div className="row controls">
       <div className="btn-group-justified">
         <div className="btn-group">
-          <button className="btn btn-default" type="button" onClick={() => onReload(sources)}>
+          <label className="btn btn-default" type="button" onClick={() => onReload(sources)}>
             <span className="glyphicon glyphicon-refresh" aria-hidden="true"></span> New Batch
-          </button>
+          </label>
         </div>
         <div className="btn-group">
-          <button className="btn btn-default" type="button" onClick={() => onReset(comments)}>
+          <label className="btn btn-default" type="button" onClick={() => onReset(comments)}>
             <span className="glyphicon glyphicon-erase" aria-hidden="true"></span> Reset Batch
-          </button>
+          </label>
         </div>
       </div>
     </div>

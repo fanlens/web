@@ -5,9 +5,8 @@ import {createStore, combineReducers, applyMiddleware} from 'redux'
 import {Provider} from 'react-redux'
 import createLogger from 'redux-logger'
 import thunkMiddleware from 'redux-thunk'
-import _ from 'lodash'
 
-import {fetchSources, fetchRandomComments, fetchStats} from './actions/TaggerActions'
+import {initApp} from './actions/TaggerActions'
 import alerts from './reducers/alerts'
 import tagger from './reducers/tagger'
 
@@ -39,11 +38,4 @@ render(
   document.getElementById('alerts')
 );
 
-store.dispatch(fetchSources())
-  .then(() => {
-      store.dispatch(fetchRandomComments(5, _.chain(store.getState().tagger.sources).filter('active').map('id').value()));
-      _.chain(store.getState().tagger.sources).filter('active').map('id').each(source => {
-        store.dispatch(fetchStats(source))
-      }).value();
-    }
-  );
+store.dispatch(initApp())

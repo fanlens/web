@@ -1,3 +1,11 @@
+nav {
+    opacity: 0.85;
+}
+
+#app {
+    padding-top: 20px;
+}
+
 #content {
     padding-top: 50px;
 }
@@ -93,4 +101,9 @@ footer {
 
 .panel-body > .list-group > .list-group-item {
     border-top: 1px solid #ecf0f1 !important;
+}
+
+.panel-button {
+    text-align: left;
+    display: block;
 }

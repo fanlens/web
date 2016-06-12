@@ -3,11 +3,11 @@ import classnames from 'classnames';
 
 
 export const PanelButton = ({active, children, onClick}) => {
-  let btnClasses = classnames('list-group-item', 'btn', {'active': active});
+  let btnClasses = classnames('list-group-item', 'btn', 'panel-button', {'active': active});
   return (
-    <button type="button" className={btnClasses} onClick={() => onClick()}>
+    <a role="button" className={btnClasses} onClick={() => onClick()}>
       {children}
-    </button>
+    </a>
   );
 }
 

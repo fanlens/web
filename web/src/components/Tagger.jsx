@@ -21,9 +21,10 @@ const ToolTip = ({children}) => (
 const Tag = ({tag, active, suggestion, onToggle}) => {
   const [suggPercent] = suggestion || [0];
   const suggested = suggPercent > 0.7;
+  // using label buttons to fix focus issues with button
   return (
     <div className="btn-group" role="group">
-      <button className={classnames('btn', 'ellipsis', {
+      <label className={classnames('btn', 'ellipsis', {
                         'btn-primary': suggested,
                         'btn-default': !suggested,
                         'active': active
@@ -40,7 +41,7 @@ const Tag = ({tag, active, suggestion, onToggle}) => {
                   style={{color: '#fff', marginLeft: '0.25em', marginTop:'0.10em'}} aria-hidden="true"></span>
           </ToolTip> : null
         }
-      </button>
+      </label>
     </div>
   )
 }
