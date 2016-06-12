@@ -6,7 +6,7 @@ const TagSetElement = ({tagCounts, title, tags}) => (
   <div style={{lineHeight:'1.75em', whiteSpace:'normal'}}>{title}:<br/>
     {tags.map((tag, idx) => (
       <span key={idx} className="badge" style={{border:'2px solid white', marginRight:'0.2em', display:'inline-block'}}>
-        <span className="glyphicon glyphicon-tag" aria-hidden="true"></span> {tag} {tagCounts[tag] || ''}
+        <em className="glyphicon glyphicon-tag" aria-hidden="true" />{tag} {tagCounts[tag] || ''}
       </span>
     ))}
   </div>
@@ -14,10 +14,12 @@ const TagSetElement = ({tagCounts, title, tags}) => (
 
 const TagSetPanel = ({tagSets, tagCounts, onTagSetSelected}) => (
   <Panel id="panel-element-tagsets" title="Tag Sets">
-    {tagSets.map(tagSet => (
-      <PanelButton key={tagSet.id} {...tagSet} onClick={() => onTagSetSelected(tagSet.id)}>
-        <TagSetElement tagCounts={tagCounts} {...tagSet}/>
-      </PanelButton>))}
+    <div className="list-group">
+      {tagSets.map(tagSet => (
+        <PanelButton key={tagSet.id} {...tagSet} onClick={() => onTagSetSelected(tagSet.id)}>
+          <TagSetElement tagCounts={tagCounts} {...tagSet}/>
+        </PanelButton>))}
+    </div>
   </Panel>
 )
 

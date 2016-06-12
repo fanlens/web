@@ -10,7 +10,7 @@ const TaggerList = ({comments, sources, onReload, onReset}) => (
       <ul className="list-group">
         {_.map(_.sortBy(comments, 'id'), (comment) => {
           return (
-            <li key={comment.id} className="list-group-item">
+            <li key={comment.id} className="list-group-item col-md-6">
               <TaggerContainer id={comment.id}/>
             </li>
           );
@@ -20,12 +20,17 @@ const TaggerList = ({comments, sources, onReload, onReset}) => (
     <div className="row controls">
       <div className="btn-group-justified">
         <div className="btn-group">
-          <label className="btn btn-default" type="button" onClick={() => onReload(sources)}>
+          <label className="btn btn-primary" type="button" onClick={() => onReload(sources, comments.length)}>
             <span className="glyphicon glyphicon-refresh" aria-hidden="true"></span> New Batch
           </label>
         </div>
         <div className="btn-group">
-          <label className="btn btn-default" type="button" onClick={() => onReset(comments)}>
+          <label className="btn btn-success" type="button" onClick={() => null}>
+            <span className="glyphicon glyphicon-tags" aria-hidden="true"></span> Accept All
+          </label>
+        </div>
+        <div className="btn-group">
+          <label className="btn btn-warning" type="button" onClick={() => onReset(comments)}>
             <span className="glyphicon glyphicon-erase" aria-hidden="true"></span> Reset Batch
           </label>
         </div>

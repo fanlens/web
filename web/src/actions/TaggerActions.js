@@ -56,7 +56,7 @@ export function initApp() {
     return dispatch(fetchSources())
       .then(() => {
         const activeSources = _.chain(getState().tagger.sources).filter('active').map('id').value();
-        dispatch(fetchRandomComments(5, activeSources));
+        dispatch(fetchRandomComments(8, activeSources));
         _.each(activeSources, (source) => dispatch(fetchStats(source)));
       });
   }

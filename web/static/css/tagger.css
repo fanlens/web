@@ -1,15 +1,33 @@
+.panel-body .nav {
+    display: inline
+}
+
+.glyphicon {
+    margin-right: 0.35rem;
+    display: inline-block;
+    top: 0.2rem;
+    margin-bottom: 0.45rem;
+    color: #fff;
+}
+
+.glyphicon.quality {
+    margin-right: 0;
+    margin-left: 0.35rem;
+}
+
 .form-group {
     margin: 0;
 }
-.list-group-item {
-    padding-top: 1em;
-    padding-bottom: 1.3em;
+
+.tagger {
+    padding-top: 0.2em;
+    padding-bottom: 0.4em;
 }
 
-.list-group-item-text {
+.tagger .list-group-item-text {
     overflow-y: auto;
-    max-height: 5.2em;
-    margin-bottom: 0.5em;
+    height: 6.25em;
+    margin-bottom: 0.8em;
 }
 
 .new-tag {

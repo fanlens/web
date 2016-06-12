@@ -3,7 +3,7 @@ import classnames from 'classnames';
 
 
 export const PanelButton = ({active, children, onClick}) => {
-  let btnClasses = classnames('list-group-item', 'btn', 'panel-button', {'active': active});
+  let btnClasses = classnames('list-group-item', 'btn', 'btn-md', 'panel-button', {'active': active});
   return (
     <a role="button" className={btnClasses} onClick={() => onClick()}>
       {children}
@@ -27,9 +27,7 @@ const Panel = ({id, title, children}) => {
 
       <div id={id} className="panel-collapse collapse in">
         <div className="panel-body">
-          <div className="list-group">
-            {children}
-          </div>
+          {children}
         </div>
       </div>
     </div>

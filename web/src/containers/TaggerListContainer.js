@@ -8,10 +8,10 @@ const mapStateToProps = (state) => {
   return {comments: _.values(state.tagger.comments), sources: _.values(state.tagger.sources)};
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    onReload: (sources) => {
-      dispatch(fetchRandomComments(ownProps.count, _.chain(sources).filter('active').map('id').value()));
+    onReload: (sources, count) => {
+      dispatch(fetchRandomComments(count, _.chain(sources).filter('active').map('id').value()));
     },
     onReset: (comments) => {
       _.values(comments).forEach(comment => dispatch(resetCommentTags(comment.id, comment.tags)));

@@ -42,53 +42,29 @@
 {% block navbar %}
     <header>
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="navbar-header">
-                            <button type="button" class="navbar-toggle" data-toggle="collapse"
-                                    data-target="#bs-example-navbar-collapse-1">
-                                <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
-                                    class="icon-bar"></span><span class="icon-bar"></span>
-                            </button>
-                            <a class="navbar-brand" href="/" rel="home"><img
-                                    src="{{ url_for('static', filename='img/logo.png') }}" alt="src"/>
-                                <span>{{ variables.company }}</span></a>
-                        </div>
-                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                            <ul class="nav navbar-nav">
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools<strong
-                                            class="caret"></strong></a>
-                                    <ul class="dropdown-menu">
-                                        {% for text, href in [("Home", "/"), ("Tagger", "/tagger")] %}
-                                            <li>
-                                                <a href="{{ href }}">{{ text }}</a>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            </ul>
-                            <ul class="nav navbar-nav navbar-right">
-                                <li>
-                                    <a href="#">Billing</a>
-                                </li>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings<strong
-                                            class="caret"></strong></a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a href="/user">User Profile</a>
-                                        </li>
-                                        <li>
-                                            <a href="/user/logout">Logout</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/" rel="home"><img src="{{ url_for('static', filename='img/logo.png') }}"
+                                                                 alt="src"/> <span>{{ variables.company }}</span></a>
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
+                        class="icon-bar"></span><span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                {% block navbar_app %} {% endblock %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#">Billing</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings<em class="caret"></em></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/user">User Profile</a></li>
+                            <li><a href="/user/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </nav>
     </header>

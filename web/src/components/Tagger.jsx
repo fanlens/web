@@ -7,12 +7,12 @@ const URL_PATTERN = /(?:(?:http|ftp|https):\/\/)?(?:[\w_-]+(?:(?:\.[\w_-]+)+))(?
 
 const ToolTip = ({children}) => (
   <a href="#" rel="tooltip" data-container="body" data-toggle="tooltip" data-html="true" data-delay="300"
-     title="<p>
+     title="<div style='padding:0.8rem 0 0.8rem 0;'>
      Confidence<br/>
-     <span class='glyphicon glyphicon-certificate' aria-hidden='true'></span> Excellent
-     <span class='glyphicon glyphicon-star' aria-hidden='true'></span> Good
-     <span class='glyphicon glyphicon-star-empty' aria-hidden='true'></span> Fair
-     </p>
+     <em class='glyphicon glyphicon-certificate' aria-hidden='true'></em>Excellent&nbsp;&nbsp;
+     <em class='glyphicon glyphicon-star' aria-hidden='true'></em>Good&nbsp;&nbsp;
+     <em class='glyphicon glyphicon-star-empty' aria-hidden='true'></em>Fair
+     </div>
      " class="text-danger">
     {children}
   </a>
@@ -24,21 +24,21 @@ const Tag = ({tag, active, suggestion, onToggle}) => {
   // using label buttons to fix focus issues with button
   return (
     <div className="btn-group" role="group">
-      <label className={classnames('btn', 'ellipsis', {
-                        'btn-primary': suggested,
+      <label className={classnames('btn', 'btn-sm', 'ellipsis', {
+                        'btn-success': suggested,
                         'btn-default': !suggested,
                         'active': active
                       })}
-              type="button" onClick={onToggle}>
-        <span className="glyphicon glyphicon-tag" aria-hidden="true"></span> {tag}
+             type="button" onClick={onToggle}>
+        <em className="glyphicon glyphicon-tag" aria-hidden="true"/>{tag}
         {suggested ?
           <ToolTip>
-            <span className={classnames('glyphicon', {
+            <em className={classnames('glyphicon', 'quality', {
                               'glyphicon-star-empty': suggPercent <= 0.95,
                               'glyphicon-star': 0.95 < suggPercent && suggPercent <= 0.99,
                               'glyphicon-certificate': 0.99 < suggPercent
                              })}
-                  style={{color: '#fff', marginLeft: '0.25em', marginTop:'0.10em'}} aria-hidden="true"></span>
+                aria-hidden="true"/>
           </ToolTip> : null
         }
       </label>
@@ -95,7 +95,8 @@ const TagList = ({allTags, tags, suggestion, onDuplicate, onToggle}) => {
         })}
 
         <div className="btn-group" role="group" key={"$$new$$"}>
-          <input type="text" className="form-control new-tag" placeholder="new tag..." ref={node => input = node}/>
+          <input type="text" className="form-control new-tag input-sm" placeholder="new tag..."
+                 ref={node => input = node}/>
         </div>
       </div>
     </form>
@@ -103,7 +104,7 @@ const TagList = ({allTags, tags, suggestion, onDuplicate, onToggle}) => {
 }
 
 const Tagger = ({id, user, page, message, tags, tagSet, suggestion, onDuplicate, onToggle}) => (
-  <div className="container-fluid">
+  <div className="container-fluid tagger">
     <div className="row">
 
       <FBIcon id={user.id}/>

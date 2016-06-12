@@ -11,11 +11,13 @@ const SourceElement = ({source}) => (
 
 const SourcesPanel = ({sources, onSourceSelected}) => (
   <Panel id="panel-element-sources" title="Sources">
-    {sources.map((source) => (
-      <PanelButton key={source.id} {...source} onClick={() => onSourceSelected(source.id)}>
-        <SourceElement source={source.id}/>
-      </PanelButton>
-    ))}
+    <div className="list-group">
+      {sources.map((source) => (
+        <PanelButton key={source.id} {...source} onClick={() => onSourceSelected(source.id)}>
+          <SourceElement source={source.id}/>
+        </PanelButton>
+      ))}
+    </div>
   </Panel>
 )
 

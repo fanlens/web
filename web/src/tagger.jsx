@@ -27,7 +27,7 @@ const store = createStore(
 )
 render(
   <Provider store={store}>
-    <TaggerApp count={5}/>
+    <TaggerApp />
   </Provider>,
   document.getElementById('app')
 );
