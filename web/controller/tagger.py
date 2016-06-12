@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import g
 from sqlalchemy.sql import text
 
 from db import flag_modified
-
 from db.models.facebook import FacebookCommentEntry
+from web.modules.database import db
+from web.modules.celery import celery
 
 
 class TaggerController(object):
@@ -32,7 +32,7 @@ LIMIT :limit""")
 
     @classmethod
     def get_sources(cls) -> list:
-        query = g.db_session.execute(cls._sources_sql)
+        query = db.session.execute(cls._sources_sql)
         return sorted([r[0] for r in query])
 
     @classmethod
@@ -43,9 +43,9 @@ LIMIT :limit""")
             ignore_source = True
         else:
             ignore_source = False
-        query = g.db_session.execute(cls._random_comment_sql,
-                                     dict(frac=1.0, limit=count, lang='en', ignore_source=ignore_source,
-                                          sources=tuple(sources)))
+        query = db.session.execute(cls._random_comment_sql,
+                                   dict(frac=1.0, limit=count, lang='en', ignore_source=ignore_source,
+                                        sources=tuple(sources)))
 
         if with_entity:
             results = [dict((k, v) for k, v in zip(query.keys(), r)) for r in query]
@@ -61,7 +61,7 @@ LIMIT :limit""")
 
     @classmethod
     def get_tags_for(cls, comment_id: str) -> dict:
-        row = g.db_session.query(FacebookCommentEntry).get(comment_id)
+        row = db.session.query(FacebookCommentEntry).get(comment_id)
         if not row:
             return None
         return dict(id=row.id, tags=row.meta['tags'])
@@ -70,19 +70,19 @@ LIMIT :limit""")
     def patch_tags(cls, comment_id: str, add=set(), remove=set()) -> dict:
         if any([len(tag) > 64 for tag in add.union(remove)]):  # todo proper db validation
             raise ValueError('tags are limited to 64 characters')
-        entry = g.db_session.merge(FacebookCommentEntry(id=comment_id))
+        entry = db.session.merge(FacebookCommentEntry(id=comment_id))
         entry.meta['tags'] = sorted(list(set(entry.meta.get('tags', [])).union(add).difference(remove)))
         flag_modified(entry, 'meta')
-        g.db_session.commit()
+        db.session.commit()
         return {'id': entry.id, 'tags': entry.meta['tags']}
 
     @classmethod
     def get_suggestions_for_id(cls, comment_id: str) -> tuple:
         # todo do some nice mapping
-        comment = g.db_session.query(FacebookCommentEntry).get(comment_id)
+        comment = db.session.query(FacebookCommentEntry).get(comment_id)
         if not comment or 'fingerprint' not in comment.meta or 'tokens' not in comment.meta:
             raise ValueError
         else:
-            return g.celery.send_task('worker.brain.predict', args=(
-            dict(tokens=comment.meta['tokens'], fingerprint=comment.meta['fingerprint']),),
-                                      kwargs=dict(model_id='debug_tagger'))
+            return celery.send_task('worker.brain.predict', args=(
+                dict(tokens=comment.meta['tokens'], fingerprint=comment.meta['fingerprint']),),
+                                    kwargs=dict(model_id='debug_tagger'))

@@ -3,12 +3,11 @@
 
 import typing
 
-from flask import g
 from sqlalchemy import text
 
 from db import flag_modified
 from db.models.facebook import FacebookCommentEntry
-
+from web.modules.database import db
 from web.model.meta import MetaFields, Defaults, Types, Included
 
 
@@ -47,11 +46,11 @@ class MetaController(object):
         for field in MetaFields:
             if field.value in values:
                 cls.set(obj_id, field, values[field.value], commit=False)
-        g.db_session.commit()
+        db.session.commit()
 
     @classmethod
     def get(cls, obj_id: str, key: MetaFields) -> typing.Any:
-        comment = g.db_session.query(FacebookCommentEntry).get(obj_id)
+        comment = db.session.query(FacebookCommentEntry).get(obj_id)
         if comment:
             return comment.meta.get(key.value, Defaults[key])
         else:
@@ -60,11 +59,11 @@ class MetaController(object):
     @classmethod
     def set(cls, obj_id: str, key: MetaFields, value: typing.Any, commit=True) -> typing.Any:
         entry = FacebookCommentEntry(id=obj_id)
-        entry = g.db_session.merge(entry)
+        entry = db.session.merge(entry)
         entry.meta[key.value] = value
         flag_modified(entry, 'meta')
         if commit:
-            g.db_session.commit()
+            db.session.commit()
 
     @classmethod
     def get_all_stats(cls, source_id: str = None):
@@ -85,5 +84,5 @@ class MetaController(object):
             sql = cls._scalar_stats
         elif Types[key] == typing.Iterable:
             sql = cls._list_stats
-        stats = g.db_session.execute(sql, dict(field=key.value, ignore_page=ignore_pages, page=pages))
+        stats = db.session.execute(sql, dict(field=key.value, ignore_page=ignore_pages, page=pages))
         return dict((k, v) for k, v in stats if k is not None)

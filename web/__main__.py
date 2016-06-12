@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""web entry point"""
+"""web entry point for local dev server"""
 
 import argparse
 import sys
@@ -36,4 +36,6 @@ def walk_dir(extra_dir):
 
 for extra_dir in extra_dirs:
     walk_dir(extra_dir)
+
+
 app.run(host=args.bind, port=args.port, debug=args.d, extra_files=extra_files)
