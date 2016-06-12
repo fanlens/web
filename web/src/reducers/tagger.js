@@ -38,21 +38,22 @@ const sources = (state = JSON.parse(sessionStorage.getItem('tagger_sources')) ||
   return newState;
 }
 
-const tagSets = (state = JSON.parse(sessionStorage.getItem('tagger_tagSets')) || {
-  0: {id: 0, active: false, title: 'Spam vs Ham', tags: ['spam', 'ham']},
-  1: {id: 1, active: false, title: 'Relevancy', tags: ['spam', 'irrelevant', 'fraud']},
-  2: {id: 2, active: false, title: 'Sentiment', tags: ['happy', 'sad', 'thankful', 'angry', 'neutral']}
-}, action) => {
+const tagSets = (state = JSON.parse(sessionStorage.getItem('tagger_tagSets')) || {}, action) => {
+  let newState = null
   switch (action.type) {
     case TaggerActionType.TAGGER_TOGGLE_TAGSET:
-      const newState = _.defaults({
+      newState = _.defaults({
         [action.id]: _.defaults({active: !state[action.id].active}, state[action.id])
       }, state)
-      sessionStorage.setItem('tagger_tagSets', JSON.stringify(newState));
-      return newState;
+      break;
+    case TaggerActionType.TAGGER_RECEIVE_TAGSETS:
+      newState = _.keyBy(action.tagSets, 'id');
+      break;
     default:
-      return state;
+      newState = state;
   }
+  sessionStorage.setItem('tagger_tagSets', JSON.stringify(newState));
+  return newState
 }
 
 const stats = (state = {}, action) => {

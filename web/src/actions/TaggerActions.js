@@ -5,6 +5,7 @@ import jsonheaders from '../utils/jsonheaders'
 
 export const TaggerActionType = keyMirror({
   TAGGER_RECEIVE_TAGS: null,
+  TAGGER_RECEIVE_TAGSETS: null,
   TAGGER_RECEIVE_COMMENTS: null,
   TAGGER_RECEIVE_SOURCES: null,
   TAGGER_RECEIVE_STATS: null,
@@ -16,10 +17,15 @@ export const TaggerActionType = keyMirror({
 });
 
 const BASE_URI = '/tagger/';
+const TAGSET_URI = '/tagset/';
 
 
 const receiveTags = (id, tags) => {
   return {type: TaggerActionType.TAGGER_RECEIVE_TAGS, id, tags};
+}
+
+const receiveTagSets = (tagSets) => {
+  return {type: TaggerActionType.TAGGER_RECEIVE_TAGSETS, tagSets};
 }
 
 const receiveComments = (comments) => {
@@ -46,11 +52,27 @@ export const toggleTagSet = (id) => {
 
 export function initApp() {
   return (dispatch, getState) => {
-    return dispatch(fetchSources()).then(() => {
-      const activeSources = _.chain(getState().tagger.sources).filter('active').map('id').value();
-      dispatch(fetchRandomComments(5, activeSources));
-      _.each(activeSources, (source) => dispatch(fetchStats(source)));
-    });
+    dispatch(fetchTagSets());
+    return dispatch(fetchSources())
+      .then(() => {
+        const activeSources = _.chain(getState().tagger.sources).filter('active').map('id').value();
+        dispatch(fetchRandomComments(5, activeSources));
+        _.each(activeSources, (source) => dispatch(fetchStats(source)));
+      });
+  }
+}
+
+export function fetchTagSets(includeAll = true, force = false) {
+  return (dispatch, getState) => {
+    if (!force && !_.isEmpty(getState().tagger.tagSets)) {
+      return Promise.resolve();
+    } else {
+      return fetch(TAGSET_URI + 'sets/' + (includeAll ? "?include_all=true" : ""), {
+        headers: jsonheaders(),
+        credentials: 'include'
+      }).then(response => response.json())
+        .then(json => dispatch(receiveTagSets(json.tagSets)));
+    }
   }
 }
 

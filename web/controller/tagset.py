@@ -14,7 +14,7 @@ class TagSetController(object):
 
     @classmethod
     def get_all_tags_for_user_id(cls, user_id):
-        return [tag for (_, tag) in UserToTagSet.query.join(TagSet, TagToTagSet).add_columns(Tag.tag).filter(
+        return [tag for (_, tag) in UserToTagSet.query.join(TagSet, TagToTagSet, Tag).add_columns(Tag.tag).filter(
             UserToTagSet.user_id == user_id)]
 
     @classmethod
