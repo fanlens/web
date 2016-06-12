@@ -24,9 +24,11 @@ def create_app():
     from web.routes.index import index
     from web.routes.tagger import tagger
     from web.routes.meta import meta
+    from web.routes.tagset import tagset
     app.register_blueprint(index, url_prefix='/')
     app.register_blueprint(tagger, url_prefix='/tagger')
     app.register_blueprint(meta, url_prefix='/meta')
+    app.register_blueprint(tagset, url_prefix='/tagset')
     return app
 
 app = create_app()
