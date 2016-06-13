@@ -19,15 +19,37 @@
     margin: 0;
 }
 
+#tagger .list-group-item {
+    background-color: transparent;
+    padding: 0;
+    border: 0;
+}
+
+#tagger .list-group {
+    margin-left: -0.5em;
+    margin-right: -0.3em;
+}
+
 .tagger {
-    padding-top: 0.2em;
-    padding-bottom: 0.4em;
+    background-color: white;
+    margin: 0 0.5em 1em 0.5em;
+    border: 1em solid white;
 }
 
 .tagger .list-group-item-text {
     overflow-y: auto;
     height: 6.25em;
     margin-bottom: 0.8em;
+}
+
+#evaluator .form-group {
+    background-color: white;
+    padding: 1em;
+}
+
+.tagger,
+#evaluator .form-group {
+    box-shadow: 3px 3px 5px #bbb;
 }
 
 .new-tag {
@@ -58,8 +80,4 @@
 .fb-main {
     padding-left: 0.7rem;
     padding-right: 0.7rem;
-}
-
-.controls {
-    margin-top: 0.5em;
 }

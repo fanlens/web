@@ -17,8 +17,6 @@ export const TaggerActionType = keyMirror({
 });
 
 const BASE_URI = '/tagger/';
-const TAGSET_URI = '/tagset/';
-
 
 const receiveTags = (id, tags) => {
   return {type: TaggerActionType.TAGGER_RECEIVE_TAGS, id, tags};
@@ -67,7 +65,7 @@ export function fetchTagSets(includeAll = true, force = false) {
     if (!force && !_.isEmpty(getState().tagger.tagSets)) {
       return Promise.resolve();
     } else {
-      return fetch(TAGSET_URI + 'sets/' + (includeAll ? "?include_all=true" : ""), {
+      return fetch(BASE_URI + '_tagsets/' + (includeAll ? "?include_all=true" : ""), {
         headers: jsonheaders(),
         credentials: 'include'
       }).then(response => response.json())

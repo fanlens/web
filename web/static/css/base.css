@@ -1,3 +1,6 @@
+body {
+    background-color: #ddd;
+}
 nav {
     opacity: 0.85;
 }
@@ -53,8 +56,8 @@ footer {
     display: inline;
 }
 
-.nav {
-    max-height: 32px;
+.navbar-right {
+    padding-right: 15px;
 }
 
 .btn-ellipsis, .ellipsis {
@@ -87,8 +90,8 @@ footer {
     margin-bottom: 0;
 }
 
-.list-group-item {
-    border-color: #ccc !important;
+.panel {
+    box-shadow: 3px 3px 5px #bbb;
 }
 
 .panel-body > .list-group > .list-group-item:first-child,

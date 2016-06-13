@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from flask import request, jsonify, render_template, Blueprint
-from flask_security.decorators import login_required, roles_accepted
+from flask_security import current_user
+from flask_security.decorators import login_required, roles_accepted, roles_required
 
 from web.routes import request_wants_json
 from web.controller.tagger import TaggerController
+from web.controller.tagset import TagSetController
 
 tagger = Blueprint('tagger', __name__, template_folder='templates')
 
@@ -60,3 +62,23 @@ def suggest(obj_id: str):
 @tagger.route('/_sources')
 def sources():
     return jsonify({'sources': TaggerController.get_sources()})
+
+@tagger.route('/_tagsets/')
+def user_tagsets():
+    include_all = request.args.get('include_all', '').lower() in ("1", "true")
+    tag_sets = TagSetController.get_all_tagsets_for_user_id(current_user.id)
+    if include_all:
+        all_tags = TagSetController.get_all_tags_for_user_id(current_user.id)
+        tag_sets.append(dict(id='_all', tags=all_tags, title='All Tags'))
+    return jsonify(tagSets=tag_sets)
+
+
+@tagger.route('/_tags/')
+def user_tags():
+    return jsonify(tags=TagSetController.get_all_tags_for_user_id(current_user.id))
+
+
+@tagger.route('/_tagsets/_all')
+@roles_required('admin')
+def all_tags():
+    return jsonify(tags=TagSetController.get_all_tags())
