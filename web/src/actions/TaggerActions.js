@@ -9,6 +9,9 @@ export const TaggerActionType = keyMirror({
   TAGGER_RECEIVE_COMMENTS: null,
   TAGGER_RECEIVE_SOURCES: null,
   TAGGER_RECEIVE_STATS: null,
+  TAGGER_RECEIVE_SUGGESTION: null,
+
+  TAGGER_ENTER_SUGGESTION: null,
 
   TAGGER_DISMISS_STATS: null,
 
@@ -38,6 +41,14 @@ const receiveStats = (source, stats) => {
   return {type: TaggerActionType.TAGGER_RECEIVE_STATS, source, stats};
 }
 
+const receiveSuggestion = (suggestion) => {
+  return {type: TaggerActionType.TAGGER_RECEIVE_SUGGESTION, suggestion};
+}
+
+const enterSuggestion = () => {
+  return {type: TaggerActionType.TAGGER_ENTER_SUGGESTION};
+}
+
 const dismissStats = (source) => {
   return {type: TaggerActionType.TAGGER_DISMISS_STATS, source};
 }
@@ -65,7 +76,7 @@ export function fetchTagSets(includeAll = true, force = false) {
     if (!force && !_.isEmpty(getState().tagger.tagSets)) {
       return Promise.resolve();
     } else {
-      return fetch(BASE_URI + '_tagsets/' + (includeAll ? "?include_all=true" : ""), {
+      return fetch(BASE_URI + 'tagsets/' + (includeAll ? "?include_all=true" : ""), {
         headers: jsonheaders(),
         credentials: 'include'
       }).then(response => response.json())
@@ -79,7 +90,7 @@ export function fetchSources(force = false) {
     if (!force && !_.isEmpty(getState().tagger.sources)) {
       return Promise.resolve();
     } else {
-      return fetch(BASE_URI + '_sources', {
+      return fetch(BASE_URI + 'sources/', {
         headers: jsonheaders(),
         credentials: 'include'
       }).then(response => response.json())
@@ -105,7 +116,7 @@ export function fetchRandomComments(count, sources = [], withEntity = true, with
 
 export function toggleCommentTag(id, currentTags, tag) {
   return (dispatch) => {
-    return fetch(BASE_URI + id, {
+    return fetch(BASE_URI + 'comments/' + id, {
       method: 'PATCH',
       body: JSON.stringify({
         add: _.difference([tag], currentTags),
@@ -118,9 +129,23 @@ export function toggleCommentTag(id, currentTags, tag) {
   }
 }
 
+export function addCommentTag(id, tag) {
+  return (dispatch) => {
+    return fetch(BASE_URI + 'comments/' + id, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        add: [tag]
+      }),
+      headers: jsonheaders(),
+      credentials: 'include'
+    }).then(response => response.json())
+      .then(({id, tags}) => dispatch(receiveTags(id, tags)));
+  }  
+}
+
 export function resetCommentTags(id, tags) {
   return (dispatch) => {
-    return fetch(BASE_URI + id, {
+    return fetch(BASE_URI + 'comments/' + id, {
       method: 'PATCH',
       body: JSON.stringify({remove: tags}),
       headers: jsonheaders(),
@@ -137,5 +162,18 @@ export function fetchStats(source) {
       credentials: 'include'
     }).then(response => response.json())
       .then(stats => dispatch(receiveStats(source, stats)));
+  }
+}
+
+export function fetchSuggestionForText(text) {
+  return (dispatch) => {
+    dispatch(enterSuggestion())
+    return fetch(BASE_URI + 'suggestion', {
+      method: 'POST',
+      body: JSON.stringify({text}),
+      headers: jsonheaders(),
+      credentials: 'include'
+    }).then(response => response.json())
+      .then(suggestion => dispatch(receiveSuggestion(suggestion)));
   }
 }

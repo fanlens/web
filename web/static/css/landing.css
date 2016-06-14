@@ -11,25 +11,28 @@ footer div.text-left {
     color: black;
 }
 
-#app .row div {
+#app img {
+    width: 100%;
+}
+
+#app section {
     height: 35em;
     overflow: scroll;
     padding: 2em 5em 2em 5em;
-    margin-bottom: 5em;
 }
 
-#app .row:nth-child(1) {
+#app section:nth-child(1) {
     background-color: #2780e3;
 }
 
-#app .row:nth-child(2) {
+#app section:nth-child(2) {
     background-color: #ff7518;
 }
 
-#app .row:nth-child(3) {
+#app section:nth-child(3) {
     background-color: #9954bb;
 }
 
-#app .row:nth-child(4) {
+#app section:nth-child(4) {
     background-color: #3fb618;
 }

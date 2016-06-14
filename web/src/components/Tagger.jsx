@@ -19,24 +19,23 @@ const ToolTip = ({children}) => (
 )
 
 const Tag = ({tag, active, suggestion, onToggle}) => {
-  const [suggPercent] = suggestion || [0];
-  const suggested = suggPercent > 0.7;
+  const [quality] = suggestion || [-1];
   // using label buttons to fix focus issues with button
   return (
     <div className="btn-group" role="group">
       <label className={classnames('btn', 'btn-sm', 'ellipsis', {
-                        'btn-success': suggested,
-                        'btn-default': !suggested,
+                        'btn-success': quality >= 0,
+                        'btn-default': quality < 0,
                         'active': active
                       })}
              type="button" onClick={onToggle}>
         <em className="glyphicon glyphicon-tag" aria-hidden="true"/>{tag}
-        {suggested ?
+        {quality >= 0 ?
           <ToolTip>
             <em className={classnames('glyphicon', 'quality', {
-                              'glyphicon-star-empty': suggPercent <= 0.95,
-                              'glyphicon-star': 0.95 < suggPercent && suggPercent <= 0.99,
-                              'glyphicon-certificate': 0.99 < suggPercent
+                              'glyphicon-star-empty': quality == 2,
+                              'glyphicon-star': quality == 1,
+                              'glyphicon-certificate': quality == 0
                              })}
                 aria-hidden="true"/>
           </ToolTip> : null

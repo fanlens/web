@@ -74,15 +74,16 @@ class MetaController(object):
         return result
 
     @classmethod
-    def get_stats(cls, key: MetaFields, pages: tuple = None) -> typing.Any:
+    def get_stats(cls, key: MetaFields,
+                  pages: typing.Union[typing.AnyStr, typing.Set[typing.AnyStr]] = None) -> typing.Any:
         ignore_pages = pages is None or len(pages) == 0
         if ignore_pages:
-            pages = tuple([None])
-        if not isinstance(pages, tuple):
-            pages = (pages,)
+            pages = {None}
+        if not isinstance(pages, set):
+            pages = {pages}
         if Types[key] == typing.AnyStr:
             sql = cls._scalar_stats
         elif Types[key] == typing.Iterable:
             sql = cls._list_stats
-        stats = db.session.execute(sql, dict(field=key.value, ignore_page=ignore_pages, page=pages))
+        stats = db.session.execute(sql, dict(field=key.value, ignore_page=ignore_pages, page=tuple(pages)))
         return dict((k, v) for k, v in stats if k is not None)

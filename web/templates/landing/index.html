@@ -46,24 +46,65 @@
 
 {% block app %}
     <div class="container-fluid">
-        <div class="row">
+        <section class="row" id="elevator">
             <div class="col-md-12">
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
+        </section>
+        <section class="row" id="trustedby">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <h1>Trusted By</h1>
+                        </div>
+                    </div>
+                    <div class="row", style="margin-bottom: 2em;">
+                        <div class="col-md-4">
+                            <a href="https://visalyze.com" target="_blank"> <img
+                                    src="{{ url_for('static', filename='img/landing/sirenio.png') }}"
+                                    alt="sirenio.com"/></a>
+                        </div>
+                        <div class="col-md-8 text-justify">
+                            <p>
+                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget metus at dui
+                                finibus lacinia. Maecenas ornare molestie suscipit. Nunc tristique nunc non mauris
+                                tristique, quis facilisis sapien posuere. In a augue felis. Phasellus suscipit at nisi
+                                et consequat."
+                            </p>
+                            <p class="text-right">-- Allan Lund Hansen, CEO of <a href="https://sirenio.com"
+                                                                                  target="_blank">sirenio.com</a></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="https://visalyze.com" target="_blank"> <img
+                                    src="{{ url_for('static', filename='img/landing/visalyze.png') }}"
+                                    alt="visalyze.com"/></a>
+                        </div>
+                        <div class="col-md-8">
+                            <p>
+                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget metus at dui
+                                finibus lacinia. Maecenas ornare molestie suscipit. Nunc tristique nunc non mauris
+                                tristique, quis facilisis sapien posuere. In a augue felis. Phasellus suscipit at nisi
+                                et consequat."
+                            </p>
+                            <p class="text-right">-- Christoph Holz, CEO of <a href="https://visalyze.com"
+                                                                               target="_blank">visalyze.com</a></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="row">
+        </section>
+        <section class="row">
             <div class="col-md-12">
                 hello
             </div>
-        </div>
-        <div class="row">
+        </section>
+        <section class="row">
             <div class="col-md-12">
                 goodbye
             </div>
-        </div>
+        </section>
     </div>
     <div class="modal fade" id="termsModal" role="dialog">
         <div class="modal-dialog modal-lg">

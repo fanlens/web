@@ -7,7 +7,15 @@ const comments = (state = {}, action) => {
   switch (action.type) {
     case TaggerActionType.TAGGER_RECEIVE_COMMENTS:
       // todo: maybe hand off in a _.mapValue to comment() to perform some checks
-      return _.mapKeys(action.comments, (v, k) => v.id)
+      return _.chain(action.comments)
+        .mapValues(comment => _.defaults({
+            suggestion: _.chain(comment.suggestion)
+              .map(([s, t]) => [s > 0.99 ? 0 : s > 0.95 ? 1 : s > 0.8 ? 2 : null, t])  // 0 excellent, 1 good, 2 fair
+              .reject([0, null])
+              .value()
+          }, comment))
+        .mapKeys('id')
+        .value();
     case TaggerActionType.TAGGER_RECEIVE_TAGS:
       return _.defaults({
         [action.id]: _.defaults({tags: _.uniq(action.tags)}, state[action.id])
@@ -67,10 +75,22 @@ const stats = (state = {}, action) => {
   }
 }
 
+const evaluator = (state = {loading: false, suggestion: {}}, action) => {
+  switch (action.type) {
+    case TaggerActionType.TAGGER_RECEIVE_SUGGESTION:
+      return _.defaults({loading: false, suggestion: action.suggestion}, state);
+    case TaggerActionType.TAGGER_ENTER_SUGGESTION:
+      return _.defaults({loading: true}, state);
+    default:
+      return state;
+  }
+}
+
 const tagger = combineReducers({
   comments,
   sources,
   tagSets,
+  evaluator,
   stats
 });
 

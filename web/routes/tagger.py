@@ -35,13 +35,13 @@ def random_comments():
         return render_template('apps/tagger.html')
 
 
-@tagger.route('/<string:obj_id>')
+@tagger.route('/comments/<string:obj_id>')
 def get(obj_id: str):
     tags = TaggerController.get_tags_for(obj_id)
     return jsonify(tags)
 
 
-@tagger.route('/<string:obj_id>', methods=['PATCH'])
+@tagger.route('/comments/<string:obj_id>', methods=['PATCH'])
 def add_tag(obj_id: str):
     patch = request.json
     add = set(patch.get('add', set()))
@@ -50,20 +50,12 @@ def add_tag(obj_id: str):
     return jsonify(amended)
 
 
-@tagger.route('/<string:obj_id>/suggestions', methods=['GET'])
-def suggest(obj_id: str):
-    try:
-        [suggestion, ] = TaggerController.get_suggestions_for_id(obj_id)
-        return jsonify({'id': obj_id, 'suggestion': suggestion})
-    except KeyError:
-        return jsonify({'error': 'object with id %s not found' % obj_id}), 404
-
-
-@tagger.route('/_sources')
+@tagger.route('/sources/')
 def sources():
     return jsonify({'sources': TaggerController.get_sources()})
 
-@tagger.route('/_tagsets/')
+
+@tagger.route('/tagsets/')
 def user_tagsets():
     include_all = request.args.get('include_all', '').lower() in ("1", "true")
     tag_sets = TagSetController.get_all_tagsets_for_user_id(current_user.id)
@@ -73,12 +65,34 @@ def user_tagsets():
     return jsonify(tagSets=tag_sets)
 
 
-@tagger.route('/_tags/')
+@tagger.route('/tags/')
 def user_tags():
     return jsonify(tags=TagSetController.get_all_tags_for_user_id(current_user.id))
 
 
-@tagger.route('/_tagsets/_all')
+@tagger.route('/tags/_all')
 @roles_required('admin')
 def all_tags():
     return jsonify(tags=TagSetController.get_all_tags())
+
+
+@tagger.route('/comments/<string:obj_id>/suggestion', methods=['GET'])
+def suggest(obj_id: str):
+    try:
+        [suggestion, ] = TaggerController.get_suggestions_for_id(obj_id)
+        return jsonify({'id': obj_id, 'suggestion': suggestion})
+    except KeyError:
+        return jsonify({'error': 'object with id %s not found' % obj_id}), 404
+
+
+@tagger.route('/suggestion', methods=['POST'])
+def suggest_new():
+    try:
+        body = request.json
+        text = body['text']
+        suggestion = TaggerController.get_suggestions_for_text(text)
+        return jsonify({'text': text, 'suggestion': suggestion})
+    except KeyError:
+        return jsonify({'error': 'no text field in request'}), 400
+    except Exception as err:
+        return jsonify({'error': str(err.args)}), 400

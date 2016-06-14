@@ -56,6 +56,7 @@ LIMIT :limit""")
             for result in results:
                 result['suggestion'] = cls.get_suggestions_for_id(result['id'])
             for result in results:
+                # switch to better backend
                 result['suggestion'] = cls.get_suggestions_for_id(result['id']).get(interval=0.0005)
         return results
 
@@ -75,6 +76,12 @@ LIMIT :limit""")
         flag_modified(entry, 'meta')
         db.session.commit()
         return {'id': entry.id, 'tags': entry.meta['tags']}
+
+    @classmethod
+    def get_suggestions_for_text(cls, text: str) -> tuple:
+        task = celery.send_task('worker.brain.predict_text', args=(text,), kwargs=dict(model_id='debug_tagger'))
+        # switch to better backend
+        return task.get(interval=0.0005)
 
     @classmethod
     def get_suggestions_for_id(cls, comment_id: str) -> tuple:

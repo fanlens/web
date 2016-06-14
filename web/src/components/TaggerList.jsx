@@ -4,7 +4,7 @@ import _ from 'lodash'
 import TaggerContainer from '../containers/TaggerContainer'
 
 
-const TaggerList = ({comments, sources, onReload, onReset}) => (
+const TaggerList = ({comments, sources, onReload, onAcceptAll, onReset}) => (
   <div className="container-fluid">
     <div className="row">
       <ul className="list-group">
@@ -25,7 +25,7 @@ const TaggerList = ({comments, sources, onReload, onReset}) => (
           </label>
         </div>
         <div className="btn-group">
-          <label className="btn btn-success" type="button" onClick={() => null}>
+          <label className="btn btn-success" type="button" onClick={() => onAcceptAll(comments)}>
             <span className="glyphicon glyphicon-tags" aria-hidden="true"></span> Accept All
           </label>
         </div>

@@ -34,10 +34,10 @@ def stats_for_source(source_id: str):
 @meta.route('/_stats/<string:source_id>/<string:field>', methods=['GET'])
 def field_stats(source_id: str, field: str):
     if ',' in source_id:
-        source_id = tuple(source_id.split(','))
+        source_id = set(source_id.split(','))
     try:
         field = MetaFields(field)
-        value = MetaController.get_stats(field, source_id)
+        value = MetaController.get_stats(field, pages=source_id)
         return jsonify({field.value: value}), 404 if value is None else 200
     except ValueError:
         return jsonify(error='field %s not supported' % field.value), 404
