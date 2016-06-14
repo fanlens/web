@@ -64,7 +64,7 @@ const tagSets = (state = JSON.parse(sessionStorage.getItem('tagger_tagSets')) ||
   return newState
 }
 
-const stats = (state = {}, action) => {
+const stats = (state = {__all: {tags:{}}}, action) => {
   switch (action.type) {
     case TaggerActionType.TAGGER_RECEIVE_STATS:
       return _.defaults({[action.source]: action.stats}, state);

@@ -61,12 +61,12 @@ export const toggleTagSet = (id) => {
 
 export function initApp() {
   return (dispatch, getState) => {
+    dispatch(fetchTagCounts());
     dispatch(fetchTagSets());
     return dispatch(fetchSources())
       .then(() => {
         const activeSources = _.chain(getState().tagger.sources).filter('active').map('id').value();
         dispatch(fetchRandomComments(8, activeSources));
-        _.each(activeSources, (source) => dispatch(fetchStats(source)));
       });
   }
 }
@@ -140,7 +140,7 @@ export function addCommentTag(id, tag) {
       credentials: 'include'
     }).then(response => response.json())
       .then(({id, tags}) => dispatch(receiveTags(id, tags)));
-  }  
+  }
 }
 
 export function resetCommentTags(id, tags) {
@@ -155,13 +155,23 @@ export function resetCommentTags(id, tags) {
   }
 }
 
-export function fetchStats(source) {
+// export function fetchStats(source) {
+//   return (dispatch) => {
+//     return fetch(`/meta/_stats/${source}/tags`, {
+//       headers: jsonheaders(),
+//       credentials: 'include'
+//     }).then(response => response.json())
+//       .then(stats => dispatch(receiveStats(source, stats)));
+//   }
+// }
+
+export function fetchTagCounts() {
   return (dispatch) => {
-    return fetch(`/meta/_stats/${source}/tags`, {
+    return fetch(BASE_URI + 'tags/_counts', {
       headers: jsonheaders(),
       credentials: 'include'
     }).then(response => response.json())
-      .then(stats => dispatch(receiveStats(source, stats)));
+      .then(stats => dispatch(receiveStats('__all', stats)));
   }
 }
 

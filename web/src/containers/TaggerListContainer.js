@@ -1,7 +1,7 @@
 import {connect} from 'react-redux'
 import _ from 'lodash'
 
-import {fetchRandomComments, resetCommentTags, addCommentTag} from '../actions/TaggerActions'
+import {fetchRandomComments, resetCommentTags, addCommentTag, fetchTagCounts} from '../actions/TaggerActions'
 import TaggerList from '../components/TaggerList.jsx'
 
 const mapStateToProps = (state) => {
@@ -15,15 +15,17 @@ const mapDispatchToProps = (dispatch) => {
         .filter('active')
         .map('id')
         .value())),
-    onReset: (comments) => _.chain(comments)
-      .each(comment => dispatch(resetCommentTags(comment.id, comment.tags)))
-      .value(),
-    onAcceptAll: (comments) => _.chain(comments)
-      .each(({id, suggestion}) => _.chain(suggestion)
+    onReset: (comments) => Promise.all(_.chain(comments)
+      .map(comment => dispatch(resetCommentTags(comment.id, comment.tags)))
+      .value())
+      .then(() => dispatch(fetchTagCounts())),
+    onAcceptAll: (comments) => Promise.all(_.chain(comments)
+      .flatMap(({id, suggestion}) => _.chain(suggestion)
         .map('1')
-        .each(tag => dispatch(addCommentTag(id, tag)))
+        .flatMap(tag => dispatch(addCommentTag(id, tag)))
         .value())
-      .value()
+      .value())
+      .then(() => dispatch(fetchTagCounts()))
   }
 }
 

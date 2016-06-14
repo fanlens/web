@@ -3,6 +3,7 @@
 
 from collections import defaultdict
 from db.models.tags import Tag, TagToTagSet, TagSet
+
 from web.modules.database import db
 from web.model.tags import UserToTagSet
 

@@ -2,7 +2,7 @@ import {connect} from 'react-redux'
 import _ from 'lodash'
 
 import {warning} from '../actions/AlertActions'
-import {toggleCommentTag} from '../actions/TaggerActions'
+import {toggleCommentTag, fetchTagCounts} from '../actions/TaggerActions'
 
 import Tagger from '../components/Tagger.jsx'
 
@@ -17,7 +17,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       dispatch(warning(text));
     },
     onToggle: (currentTags, tag) => {
-      dispatch(toggleCommentTag(ownProps.id, currentTags, tag));
+      dispatch(toggleCommentTag(ownProps.id, currentTags, tag)).then(dispatch(fetchTagCounts()));
     }
   }
 }

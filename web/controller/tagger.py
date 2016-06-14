@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from sqlalchemy.sql import text
+from sqlalchemy.sql import text, func
 
-from db import flag_modified
+from db import insert_or_ignore
 from db.models.facebook import FacebookCommentEntry
+
+from web.model.tags import UserToTagToComment
 from web.modules.database import db
 from web.modules.celery import celery
 
@@ -36,7 +38,7 @@ LIMIT :limit""")
         return sorted([r[0] for r in query])
 
     @classmethod
-    def get_random_comments(cls, count=1, with_entity=False, with_suggestion=False, sources=None):
+    def get_random_comments(cls, user_id: int, count=1, with_entity=False, with_suggestion=False, sources=None):
         # todo: using frac of 1.0 might be pretty slow
         if sources is None:
             sources = [None]
@@ -49,6 +51,8 @@ LIMIT :limit""")
 
         if with_entity:
             results = [dict((k, v) for k, v in zip(query.keys(), r)) for r in query]
+            for result in results:
+                result['tags'] = cls.get_tags_for(result['id'], user_id)['tags']
         else:
             results = [{'id': r[0]} for r in query]
 
@@ -61,21 +65,25 @@ LIMIT :limit""")
         return results
 
     @classmethod
-    def get_tags_for(cls, comment_id: str) -> dict:
-        row = db.session.query(FacebookCommentEntry).get(comment_id)
-        if not row:
-            return None
-        return dict(id=row.id, tags=row.meta['tags'])
+    def get_tag_counts_for_user_id(cls, user_id: int):
+        return dict((k, v) for k, v in
+                    db.session.query(UserToTagToComment.tag).filter_by(user_id=user_id).add_column(
+                        func.count()).group_by(
+                        UserToTagToComment.tag).all())
 
     @classmethod
-    def patch_tags(cls, comment_id: str, add=set(), remove=set()) -> dict:
-        if any([len(tag) > 64 for tag in add.union(remove)]):  # todo proper db validation
-            raise ValueError('tags are limited to 64 characters')
-        entry = db.session.merge(FacebookCommentEntry(id=comment_id))
-        entry.meta['tags'] = sorted(list(set(entry.meta.get('tags', [])).union(add).difference(remove)))
-        flag_modified(entry, 'meta')
+    def get_tags_for(cls, comment_id: str, user_id: int) -> dict:
+        tags = UserToTagToComment.query.filter_by(comment_id=comment_id, user_id=user_id).all()
+        return dict(id=comment_id, tags=[tag.tag for tag in tags])
+
+    @classmethod
+    def patch_tags(cls, comment_id: str, user_id: int, add=set(), remove=set()) -> dict:
+        for remove_tag in remove:
+            UserToTagToComment.query.filter_by(user_id=user_id, tag=remove_tag, comment_id=comment_id).delete()
+        for add_tag in add:
+            insert_or_ignore(db.session, UserToTagToComment(user_id=user_id, tag=add_tag, comment_id=comment_id))
         db.session.commit()
-        return {'id': entry.id, 'tags': entry.meta['tags']}
+        return cls.get_tags_for(comment_id, user_id)
 
     @classmethod
     def get_suggestions_for_text(cls, text: str) -> tuple:

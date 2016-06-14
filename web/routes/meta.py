@@ -9,9 +9,12 @@ from web.model.meta import MetaFields
 
 meta = Blueprint('meta', __name__, template_folder='templates')
 
+
+# todo this is somewhat obsolete, refactor tagger.py and meta.py a bit
+
 @meta.before_request
 @login_required
-@roles_accepted('admin', 'tagger')
+@roles_accepted('admin')
 def enable_global_login_for_bp():
     """forces blueprint wide authentication"""
     pass

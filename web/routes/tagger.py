@@ -28,7 +28,7 @@ def random_comments():
         sources = sources.split(',') if sources else None
         with_entity = request.args.get('with_entity', '').lower() in ("1", "true")
         with_suggestion = request.args.get('with_suggestion', '').lower() in ("1", "true")
-        comment_ids = TaggerController.get_random_comments(count=count, with_entity=with_entity,
+        comment_ids = TaggerController.get_random_comments(current_user.id, count=count, with_entity=with_entity,
                                                            with_suggestion=with_suggestion, sources=sources)
         return jsonify({"comments": comment_ids})
     else:
@@ -37,7 +37,7 @@ def random_comments():
 
 @tagger.route('/comments/<string:obj_id>')
 def get(obj_id: str):
-    tags = TaggerController.get_tags_for(obj_id)
+    tags = TaggerController.get_tags_for(obj_id, current_user.id)
     return jsonify(tags)
 
 
@@ -46,7 +46,7 @@ def add_tag(obj_id: str):
     patch = request.json
     add = set(patch.get('add', set()))
     remove = set(patch.get('remove', set()))
-    amended = TaggerController.patch_tags(obj_id, add, remove)
+    amended = TaggerController.patch_tags(obj_id, current_user.id, add, remove)
     return jsonify(amended)
 
 
@@ -68,6 +68,11 @@ def user_tagsets():
 @tagger.route('/tags/')
 def user_tags():
     return jsonify(tags=TagSetController.get_all_tags_for_user_id(current_user.id))
+
+
+@tagger.route('/tags/_counts')
+def user_tags_counts():
+    return jsonify(tags=TaggerController.get_tag_counts_for_user_id(current_user.id))
 
 
 @tagger.route('/tags/_all')
