@@ -1,5 +1,6 @@
 import React from 'react';
 
+//TODO refactor
 const Evaluator = ({loading, suggestion, onEvaluate, onPost, onDelayed}) => {
   let input;
   return (

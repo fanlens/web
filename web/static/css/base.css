@@ -1,6 +1,9 @@
 body {
     background-color: #ddd;
 }
+.jumbotron {
+    background-color: white;
+}
 nav {
     opacity: 0.85;
 }
@@ -90,7 +93,7 @@ footer {
     margin-bottom: 0;
 }
 
-.panel {
+.jumbotron, .panel {
     box-shadow: 0px 0px 4px 2px #bbb;
 }
 
