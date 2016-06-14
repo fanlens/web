@@ -46,8 +46,11 @@ def add_tag(obj_id: str):
     patch = request.json
     add = set(patch.get('add', set()))
     remove = set(patch.get('remove', set()))
-    amended = TaggerController.patch_tags(obj_id, current_user.id, add, remove)
-    return jsonify(amended)
+    try:
+        amended = TaggerController.patch_tags(obj_id, current_user.id, add, remove)
+        return jsonify(amended)
+    except ValueError as err:
+        return jsonify(error=err.args), 400
 
 
 @tagger.route('/sources/')
@@ -85,9 +88,9 @@ def all_tags():
 def suggest(obj_id: str):
     try:
         [suggestion, ] = TaggerController.get_suggestions_for_id(obj_id)
-        return jsonify({'id': obj_id, 'suggestion': suggestion})
+        return jsonify(id=obj_id, suggestion=suggestion)
     except KeyError:
-        return jsonify({'error': 'object with id %s not found' % obj_id}), 404
+        return jsonify(error='object with id %s not found' % obj_id), 404
 
 
 @tagger.route('/suggestion', methods=['POST'])
@@ -96,8 +99,8 @@ def suggest_new():
         body = request.json
         text = body['text']
         suggestion = TaggerController.get_suggestions_for_text(text)
-        return jsonify({'text': text, 'suggestion': suggestion})
+        return jsonify(text=text, suggestion=suggestion)
     except KeyError:
-        return jsonify({'error': 'no text field in request'}), 400
+        return jsonify(error='no text field in request'), 400
     except Exception as err:
-        return jsonify({'error': str(err.args)}), 400
+        return jsonify(error=str(err.args)), 400

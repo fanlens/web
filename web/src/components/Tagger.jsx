@@ -69,17 +69,18 @@ const FBIcon = ({id}) => (
   </div>
 )
 
-const TagList = ({allTags, tags, suggestion, onDuplicate, onToggle}) => {
+const TagList = ({allTags, tags, suggestion, onDuplicate, onToggle, onNewTag}) => {
   let input;
   return (
     <form className="form-group" onSubmit={ e => {
           e.preventDefault();
-          const newTag = input.value.trim()
+          const newTag = input.value.trim();
+          input.value = '';
           if (newTag && newTag != '$$new$$') {
             if (_.includes(allTags, newTag)) {
-              onDuplicate(`The entered tag ${newTag} is a duplicate!`)
+              onDuplicate(`The entered tag "${newTag}" is a duplicate!`)
             } else {
-              onToggle(newTag)
+              onNewTag(newTag)
             }
           }
         }
@@ -102,7 +103,7 @@ const TagList = ({allTags, tags, suggestion, onDuplicate, onToggle}) => {
   )
 }
 
-const Tagger = ({id, user, page, message, tags, tagSet, suggestion, onDuplicate, onToggle}) => (
+const Tagger = ({id, user, page, message, tags, tagSet, suggestion, onDuplicate, onToggle, onNewTag}) => (
   <div className="container-fluid tagger">
     <div className="row">
 
@@ -124,6 +125,7 @@ const Tagger = ({id, user, page, message, tags, tagSet, suggestion, onDuplicate,
                tags={tags}
                suggestion={suggestion}
                onDuplicate={onDuplicate}
+               onNewTag={(tag) => onNewTag(tags, tag)}
                onToggle={(tag) => onToggle(tags, tag)}
       />
     </div>

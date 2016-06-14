@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text, func
 
 from db import insert_or_ignore
@@ -81,7 +82,11 @@ LIMIT :limit""")
         for remove_tag in remove:
             UserToTagToComment.query.filter_by(user_id=user_id, tag=remove_tag, comment_id=comment_id).delete()
         for add_tag in add:
-            insert_or_ignore(db.session, UserToTagToComment(user_id=user_id, tag=add_tag, comment_id=comment_id))
+            try:
+                insert_or_ignore(db.session, UserToTagToComment(user_id=user_id, tag=add_tag, comment_id=comment_id))
+            except IntegrityError:
+                db.session.rollback()
+                raise ValueError('tag not allowed')
         db.session.commit()
         return cls.get_tags_for(comment_id, user_id)
 

@@ -32,7 +32,7 @@ const Alerts = ({alerts, onDismiss}) => (
       <ul className="list-unstyled">
         {alerts.map((alert) => (
           <li key={alert.id} id={'alert-' + alert.id}>
-            <Alert {...alert} onDismiss={() => $('#alert-'+alert.id).fadeOut(250, () => onDismiss(alert.id))}/>
+            <Alert {...alert} onDismiss={() => $('#alert-'+alert.id).fadeOut(100, () => onDismiss(alert.id))}/>
           </li>
         ))
         }
