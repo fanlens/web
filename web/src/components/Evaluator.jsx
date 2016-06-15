@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash'
 
-//TODO refactor
+//TODO refactor!
 const Evaluator = ({loading, suggestion, onEvaluate, onPost, onDelayed}) => {
   let input;
   return (
@@ -45,7 +45,18 @@ const Evaluator = ({loading, suggestion, onEvaluate, onPost, onDelayed}) => {
           <div className="container-fluid tool">
             <div className="row">
               <div className="col-md-12">
-                {_.map(suggestion, ([percent, tag]) => <span key={tag} className="badge">{percent * 100} {tag}</span>)}
+                <div class="form-group">
+                  <label for="inferred-tags">Tags:</label>
+                  <ul className="list-unstyled list-inline text-center" name="inferred-tags">
+                    {_.map(suggestion, ([percent, tag]) => (
+                      <li key={tag}>
+                        <span className="badge badge-lg">
+                          <em className="glyphicon glyphicon-tag"/> {tag} {(percent * 100).toFixed(0) + '%'}
+                        </span>
+                      </li>)
+                    )}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>

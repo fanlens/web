@@ -5,7 +5,7 @@ import Panel, {PanelButton} from './Panel.jsx';
 const TagSetElement = ({tagCounts, title, tags}) => (
   <div style={{lineHeight:'1.75em', whiteSpace:'normal'}}>{title}:<br/>
     {tags.map((tag, idx) => (
-      <span key={idx} className="badge" style={{border:'2px solid white', marginRight:'0.2em', display:'inline-block'}}>
+      <span key={idx} className="badge">
         <em className="glyphicon glyphicon-tag" aria-hidden="true" />{tag} {tagCounts[tag] || ''}
       </span>
     ))}

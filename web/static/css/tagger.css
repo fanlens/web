@@ -53,6 +53,16 @@
     box-shadow: 0px 0px 4px 2px #bbb;
 }
 
+.badge-lg {
+    font-size: 1.4em;
+}
+
+.badge {
+    border: 0.2rem solid white;
+    margin-right: 0.25rem;
+    display: inline-block;
+}
+
 .new-tag {
     margin-left: 0.2em;
 }
