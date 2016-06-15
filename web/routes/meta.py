@@ -14,7 +14,7 @@ meta = Blueprint('meta', __name__, template_folder='templates')
 
 @meta.before_request
 @login_required
-@roles_accepted('admin')
+@roles_required('admin')
 def enable_global_login_for_bp():
     """forces blueprint wide authentication"""
     pass
