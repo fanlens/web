@@ -18,10 +18,10 @@ def setup_security(app):
     app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
     app.config['SECURITY_PASSWORD_SALT'] = web_config['salt']  # unnecessary but required
     app.config['SECURITY_URL_PREFIX'] = '/user'
-    app.config['SECURITY_CONFIRMABLE'] = True
-    app.config['SECURITY_REGISTERABLE'] = True
-    app.config['SECURITY_RECOVERABLE'] = True
-    app.config['SECURITY_CHANGEABLE'] = True
+    app.config['SECURITY_CONFIRMABLE'] = False
+    app.config['SECURITY_REGISTERABLE'] = False
+    app.config['SECURITY_RECOVERABLE'] = False
+    app.config['SECURITY_CHANGEABLE'] = False
 
     csrf.init_app(app)
 
