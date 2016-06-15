@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch'
 import keyMirror from 'keymirror'
 import _ from 'lodash'
 import jsonheaders from '../utils/jsonheaders'
+import {warning} from './AlertActions'
 
 export const TaggerActionType = keyMirror({
   TAGGER_RECEIVE_TAGS: null,
@@ -183,7 +184,18 @@ export function fetchSuggestionForText(text) {
       body: JSON.stringify({text}),
       headers: jsonheaders(),
       credentials: 'include'
+    }).then(response => {
+      console.log(response)
+      if (response.status >= 400) {
+        return Promise.reject(new Error())
+      } else {
+        return Promise.resolve(response)
+      }
     }).then(response => response.json())
-      .then(suggestion => dispatch(receiveSuggestion(suggestion)));
+      .then(suggestion => dispatch(receiveSuggestion(suggestion)))
+      .catch(_ => {
+        dispatch(warning("There was a problem with the provided text! Is it in english?"));
+        dispatch(receiveSuggestion([]));
+      });
   }
 }
