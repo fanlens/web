@@ -8,7 +8,7 @@ import Evaluator from '../components/Evaluator.jsx'
 const mapStateToProps = (state) => {
   return {
     loading: state.tagger.evaluator.loading,
-    suggestion: state.tagger.evaluator.suggestion
+    suggestion: state.tagger.evaluator.suggestion.suggestion
   }
 }
 

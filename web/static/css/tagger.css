@@ -42,13 +42,14 @@
     margin-bottom: 0.8em;
 }
 
-#evaluator .form-group {
+#evaluator .tool {
     background-color: white;
     padding: 1em;
+    margin-bottom: 1em;
 }
 
 .tagger,
-#evaluator .form-group {
+#evaluator .tool {
     box-shadow: 0px 0px 4px 2px #bbb;
 }
 
