@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import logging
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text, func
@@ -7,7 +8,7 @@ from sqlalchemy.sql import text, func
 from db import insert_or_ignore
 from db.models.facebook import FacebookCommentEntry
 
-from web.model.tags import UserToTagToComment
+from db.models.tags import UserToTagToComment
 from web.modules.database import db
 from web.modules.celery import celery
 
@@ -62,7 +63,11 @@ LIMIT :limit""")
                 result['suggestion'] = cls.get_suggestions_for_id(result['id'])
             for result in results:
                 # switch to better backend
-                result['suggestion'] = cls.get_suggestions_for_id(result['id']).get(interval=0.0005)
+                try:
+                    result['suggestion'] = cls.get_suggestions_for_id(result['id']).get(interval=0.0005)
+                except Exception as err:
+                    logging.exception('error getting suggestions')
+                    result['suggestion'] = []
         return results
 
     @classmethod
@@ -74,13 +79,14 @@ LIMIT :limit""")
 
     @classmethod
     def get_tags_for(cls, comment_id: str, user_id: int) -> dict:
-        tags = UserToTagToComment.query.filter_by(comment_id=comment_id, user_id=user_id).all()
+        tags = db.session.query(UserToTagToComment).filter_by(comment_id=comment_id, user_id=user_id).all()
         return dict(id=comment_id, tags=[tag.tag for tag in tags])
 
     @classmethod
     def patch_tags(cls, comment_id: str, user_id: int, add=set(), remove=set()) -> dict:
         for remove_tag in remove:
-            UserToTagToComment.query.filter_by(user_id=user_id, tag=remove_tag, comment_id=comment_id).delete()
+            db.session.query(UserToTagToComment).filter_by(user_id=user_id, tag=remove_tag,
+                                                           comment_id=comment_id).delete()
         for add_tag in add:
             try:
                 insert_or_ignore(db.session, UserToTagToComment(user_id=user_id, tag=add_tag, comment_id=comment_id))
@@ -100,9 +106,8 @@ LIMIT :limit""")
     def get_suggestions_for_id(cls, comment_id: str) -> tuple:
         # todo do some nice mapping
         comment = db.session.query(FacebookCommentEntry).get(comment_id)
-        if not comment or 'fingerprint' not in comment.meta or 'tokens' not in comment.meta:
-            raise ValueError
+        if not comment or 'fingerprint' not in comment.meta:
+            raise ValueError('no fingerprint for comment')
         else:
-            return celery.send_task('worker.brain.predict', args=(
-                dict(tokens=comment.meta['tokens'], fingerprint=comment.meta['fingerprint']),),
+            return celery.send_task('worker.brain.predict', args=(comment.data['message'], comment.meta['fingerprint']),
                                     kwargs=dict(model_id='debug_tagger'))

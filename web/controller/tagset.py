@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
-from db.models.tags import Tag, TagToTagSet, TagSet
+from db.models.tags import Tag, TagToTagSet, TagSet, UserToTagSet
 
 from web.modules.database import db
-from web.model.tags import UserToTagSet
 
 
 class TagSetController(object):
@@ -15,13 +14,14 @@ class TagSetController(object):
 
     @classmethod
     def get_all_tags_for_user_id(cls, user_id):
-        return [tag for (_, tag) in UserToTagSet.query.join(TagSet, TagToTagSet, Tag).add_columns(Tag.tag).filter(
-            UserToTagSet.user_id == user_id)]
+        return [tag for (_, tag) in
+                db.session.query(UserToTagSet).join(TagSet, TagToTagSet, Tag).add_columns(Tag.tag).filter(
+                    UserToTagSet.user_id == user_id)]
 
     @classmethod
     def get_all_tagsets_for_user_id(cls, user_id):
         tagsets = defaultdict(lambda: defaultdict(list))
-        for _, tag, tagset_id, tagset_title in (UserToTagSet.query
+        for _, tag, tagset_id, tagset_title in (db.session.query(UserToTagSet)
                                                         .join(TagSet, TagToTagSet, Tag)
                                                         .add_columns(Tag.tag, TagSet.id, TagSet.title)
                                                         .filter(UserToTagSet.user_id == user_id)):
