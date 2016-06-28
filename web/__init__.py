@@ -24,9 +24,9 @@ def create_app():
     from web.routes.index import index
     from web.routes.tagger import tagger
     from web.routes.meta import meta
-    app.register_blueprint(index, url_prefix='/')
-    app.register_blueprint(tagger, url_prefix='/tagger')
-    app.register_blueprint(meta, url_prefix='/meta')
+    app.register_blueprint(index, url_prefix='/v1/')
+    app.register_blueprint(tagger, url_prefix='/v1/tagger')
+    app.register_blueprint(meta, url_prefix='/v1/meta')
     return app
 
 app = create_app()

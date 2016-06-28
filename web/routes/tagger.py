@@ -1,15 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import request, jsonify, render_template, Blueprint
+from flask import request, jsonify, render_template, Blueprint, redirect, url_for
 from flask_security import current_user
 from flask_security.decorators import login_required, roles_accepted, roles_required
+
+from web.modules.security import csrf
+
+from web.modules.celery import celery
 
 from web.routes import request_wants_json
 from web.controller.tagger import TaggerController
 from web.controller.tagset import TagSetController
+from web.controller.model import ModelController
 
 tagger = Blueprint('tagger', __name__, template_folder='templates')
+
+csrf.exempt(tagger)
 
 
 @tagger.before_request
@@ -96,11 +103,53 @@ def suggest(obj_id: str):
 @tagger.route('/suggestion', methods=['POST'])
 def suggest_new():
     try:
-        body = request.json
-        text = body['text']
+        text = request.json['text']
         suggestion = TaggerController.get_suggestions_for_text(text)
         return jsonify(text=text, suggestion=suggestion)
     except KeyError:
         return jsonify(error='no text field in request'), 400
     except Exception as err:
         return jsonify(error=str(err.args)), 400
+
+
+@tagger.route('/train', methods=['POST'])
+@roles_required('admin')
+def train():
+    try:
+        tagset = request.json['tagset']
+        sources = request.json.get('sources', tuple())
+        task_id = ModelController.train_model(current_user.id, tagset, sources)
+        return jsonify(status='job added to queue'), 303, {'Retry-After': 30,
+                                                           'Location': url_for('tagger.training_status',
+                                                                               status_id=task_id)}
+    except KeyError:
+        return jsonify(error='please provide the tagset and sources in your request'), 400
+
+
+@tagger.route('/train/<string:status_id>', methods=['GET'])
+@roles_required('admin')
+def training_status(status_id: str):
+    result = celery.AsyncResult(status_id)
+    if result.ready():
+        if result.successful():
+            model_id = result.get(timeout=2)
+            return redirect(url_for('tagger.model_stats', model_id=model_id), code=201)
+        elif result.failed():
+            return jsonify(error='model could not be created'), 410
+    else:  # still running
+        if result.state == 'PENDING':  # most likely doesn't exist
+            # todo strictly speaking not 404, the task could be simply not started yet
+            return jsonify(error='no job with id ' + status_id), 404
+        else:
+            # lot of debate what to return, 503 is semantically not really true since the server itself is still running
+            # but 503 has better support for polling/Retry-After, other candidates 200, 304
+            return jsonify(status='still running...'), 503, {'Retry-After': 30,
+                                                             'Location': url_for('tagger.training_status',
+                                                                                 status_id=status_id)}
+
+
+@tagger.route('/model/<string:model_id>', methods=['GET'])
+@roles_required('admin')
+def model_stats(model_id: str):
+    stats = ModelController.get_stats(current_user.id, model_id)
+    return jsonify(stats=stats)

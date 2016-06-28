@@ -20,7 +20,7 @@ export const TaggerActionType = keyMirror({
   TAGGER_TOGGLE_TAGSET: null
 });
 
-const BASE_URI = '/tagger/';
+const BASE_URI = '/v1/tagger/';
 
 const receiveTags = (id, tags) => {
   return {type: TaggerActionType.TAGGER_RECEIVE_TAGS, id, tags};
@@ -158,7 +158,7 @@ export function resetCommentTags(id, tags) {
 
 // export function fetchStats(source) {
 //   return (dispatch) => {
-//     return fetch(`/meta/_stats/${source}/tags`, {
+//     return fetch(`/v1/meta/_stats/${source}/tags`, {
 //       headers: jsonheaders(),
 //       credentials: 'include'
 //     }).then(response => response.json())

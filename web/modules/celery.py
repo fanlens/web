@@ -15,6 +15,8 @@ def setup_celery(app):
     app.config['CELERY_TASK_SERIALIZER'] = 'msgpack'
     app.config['CELERY_RESULT_SERIALIZER'] = 'msgpack'
     app.config['CELERY_ACCEPT_CONTENT'] = ['msgpack']
+    app.config['CELERY_IGNORE_RESULT'] = False,
+    app.config['CELERY_TRACK_STARTED'] = True,
 
     global celery
     celery = Celery(app.import_name, backend=app.config['CELERY_BACKEND'], broker=app.config['CELERY_BROKER_URL'])

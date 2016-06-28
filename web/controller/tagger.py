@@ -64,7 +64,7 @@ LIMIT :limit""")
             for result in results:
                 # switch to better backend
                 try:
-                    result['suggestion'] = cls.get_suggestions_for_id(result['id']).get(interval=0.0005)
+                    result['suggestion'] = result['suggestion'].get(interval=0.0005)
                 except Exception as err:
                     logging.exception('error getting suggestions')
                     result['suggestion'] = []
@@ -98,7 +98,7 @@ LIMIT :limit""")
 
     @classmethod
     def get_suggestions_for_text(cls, text: str) -> tuple:
-        task = celery.send_task('worker.brain.predict_text', args=(text,), kwargs=dict(model_id='debug_tagger'))
+        task = celery.send_task('worker.brain.predict', args=(text,), kwargs=dict(model_id='debug_tagger'))
         # switch to better backend
         return task.get(interval=0.0005)
 
@@ -109,5 +109,5 @@ LIMIT :limit""")
         if not comment or 'fingerprint' not in comment.meta:
             raise ValueError('no fingerprint for comment')
         else:
-            return celery.send_task('worker.brain.predict', args=(comment.data['message'], comment.meta['fingerprint']),
-                                    kwargs=dict(model_id='debug_tagger'))
+            return celery.send_task('worker.brain.predict', args=(comment.data['message'],),
+                                    kwargs=dict(fingerprint=comment.meta['fingerprint'], model_id='debug_tagger'))
