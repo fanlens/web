@@ -32,13 +32,6 @@ WHERE meta :: JSONB ->> 'lang' = :lang AND
         WHERE CHAR_LENGTH(data :: JSONB ->> 'message') > 64)
 LIMIT :limit""")
 
-    _sources_sql = text("select distinct(meta::jsonb->>'page') as source from data.facebook_comments")
-
-    @classmethod
-    def get_sources(cls) -> list:
-        query = db.session.execute(cls._sources_sql)
-        return sorted([r[0] for r in query])
-
     @classmethod
     def get_random_comments(cls, user_id: int, count=1, with_entity=False, with_suggestion=False, sources=None):
         # todo: using frac of 1.0 might be pretty slow

@@ -62,22 +62,27 @@ def add_tag(obj_id: str):
 
 @tagger.route('/sources/')
 def sources():
-    return jsonify({'sources': TaggerController.get_sources()})
+    return jsonify({'sources': [source.slug or source.external_id for source in
+                                current_user.sources]})  # todo switch to internal id?!
 
 
 @tagger.route('/tagsets/')
 def user_tagsets():
     include_all = request.args.get('include_all', '').lower() in ("1", "true")
-    tag_sets = TagSetController.get_all_tagsets_for_user_id(current_user.id)
+    tagsets = dict((str(tagset.id), dict(id=tagset.id, title=tagset.title, tags=[tag.tag for tag in tagset.tags]))
+                   for tagset in current_user.tagsets)
     if include_all:
-        all_tags = TagSetController.get_all_tags_for_user_id(current_user.id)
-        tag_sets.append(dict(id='_all', tags=all_tags, title='All Tags'))
-    return jsonify(tagSets=tag_sets)
+        all_tags = set()
+        for tagset in tagsets.values():
+            all_tags = all_tags.union(tagset['tags'])
+        tagsets['_all'] = dict(id='_all', tags=list(all_tags), title='All Tags')
+    print(tagsets)
+    return jsonify(tagSets=tagsets)
 
 
 @tagger.route('/tags/')
 def user_tags():
-    return jsonify(tags=TagSetController.get_all_tags_for_user_id(current_user.id))
+    return jsonify(tags=list(set([tag.tag for tagset in current_user.tagsets for tag in tagset.tags])))
 
 
 @tagger.route('/tags/_counts')
