@@ -3,6 +3,7 @@
 {% block styles %}
     {{ super() }}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/landing.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tagger.css') }}">
 {% endblock %}
 
 {% block navbar %}
@@ -24,13 +25,13 @@
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
-                                    <a href="#">Pricing</a>
+                                    <a href="#contact">Pricing</a>
                                 </li>
                                 <li>
-                                    <a href="#">Team</a>
+                                    <a href="#team">Team</a>
                                 </li>
                                 <li>
-                                    <a href="/user/register">Signup</a>
+                                    <a href="#contact">Signup</a>
                                 </li>
                                 <li>
                                     <a href="/user/login">Login</a>
@@ -47,7 +48,156 @@
 {% block app %}
     <div class="container-fluid">
         <section class="row" id="elevator">
-            <div class="col-md-12">
+            <div class="col-md-6 col-md-offset-1">
+                <h1 class="text-center">Machine Learning &plus; Social Media</h1>
+                <p>The Fanlens suite of tools integrates bleeding edge <strong>artificial intelligence</strong> research
+                    with <strong>social media management</strong>.</p>
+                <p>Here, take a look, this is a model trained to recognize spam on
+                    <a href="https://graph.facebook.com/ladygaga" target="_blank">Lady Gaga's</a> Facebook page:</p>
+
+                <div class="container-fluid tagger">
+                    <div class="row">
+                        <div class="col-xs-1 text-center fb-icon-col"><a
+                                href="https://facebook.com/{{ demo.user.id }}"><img
+                                src="https://graph.facebook.com/{{ demo.user.id }}/picture?type=normal"
+                                class="img-responsive img-rounded fb-icon"></a></div>
+                        <div class="col-xs-10 fb-main"><h4 class="list-group-item-heading"><a
+                                href="https://facebook.com/{{ demo.user.id }}"> {{ demo.user.name }}</a></h4>
+                            <p class="list-group-item-text">
+                                <span>{{ demo.message }}</span>
+                            </p></div>
+                        <div class="col-xs-1 text-center fb-icon-col"><a href="https://facebook.com/{{ demo.page }}">
+                            <img src="https://graph.facebook.com/{{ demo.page }}/picture?type=normal"
+                                 class="img-responsive img-rounded fb-icon"></a></div>
+                    </div>
+                    <div class="row">
+                        <form class="form-group">
+                            <div class="btn-group btn-group-justified" role="group">
+                                {% for percent, tag in demo.suggestion %}
+                                    <div class="btn-group" role="group">
+                                        {% if percent <= 0.8 %}
+                                            <label class="btn btn-sm ellipsis btn-default" type="button"><em
+                                                    class="glyphicon glyphicon-tag" aria-hidden="true"></em> {{ tag }}
+                                            </label>
+                                        {% else %}
+                                            <label class="btn btn-sm ellipsis btn-success" type="button"><em
+                                                    class="glyphicon glyphicon-tag" aria-hidden="true"></em>
+                                                {{ tag }}
+                                                <a href="#" rel="tooltip"
+                                                   data-container="body"
+                                                   data-toggle="tooltip"
+                                                   data-html="true"
+                                                   data-delay="300"
+                                                   title="<div style='padding:0.8rem 0 0.8rem 0;'> Confidence<br/> <em class='glyphicon glyphicon-certificate' aria-hidden='true'></em>Excellent&nbsp;&nbsp; <em class='glyphicon glyphicon-star' aria-hidden='true'></em>Good&nbsp;&nbsp; <em class='glyphicon glyphicon-star-empty' aria-hidden='true'></em>Fair </div> "><em
+                                                        {% if percent > 0.99 %}
+                                                            class="glyphicon quality glyphicon-certificate"
+                                                        {% elif percent > 0.95 %}
+                                                            class="glyphicon quality glyphicon-star"
+                                                        {% else %}
+                                                            class="glyphicon quality glyphicon-star-empty"
+                                                        {% endif %}
+                                                            aria-hidden="true"></em></a>
+                                            </label>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <p class="small text-center">(Link to external source! We take no responsibility for the shown content.
+                    Reload the page to fetch a new comment.)</p>
+                <p>With a few clicks you can generate <strong>personalized</strong> models that encapsulate the
+                    <strong>behaviour</strong> of your fans and followers. It's your own little pet robot that reacts in
+                    the same ways as your average fan!</p>
+                <p>If you can even integrate your personal models into your own tools via an <strong>intuitive
+                    API!</strong></p>
+                <h2 class="text-center">Join Fanlens and kick your social media game into <strong>overdrive!</strong>
+                </h2>
+            </div>
+            <div class="col-md-4 col-md-offset-1">
+                <form id="contact-target" class="jumbotron form-horizontal" role="form" method="post"
+                      action="{{ url_for('index.root') }}">
+                    {{ contact_form.hidden_tag() }}
+                    <a id="contact" style="text-decoration: none; padding-top: 12em; margin-top: -12em;">
+                        <h1>Get in touch!</h1>
+                    </a>
+                    <p>Questions about the product?
+                        A challenge needing to be solved?
+                        Funny pictures of humanoid robots in precarious situations?</p>
+                    <p>We'd love to hear from you!</p>
+
+                    {{ contact_form.email(placeholder="example@domain.com", class="form-control input-sm") }}
+                    {{ contact_form.company(placeholder="Company (optional)", class="form-control input-sm") }}
+                    {{ contact_form.message(placeholder="Message", class="form-control input-sm", rows="4") }}
+                    <div class="btn-group-justified">
+                        <div class="btn-group">
+                            {{ contact_form.submit(class="btn btn-default") }}
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </section>
+        <section class="row">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <h1>The Fanlens Suite</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5 col-md-offset-1">
+                        <h2 class="text-center">Tagger</h2>
+                        <p>We took the hassle out of AI! Add any Facebook page you want and <strong>immediately</strong>
+                            get your own <strong>personalized</strong> machine learning model.</p>
+                        <p>You can start with some smart suggestions provided by us and simply <strong>add your
+                            own.</strong> Each
+                            click trains your little pet robot to become <strong>smarter and smarter!</strong></p>
+                        <p class="text-center">
+                            <img src="{{ url_for('static', filename='img/landing/tagger.png') }}"
+                                 style="max-width: 520px"
+                                 alt="The Fanlens Tagger"/>
+                        </p>
+
+
+                        <p>What can you do with it?</p>
+                        <ul>
+                            <li>Smart filtering of comments and postings!</li>
+                            <li>Gain insights about the mood in your community!</li>
+                            <li>Detect fraud and scams!</li>
+                            <li>And much more! There is <strong>no limit</strong>, add any tags you want and let the
+                                Tagger do the
+                                work for you!
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-5">
+                        <h2 class="text-center">Evaluator</h2>
+                        <p><strong>No more uncertainty</strong> before you post! Fanlens isn't limited to analyzing your
+                            fan base,
+                            your Tagger models can be used to <strong>evaluate</strong> your own postings as well.</p>
+                        <p class="text-center">
+                            <img src="{{ url_for('static', filename='img/landing/evaluator.png') }}"
+                                 style="max-width: 610px;"
+                                 alt="The Fanlens Evaluator"/>
+                        </p>
+                        <p>Enter your post, press Evaluate and <strong>immediately know how your post will be
+                            received</strong>. If your
+                            happy with it you can post it right away or batch it up and delay it until a better time.
+                        </p>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 2em;">
+                    <div class="col-md-5 center-block">
+                        <h2 class="text-center">Your ideas are our opportunities!</h2>
+                        <p>Fanlens is not only a product. We are a highly motivated and skilled team that wants to
+                            <strong>solve your challenges!</strong> We firmly believe that the only way to stay relevant
+                            is solving <strong>real world</strong> problems.</p>
+                        <p>Let's get in touch and see how we can <strong>work together</strong>.</p>
+                        <p class="text-center"><a href="#contact" class="btn btn-default">Get in touch!</a></p>
+                    </div>
+                </div>
             </div>
         </section>
         <section class="row" id="trustedby">
@@ -58,51 +208,163 @@
                             <h1>Trusted By</h1>
                         </div>
                     </div>
-                    <div class="row", style="margin-bottom: 2em;">
-                        <div class="col-md-4">
+                    <div class="row" style="margin-bottom: 2em;">
+                        <div class="col-md-3 text-center">
                             <a href="https://visalyze.com" target="_blank"> <img
+                                    class="img-company"
                                     src="{{ url_for('static', filename='img/landing/sirenio.png') }}"
                                     alt="sirenio.com"/></a>
                         </div>
-                        <div class="col-md-8 text-justify">
+                        <div class="col-md-7 col-xs-10 text-justify">
                             <p>
-                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget metus at dui
-                                finibus lacinia. Maecenas ornare molestie suscipit. Nunc tristique nunc non mauris
-                                tristique, quis facilisis sapien posuere. In a augue felis. Phasellus suscipit at nisi
-                                et consequat."
+                                "I've come to know the Fanlens team as highly motivated and intelligent individuals. We
+                                are currently tasking Fanlens with the R&D of our machine learning features and couldn't
+                                be happier!" 
                             </p>
                             <p class="text-right">-- Allan Lund Hansen, CEO of <a href="https://sirenio.com"
                                                                                   target="_blank">sirenio.com</a></p>
                         </div>
+                        <div class="col-md-2 col-xs-2">
+                            <p><img class="img-circle"
+                                    src="{{ url_for('static', filename='img/landing/allan.jpg') }}"/>
+                            </p>
+                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3 text-center">
                             <a href="https://visalyze.com" target="_blank"> <img
+                                    class="img-company"
                                     src="{{ url_for('static', filename='img/landing/visalyze.png') }}"
                                     alt="visalyze.com"/></a>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-7 col-xs-10 text-justify">
                             <p>
-                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget metus at dui
-                                finibus lacinia. Maecenas ornare molestie suscipit. Nunc tristique nunc non mauris
-                                tristique, quis facilisis sapien posuere. In a augue felis. Phasellus suscipit at nisi
-                                et consequat."
+                                "Fanlens ist eine äußerst interessante Firma und Technologie die es uns ermöglicht
+                                Machine Learning Probleme mittels simplen Plug&Play Komponenten zu lösen." 
                             </p>
                             <p class="text-right">-- Christoph Holz, CEO of <a href="https://visalyze.com"
                                                                                target="_blank">visalyze.com</a></p>
+                        </div>
+                        <div class="col-md-2 col-xs-2">
+                            <p><img class="img-circle"
+                                    src="{{ url_for('static', filename='img/landing/christoph.jpg') }}"/>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <h1>Proudly Sponsored By</h1>
+                            <p>
+                                <figure>
+                                    <a href="http://www.cast-tyrol.com/" target="_blank"> <img
+                                            style="height: 5em"
+                                            class="img-company"
+                                            src="{{ url_for('static', filename='img/landing/cast.png') }}"
+                                            alt="CAST Tyrol"/></a>
+                                    <figcaption>CAST Tyrol</figcaption>
+                                </figure>
+                                <figure>
+                                    <a href="https://www.uibk.ac.at/" target="_blank"> <img
+                                            style="height: 5em"
+                                            class="img-company"
+                                            src="{{ url_for('static', filename='img/landing/uibk.png') }}"
+                                            alt="University of Innsbruck"/></a>
+                                    <figcaption>University of Innsbruck</figcaption>
+                                </figure>
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="row">
-            <div class="col-md-12">
-                hello
-            </div>
-        </section>
-        <section class="row">
-            <div class="col-md-12">
-                goodbye
+        <section class="row" id="section-team">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12 text-center" style="margin-bottom: 1.5em;">
+                        <h1 id="team">Our Team</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5 col-md-offset-1">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-2 img-team">
+                                    <a href="https://linkedin.com/in/chjdev" target="_blank">
+                                        <img class="img-circle"
+                                             src="{{ url_for('static', filename='img/landing/chris.jpg') }}"
+                                             alt="Christian Junker"/>
+                                    </a>
+                                </div>
+                                <div class="col-md-10">
+                                    <h2>Christian Junker</h2>
+                                    <h4>Founder and Cook-General</h4>
+                                    <p>
+                                        "They are in front of us, behind us, and we are flanked on both sides by an
+                                        enemy that outnumbers us 29:1. They can’t get away from us now!"
+                                        -- Gen. Lewis <em>Chesty</em> Puller, USMC<br/>
+                                        Christian keeps the boat afloat, be it business strategy, platform development,
+                                        or research. </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-2 img-team">
+                                    <a href="https://linkedin.com/in/mcuquet" target="_blank">
+                                        <img class="img-circle"
+                                             src="{{ url_for('static', filename='img/landing/marti.jpg') }}"
+                                             alt="Martí Cuquet"/>
+                                    </a>
+                                </div>
+                                <div class="col-md-10">
+                                    <h2>Martí Cuquet</h2>
+                                    <h4>Co-Founder and Mad Scientist in Residence</h4>
+                                    <p>Laughing maniacally in his laboratory, he makes sure our research stays world
+                                        class. Martí was awarded his PhD in Quantum physics and is now focused
+                                        artificial
+                                        intelligence... don't worry we'll make sure he sides with the humans in the
+                                        Robopocalypse.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:2em">
+                    <div class="col-md-5 col-md-offset-4">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-3 img-team">
+                                    <a href="#team">
+                                        <img class="img-circle img-circle-lg"
+                                             src="{{ url_for('static', filename='img/landing/we-want-you.png') }}"
+                                             alt="We Want You"/>
+                                    </a>
+                                </div>
+                                <div class="col-md-9">
+                                    <h3>We Want You!</h3>
+                                    <p>We are always looking for motivated people!</p>
+                                    <ul>
+                                        <li>You're a mad scientist?</li>
+                                        <li>You're a coding ninja?</li>
+                                        <li>You're a business guru?</li>
+                                        <li>You're generally awesome?</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <p>Drop us a note and get in touch!
+                            <!-- In this case, however, funny robot pictures are NOT optional! --></p>
+                        <p><a href="#contact" class="btn btn-default btn-md">Get in touch!</a>
+                        </p>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -132,6 +394,20 @@
             </div>
         </div>
     </div>
+
+{% endblock %}
+
+{% block alerts %}
+    {% for message in contact_form.company.errors + contact_form.email.errors + contact_form.message.errors %}
+        <div class="alert fade in alert-info alert-dismissable"><strong>Warning!</strong>
+            {{ message }}<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        </div>
+    {% endfor %}
+    {% for message in get_flashed_messages() %}
+        <div class="alert fade in alert-success alert-dismissable"><strong>Info!</strong>
+            {{ message }}<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        </div>
+    {% endfor %}
 {% endblock %}
 
 {% block footer %}
@@ -139,16 +415,16 @@
         <div class="row">
             <div class="col-xs-6 text-right">
                 <ul class="list-unstyled">
-                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#team">About Us</a></li>
                     <li><a href="#contact">Contact</a></li>
-                    <li><a href="#support">Support</a></li>
+                    <li><a href="#contact">Support</a></li>
                 </ul>
             </div>
             <div class="col-xs-6 text-left">
                 <ul class="list-unstyled">
                     <li><a href="#legal" data-toggle="modal" data-target="#noticeModal">Legal Notice</a></li>
                     <li><a href="#terms" data-toggle="modal" data-target="#termsModal">Terms of Service</a></li>
-                    <li><a href="#jobs">Jobs</a></li>
+                    <li><a href="#team">Jobs</a></li>
                 </ul>
             </div>
         </div>

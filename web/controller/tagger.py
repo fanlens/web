@@ -104,7 +104,6 @@ LIMIT :limit""")
 
     @classmethod
     def get_suggestions_for_id(cls, comment_id: str) -> tuple:
-        # todo do some nice mapping
         comment = db.session.query(FacebookCommentEntry).get(comment_id)
         if not comment or 'fingerprint' not in comment.meta:
             raise ValueError('no fingerprint for comment')

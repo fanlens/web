@@ -11,28 +11,127 @@ footer div.text-left {
     color: black;
 }
 
+.jumbotron input,
+.jumbotron textarea {
+    margin-bottom: 1em;
+}
+
+.jumbotron input:last-child {
+    margin-bottom: 0em;
+}
+
+.jumbotron h1 {
+    font-size: 3em !important;
+    margin-top: 0;
+}
+
+.jumbotron p {
+    font-size: 1.4em !important;
+}
+
+.jumbotron {
+    background-color: rgba(1, 1, 1, 0.5);
+    padding: 2.5em !important;
+    margin: 0 !important;
+}
+
+.img-team {
+    padding-right: 0;
+}
+
+p {
+    font-size: 1.2em;
+}
+
+#app .img-circle {
+    max-width: 6em !important;
+    max-height: 6em !important;
+}
+
+#app .img-circle-lg {
+    max-width: 18em !important;
+    max-height: 18em !important;
+}
+
+#app .img-company {
+    max-width: 20em;
+}
+
+#section-team h2,
+#section-team h3,
+#section-team h4,
+#section-team h5 {
+    margin: 0;
+}
+
+#section-team h4 {
+    margin-bottom: 0.25em;
+}
+
+#app {
+    background-color: hsl(34, 53%, 82%);
+    background-image: repeating-linear-gradient(45deg, transparent 5px, hsla(197, 62%, 11%, 0.5) 5px, hsla(197, 62%, 11%, 0.5) 10px,
+    hsla(5, 53%, 63%, 0) 10px, hsla(5, 53%, 63%, 0) 35px, hsla(5, 53%, 63%, 0.5) 35px, hsla(5, 53%, 63%, 0.5) 40px,
+    hsla(197, 62%, 11%, 0.5) 40px, hsla(197, 62%, 11%, 0.5) 50px, hsla(197, 62%, 11%, 0) 50px, hsla(197, 62%, 11%, 0) 60px,
+    hsla(5, 53%, 63%, 0.5) 60px, hsla(5, 53%, 63%, 0.5) 70px, hsla(35, 91%, 65%, 0.5) 70px, hsla(35, 91%, 65%, 0.5) 80px,
+    hsla(35, 91%, 65%, 0) 80px, hsla(35, 91%, 65%, 0) 90px, hsla(5, 53%, 63%, 0.5) 90px, hsla(5, 53%, 63%, 0.5) 110px,
+    hsla(5, 53%, 63%, 0) 110px, hsla(5, 53%, 63%, 0) 120px, hsla(197, 62%, 11%, 0.5) 120px, hsla(197, 62%, 11%, 0.5) 140px
+    ),
+    repeating-linear-gradient(135deg, transparent 5px, hsla(197, 62%, 11%, 0.5) 5px, hsla(197, 62%, 11%, 0.5) 10px,
+            hsla(5, 53%, 63%, 0) 10px, hsla(5, 53%, 63%, 0) 35px, hsla(5, 53%, 63%, 0.5) 35px, hsla(5, 53%, 63%, 0.5) 40px,
+            hsla(197, 62%, 11%, 0.5) 40px, hsla(197, 62%, 11%, 0.5) 50px, hsla(197, 62%, 11%, 0) 50px, hsla(197, 62%, 11%, 0) 60px,
+            hsla(5, 53%, 63%, 0.5) 60px, hsla(5, 53%, 63%, 0.5) 70px, hsla(35, 91%, 65%, 0.5) 70px, hsla(35, 91%, 65%, 0.5) 80px,
+            hsla(35, 91%, 65%, 0) 80px, hsla(35, 91%, 65%, 0) 90px, hsla(5, 53%, 63%, 0.5) 90px, hsla(5, 53%, 63%, 0.5) 110px,
+            hsla(5, 53%, 63%, 0) 110px, hsla(5, 53%, 63%, 0) 140px, hsla(197, 62%, 11%, 0.5) 140px, hsla(197, 62%, 11%, 0.5) 160px
+    );
+}
+
+figure {
+    display: inline-block;
+    padding: 1em;
+}
+
 #app img {
     width: 100%;
 }
 
 #app section {
-    height: 35em;
-    overflow: scroll;
-    padding: 2em 5em 2em 5em;
+    padding-bottom: 2em;
+}
+
+.tagger .list-group-item-text {
+    color: #333333 !important;
+    height: auto !important;
+    max-height: 6.5em !important;
+}
+
+.tagger a {
+    color: cornflowerblue !important;
+}
+
+#app a {
+    color: white;
 }
 
 #app section:nth-child(1) {
-    background-color: #2780e3;
+    padding-top: 2em;
+    padding-right: 2em;
+    background-color: rgba(39, 120, 219, 0.93);
+    /*background-image: url(/static/img/landing/lego-opt.png);*/
+    background-blend-mode: soft-light;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 #app section:nth-child(2) {
-    background-color: #ff7518;
+    background-color: rgba(208, 93, 3, 0.95)
 }
 
 #app section:nth-child(3) {
-    background-color: #9954bb;
+    background-color: rgba(153, 84, 187, 0.95);
 }
 
 #app section:nth-child(4) {
-    background-color: #3fb618;
+    background-color: rgba(63, 182, 24, 0.95);
 }

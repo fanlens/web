@@ -42,6 +42,10 @@ footer {
     text-align: center;
 }
 
+.center-block {
+    float: none;
+}
+
 .navbar-brand {
     padding: 5px;
     wdith: 30em;
@@ -57,10 +61,6 @@ footer {
     border-radius: 0.7em;
     border: 2px solid black;
     display: inline;
-}
-
-.navbar-right {
-    padding-right: 15px;
 }
 
 .btn-ellipsis, .ellipsis {

@@ -8,7 +8,7 @@ import Tagger from '../components/Tagger.jsx'
 
 const mapStateToProps = (state, ownProps) => Object.assign({},
   state.tagger.comments[ownProps.id],
-  {tagSet: _.chain(state.tagger.tagSets).filter('active').map('tags').flatten().uniq().value()}//_.uniq(_.flatten(_.map(_.filter(state.tagger.tagSets, 'active'), 'tags')))}
+  {tagSet: _.chain(state.tagger.tagSets).filter('active').map('tags').flatten().uniq().value()}
 )
 
 const mapDispatchToProps = (dispatch, ownProps) => {
