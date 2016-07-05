@@ -76,7 +76,6 @@ def user_tagsets():
         for tagset in tagsets.values():
             all_tags = all_tags.union(tagset['tags'])
         tagsets['_all'] = dict(id='_all', tags=list(all_tags), title='All Tags')
-    print(tagsets)
     return jsonify(tagSets=tagsets)
 
 

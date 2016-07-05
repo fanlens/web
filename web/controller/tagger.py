@@ -93,7 +93,8 @@ LIMIT :limit""")
     @classmethod
     def get_suggestions_for_text(cls, text: str) -> tuple:
         # todo model id is hard coded
-        task = celery.send_task('worker.brain.predict', args=(text,), kwargs=dict(model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
+        task = celery.send_task('worker.brain.predict', args=(text,),
+                                kwargs=dict(model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
         # switch to better backend
         return task.get(interval=0.0005)
 
@@ -105,4 +106,6 @@ LIMIT :limit""")
         else:
             # todo model id is hard coded
             return celery.send_task('worker.brain.predict', args=(comment.data['message'],),
-                                    kwargs=dict(fingerprint=comment.meta['fingerprint'], model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
+                                    kwargs=dict(fingerprint=comment.meta['fingerprint'],
+                                                created_time=comment.data['created_time'],
+                                                model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
