@@ -9,6 +9,7 @@ from db import insert_or_ignore
 from db.models.facebook import FacebookCommentEntry
 
 from db.models.tags import UserToTagToComment
+from db.models.brain import Model
 from web.modules.database import db
 from web.modules.celery import celery
 
@@ -91,7 +92,8 @@ LIMIT :limit""")
 
     @classmethod
     def get_suggestions_for_text(cls, text: str) -> tuple:
-        task = celery.send_task('worker.brain.predict', args=(text,), kwargs=dict(model_id='debug_tagger'))
+        # todo model id is hard coded
+        task = celery.send_task('worker.brain.predict', args=(text,), kwargs=dict(model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
         # switch to better backend
         return task.get(interval=0.0005)
 
@@ -101,5 +103,6 @@ LIMIT :limit""")
         if not comment or 'fingerprint' not in comment.meta:
             raise ValueError('no fingerprint for comment')
         else:
+            # todo model id is hard coded
             return celery.send_task('worker.brain.predict', args=(comment.data['message'],),
-                                    kwargs=dict(fingerprint=comment.meta['fingerprint'], model_id='debug_tagger'))
+                                    kwargs=dict(fingerprint=comment.meta['fingerprint'], model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
