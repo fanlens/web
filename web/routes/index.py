@@ -32,11 +32,11 @@ def root():
                           body="%(sender)s\n%(message)s" % dict(
                               sender=contact_form.email.data, message=contact_form.message.data),
                           sender=contact_form.email.data,
-                          recipients=["info.fanlens@gmail.com"])
+                          recipients=["info@fanlens.io"])
             mail.send(msg)
             session['already_sent'] = True
 
     random_comment, = TaggerController.get_random_comments(g.demo_user.id, count=1, with_entity=True,
                                                            with_suggestion=True,
-                                                           sources={'adele'})
+                                                           sources={'ladygaga'})
     return render_template('landing/index.html', contact_form=contact_form, demo=random_comment)
