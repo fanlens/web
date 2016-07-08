@@ -38,5 +38,5 @@ def root():
 
     random_comment, = TaggerController.get_random_comments(g.demo_user.id, count=1, with_entity=True,
                                                            with_suggestion=True,
-                                                           sources={'ladygaga'})
+                                                           sources={'adele'})
     return render_template('landing/index.html', contact_form=contact_form, demo=random_comment)
