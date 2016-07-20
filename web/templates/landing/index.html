@@ -4,6 +4,7 @@
     {{ super() }}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/landing.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tagger.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 {% endblock %}
 
 {% block navbar %}
@@ -230,50 +231,50 @@
                             </p>
                         </div>
                     </div>
-{#                    <div class="row">#}
-{#                        <div class="col-md-3 text-center">#}
-{#                            <a href="https://visalyze.com" target="_blank"> <img#}
-{#                                    class="img-company"#}
-{#                                    src="{{ url_for('static', filename='img/landing/visalyze.png') }}"#}
-{#                                    alt="visalyze.com"/></a>#}
-{#                        </div>#}
-{#                        <div class="col-md-7 col-xs-10 text-justify">#}
-{#                            <p>#}
-{#                                "Fanlens ist eine äußerst interessante Firma und Technologie die es uns ermöglicht#}
-{#                                Machine Learning Probleme mittels simplen Plug&Play Komponenten zu lösen." #}
-{#                            </p>#}
-{#                            <p class="text-right">-- Christoph Holz, CEO of <a href="https://visalyze.com"#}
-{#                                                                               target="_blank">visalyze.com</a></p>#}
-{#                        </div>#}
-{#                        <div class="col-md-2 col-xs-2">#}
-{#                            <p><img class="img-circle"#}
-{#                                    src="{{ url_for('static', filename='img/landing/christoph.jpg') }}"/>#}
-{#                            </p>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="row">#}
-{#                        <div class="col-md-12 text-center">#}
-{#                            <h1>Proudly Sponsored By</h1>#}
-{#                            <p>#}
-{#                                <figure>#}
-{#                                    <a href="http://www.cast-tyrol.com/" target="_blank"> <img#}
-{#                                            style="height: 5em"#}
-{#                                            class="img-company"#}
-{#                                            src="{{ url_for('static', filename='img/landing/cast.png') }}"#}
-{#                                            alt="CAST Tyrol"/></a>#}
-{#                                    <figcaption>CAST Tyrol</figcaption>#}
-{#                                </figure>#}
-{#                                <figure>#}
-{#                                    <a href="https://www.uibk.ac.at/" target="_blank"> <img#}
-{#                                            style="height: 5em"#}
-{#                                            class="img-company"#}
-{#                                            src="{{ url_for('static', filename='img/landing/uibk.png') }}"#}
-{#                                            alt="University of Innsbruck"/></a>#}
-{#                                    <figcaption>University of Innsbruck</figcaption>#}
-{#                                </figure>#}
-{#                            </p>#}
-{#                        </div>#}
-{#                    </div>#}
+                    {#                    <div class="row">#}
+                    {#                        <div class="col-md-3 text-center">#}
+                    {#                            <a href="https://visalyze.com" target="_blank"> <img#}
+                    {#                                    class="img-company"#}
+                    {#                                    src="{{ url_for('static', filename='img/landing/visalyze.png') }}"#}
+                    {#                                    alt="visalyze.com"/></a>#}
+                    {#                        </div>#}
+                    {#                        <div class="col-md-7 col-xs-10 text-justify">#}
+                    {#                            <p>#}
+                    {#                                "Fanlens ist eine äußerst interessante Firma und Technologie die es uns ermöglicht#}
+                    {#                                Machine Learning Probleme mittels simplen Plug&Play Komponenten zu lösen." #}
+                    {#                            </p>#}
+                    {#                            <p class="text-right">-- Christoph Holz, CEO of <a href="https://visalyze.com"#}
+                    {#                                                                               target="_blank">visalyze.com</a></p>#}
+                    {#                        </div>#}
+                    {#                        <div class="col-md-2 col-xs-2">#}
+                    {#                            <p><img class="img-circle"#}
+                    {#                                    src="{{ url_for('static', filename='img/landing/christoph.jpg') }}"/>#}
+                    {#                            </p>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                    {#                    <div class="row">#}
+                    {#                        <div class="col-md-12 text-center">#}
+                    {#                            <h1>Proudly Sponsored By</h1>#}
+                    {#                            <p>#}
+                    {#                                <figure>#}
+                    {#                                    <a href="http://www.cast-tyrol.com/" target="_blank"> <img#}
+                    {#                                            style="height: 5em"#}
+                    {#                                            class="img-company"#}
+                    {#                                            src="{{ url_for('static', filename='img/landing/cast.png') }}"#}
+                    {#                                            alt="CAST Tyrol"/></a>#}
+                    {#                                    <figcaption>CAST Tyrol</figcaption>#}
+                    {#                                </figure>#}
+                    {#                                <figure>#}
+                    {#                                    <a href="https://www.uibk.ac.at/" target="_blank"> <img#}
+                    {#                                            style="height: 5em"#}
+                    {#                                            class="img-company"#}
+                    {#                                            src="{{ url_for('static', filename='img/landing/uibk.png') }}"#}
+                    {#                                            alt="University of Innsbruck"/></a>#}
+                    {#                                    <figcaption>University of Innsbruck</figcaption>#}
+                    {#                                </figure>#}
+                    {#                            </p>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
                 </div>
             </div>
         </section>
@@ -332,51 +333,51 @@
                         </div>
                     </div>
                 </div>
-{#                        <div class="container-fluid">#}
-{#                            <div class="row">#}
-{#                                <div class="col-md-2 img-team">#}
-{#                                    <a href="https://linkedin.com/in/mcuquet" target="_blank">#}
-{#                                        <img class="img-circle"#}
-{#                                             src="{{ url_for('static', filename='img/landing/marti.jpg') }}"#}
-{#                                             alt="Martí Cuquet"/>#}
-{#                                    </a>#}
-{#                                </div>#}
-{#                                <div class="col-md-10">#}
-{#                                    <h2>Martí Cuquet</h2>#}
-{#                                    <h4>Co-Founder and Mad Scientist in Residence</h4>#}
-{#                                    <p>Laughing maniacally in his laboratory, he makes sure our research stays world#}
-{#                                        class. Martí was awarded his PhD in Quantum physics and is now focused on#}
-{#                                        artificial intelligence... don't worry we'll make sure he sides with the humans#}
-{#                                        in the Robopocalypse.</p>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                <div class="row" style="margin-top:2em">#}
-{#                    <div class="col-md-5 col-md-offset-4">#}
-{#                        <div class="container-fluid">#}
-{#                            <div class="row">#}
-{#                                <div class="col-md-3 img-team">#}
-{#                                    <a href="#team">#}
-{#                                        <img class="img-circle img-circle-lg"#}
-{#                                             src="{{ url_for('static', filename='img/landing/we-want-you.png') }}"#}
-{#                                             alt="We Want You"/>#}
-{#                                    </a>#}
-{#                                </div>#}
-{#                                <div class="col-md-9">#}
-{#                                    <h3>We Want You!</h3>#}
-{#                                    <p>We are always looking for motivated people!</p>#}
-{#                                    <ul>#}
-{#                                        <li>You're a mad scientist?</li>#}
-{#                                        <li>You're a coding ninja?</li>#}
-{#                                        <li>You're a business guru?</li>#}
-{#                                        <li>You're generally awesome?</li>#}
-{#                                    </ul>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
+                {#                        <div class="container-fluid">#}
+                {#                            <div class="row">#}
+                {#                                <div class="col-md-2 img-team">#}
+                {#                                    <a href="https://linkedin.com/in/mcuquet" target="_blank">#}
+                {#                                        <img class="img-circle"#}
+                {#                                             src="{{ url_for('static', filename='img/landing/marti.jpg') }}"#}
+                {#                                             alt="Martí Cuquet"/>#}
+                {#                                    </a>#}
+                {#                                </div>#}
+                {#                                <div class="col-md-10">#}
+                {#                                    <h2>Martí Cuquet</h2>#}
+                {#                                    <h4>Co-Founder and Mad Scientist in Residence</h4>#}
+                {#                                    <p>Laughing maniacally in his laboratory, he makes sure our research stays world#}
+                {#                                        class. Martí was awarded his PhD in Quantum physics and is now focused on#}
+                {#                                        artificial intelligence... don't worry we'll make sure he sides with the humans#}
+                {#                                        in the Robopocalypse.</p>#}
+                {#                                </div>#}
+                {#                            </div>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                <div class="row" style="margin-top:2em">#}
+                {#                    <div class="col-md-5 col-md-offset-4">#}
+                {#                        <div class="container-fluid">#}
+                {#                            <div class="row">#}
+                {#                                <div class="col-md-3 img-team">#}
+                {#                                    <a href="#team">#}
+                {#                                        <img class="img-circle img-circle-lg"#}
+                {#                                             src="{{ url_for('static', filename='img/landing/we-want-you.png') }}"#}
+                {#                                             alt="We Want You"/>#}
+                {#                                    </a>#}
+                {#                                </div>#}
+                {#                                <div class="col-md-9">#}
+                {#                                    <h3>We Want You!</h3>#}
+                {#                                    <p>We are always looking for motivated people!</p>#}
+                {#                                    <ul>#}
+                {#                                        <li>You're a mad scientist?</li>#}
+                {#                                        <li>You're a coding ninja?</li>#}
+                {#                                        <li>You're a business guru?</li>#}
+                {#                                        <li>You're generally awesome?</li>#}
+                {#                                    </ul>#}
+                {#                                </div>#}
+                {#                            </div>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                </div>#}
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <p>Drop us a note and get in touch!
@@ -449,6 +450,12 @@
             </div>
         </div>
         <div class="row text-center">
+            <ul class="list-inline" style="margin:0.5em; font-size:1.5em">
+                <li><a target="_blank" href="https://www.facebook.com/fanlens"><i class="fa fa-facebook"></i></a></li>
+                <li><a target="_blank" href="https://twitter.com/fanlens_io"><i class="fa fa-twitter"></i></a></li>
+                <li><a target="_blank" href="https://www.linkedin.com/company/fanlens"><i class="fa fa-linkedin"></i></a></li>
+                <li><a target="_blank" href="https://angel.co/fanlens"><i class="fa fa-angellist"></i></a></li>
+            </ul>
             Fanlens &copy; 2016 All rights reserved
         </div>
     </div>
