@@ -14,20 +14,17 @@
     {% set logo = "https://fanlens.io/static/img/logo.png" %}
     <meta name="author" content="https://fanlens.io">
     <meta name="description" content="{{ description }}"/>
-    <meta name="og:description" content="{{ description }}"/>
+    <meta property="fb:app_id" content="133376753537407"/>
+    <meta property="og:description" content="{{ description }}"/>
     <meta property="og:url" content="https://fanlens.io"/>
     <meta property="og:type" content="website"/>
     <meta property="og:title" content="{{ title }}"/>
     <meta property="og:image" content="{{ logo }}" />
-    <meta name="twitter:card" content="product">
+    <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@fanlens_io">
     <meta name="twitter:creator" content="@fanlens_io">
     <meta name="twitter:title" content="{{ title }}">
     <meta name="twitter:image" content="{{ logo }}">
-    <meta name="twitter:label1" content="Tagger">
-    <meta name="twitter:data1" content="Is a comment relevant? is it spam? what mood is it in? Customizable models for your use case!">
-    <meta name="twitter:label2" content="Evaluator">
-    <meta name="twitter:data2" content="Gauge the reception of your posts before sending it!">
 {% endblock %}
 
 {% block navbar %}
