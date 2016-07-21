@@ -7,6 +7,29 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 {% endblock %}
 
+{% block metas %}
+    {{ super() }}
+    {% set description = "With a few clicks you can generate personalized models that encapsulate the behaviour of your fans and followers. It's your own little pet robot that reacts in the same ways as your fans!" %}
+    {% set title = "Fanlens: Machine Learning + Social Media" %}
+    {% set logo = "https://fanlens.io/static/img/logo.png" %}
+    <meta name="author" content="https://fanlens.io">
+    <meta name="description" content="{{ description }}"/>
+    <meta name="og:description" content="{{ description }}"/>
+    <meta property="og:url" content="https://fanlens.io"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:title" content="{{ title }}"/>
+    <meta property="og:image" content="{{ logo }}" />
+    <meta name="twitter:card" content="product">
+    <meta name="twitter:site" content="@fanlens_io">
+    <meta name="twitter:creator" content="@fanlens_io">
+    <meta name="twitter:title" content="{{ title }}">
+    <meta name="twitter:image" content="{{ logo }}">
+    <meta name="twitter:label1" content="Tagger">
+    <meta name="twitter:data1" content="Is a comment relevant? is it spam? what mood is it in? Customizable models for your use case!">
+    <meta name="twitter:label2" content="Evaluator">
+    <meta name="twitter:data2" content="Gauge the reception of your posts before sending it!">
+{% endblock %}
+
 {% block navbar %}
     <header>
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -110,7 +133,7 @@
                     Reload the page to fetch a new comment.)</p>
                 <p>With a few clicks you can generate <strong>personalized</strong> models that encapsulate the
                     <strong>behaviour</strong> of your fans and followers. It's your own little pet robot that reacts in
-                    the same ways as your average fan!</p>
+                    the same ways as your fans!</p>
                 <p>If you can even integrate your personal models into your own tools via an <strong>intuitive
                     API!</strong></p>
                 <h2 class="text-center">Join Fanlens and kick your social media game into <strong>overdrive!</strong>
@@ -453,7 +476,8 @@
             <ul class="list-inline" style="margin:0.5em; font-size:1.5em">
                 <li><a target="_blank" href="https://www.facebook.com/fanlens"><i class="fa fa-facebook"></i></a></li>
                 <li><a target="_blank" href="https://twitter.com/fanlens_io"><i class="fa fa-twitter"></i></a></li>
-                <li><a target="_blank" href="https://www.linkedin.com/company/fanlens"><i class="fa fa-linkedin"></i></a></li>
+                <li><a target="_blank" href="https://www.linkedin.com/company/fanlens"><i
+                        class="fa fa-linkedin"></i></a></li>
                 <li><a target="_blank" href="https://angel.co/fanlens"><i class="fa fa-angellist"></i></a></li>
             </ul>
             Fanlens &copy; 2016 All rights reserved
