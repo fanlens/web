@@ -40,3 +40,9 @@ def root():
                                                            with_suggestion=True,
                                                            sources={'adele'})
     return render_template('landing/index.html', contact_form=contact_form, demo=random_comment)
+
+
+# loaderio verification
+@index.route('/loaderio-6c26908350d0e775c4dd1e0204d3646f/', methods=['GET'])
+def loader_io():
+    return 'loaderio-6c26908350d0e775c4dd1e0204d3646f'
