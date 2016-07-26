@@ -56,9 +56,8 @@ LIMIT :limit""")
             for result in results:
                 result['suggestion'] = cls.get_suggestions_for_id(result['id'])
             for result in results:
-                # switch to better backend
                 try:
-                    result['suggestion'] = result['suggestion'].get(interval=0.0005)
+                    result['suggestion'] = result['suggestion'].get()
                 except Exception as err:
                     logging.exception('error getting suggestions')
                     result['suggestion'] = []
@@ -95,8 +94,7 @@ LIMIT :limit""")
         # todo model id is hard coded
         task = celery.send_task('worker.brain.predict', args=(text,),
                                 kwargs=dict(model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
-        # switch to better backend
-        return task.get(interval=0.0005)
+        return task.get()
 
     @classmethod
     def get_suggestions_for_id(cls, comment_id: str) -> tuple:
