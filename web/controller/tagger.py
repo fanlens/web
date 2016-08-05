@@ -9,9 +9,8 @@ from db import insert_or_ignore
 from db.models.facebook import FacebookCommentEntry
 
 from db.models.tags import UserToTagToComment
-from db.models.brain import Model
-from web.modules.database import db
-from web.modules.celery import celery
+from flask_modules.database import db
+from flask_modules.celery import celery
 
 
 class TaggerController(object):

@@ -1,7 +1,7 @@
 {% extends "security/security_base.html" %}
 
 {% block form_content %}
-    <h1>Login</h1>
+    <h2>Login</h2>
     <form role="form" action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
         {{ login_user_form.hidden_tag() }}
         <div class="form-group">
@@ -15,12 +15,11 @@
         </div>
         {{ render_field(login_user_form.next) }}
         <div class=" text-right">
-            {{ render_field(login_user_form.submit, class_="btn btn-default") }}
+            {{ render_field(login_user_form.submit, class_="btn btn-primary") }}
         </div>
     </form>
-    <h1>Demo</h1>
-    <p>Play around with a tagger that's been trained to detect spam!</p>
-    <p>(Note: ATM only english is supported)</p>
+    <h2>Demo</h2>
+    <p >Play with a tagger that's been trained to detect spam!<br/>(ATM only english is supported)</p>
     <dl>
         <dt>Username</dt>
         <dd>demo@example.com</dd>

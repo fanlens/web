@@ -25,7 +25,7 @@ const Tag = ({tag, active, suggestion, onToggle}) => {
     <div className="btn-group" role="group">
       <label className={classnames('btn', 'btn-sm', 'ellipsis', {
                         'btn-success': quality >= 0,
-                        'btn-default': quality < 0,
+                        'btn-primary': quality < 0,
                         'active': active
                       })}
              type="button" onClick={onToggle}>

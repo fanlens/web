@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from collections import defaultdict
-from db.models.tags import Tag, TagToTagSet, TagSet, UserToTagSet
+from db.models.tags import Tag
 
-from web.modules.database import db
+from flask_modules.database import db
 
 
 class TagSetController(object):

@@ -5,9 +5,8 @@ from flask import request, jsonify, render_template, Blueprint, redirect, url_fo
 from flask_security import current_user
 from flask_security.decorators import login_required, roles_accepted, roles_required
 
-from web.modules.security import csrf
-
-from web.modules.celery import celery
+from flask_modules.security import csrf
+from flask_modules.celery import celery
 
 from web.routes import request_wants_json
 from web.controller.tagger import TaggerController

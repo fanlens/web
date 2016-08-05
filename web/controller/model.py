@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 from db.models.brain import Model
 
-from web.modules.database import db
-from web.modules.celery import celery
+from flask_modules.database import db
+from flask_modules.celery import celery
 
 
 class ModelController(object):

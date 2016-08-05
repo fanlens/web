@@ -1,6 +1,4 @@
 {% extends "bootstrap/base.html" %}
-{% import 'variables.jinja' as variables %}
-
 {% block html_attribs %} lang="en" {% endblock %}
 
 {% block metas %}
@@ -9,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 {% endblock %}
 
-{% block title %} {{ variables.company }} {% endblock %}
+{% block title %} Fanlens {% endblock %}
 
 {% import "bootstrap/fixes.html" as fixes %}
 
@@ -39,6 +37,8 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon-precomposed.png') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet"
+          type="text/css">
 {% endblock %}
 
 {% block scripts %}
@@ -61,20 +61,6 @@
     </script>
 
     <script type="text/javascript">
-        $("a[href^='#']").on('click', function (e) {
-            e.preventDefault();
-            var hash = this.hash;
-            this.blur();
-            $('html, body').animate({
-                scrollTop: $(hash).offset().top + $(hash).outerHeight(true)
-            }, 300, function () {
-                $(hash + "-target").fadeOut(60).fadeIn(60);
-                window.location.hash = hash;
-            });
-        });
-    </script>
-
-    <script type="text/javascript">
         var CSRFToken = "{{ csrf_token() }}";
     </script>
 {% endblock %}
@@ -84,7 +70,7 @@
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <a class="navbar-brand" href="/" rel="home"><img src="{{ url_for('static', filename='img/logo.png') }}"
-                                                                 alt="src"/> <span>{{ variables.company }}</span></a>
+                                                                 alt="src"/> <span>Fanlens</span></a>
                 <button type="button" class="navbar-toggle" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span

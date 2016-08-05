@@ -2,17 +2,24 @@
 # -*- coding: utf-8 -*-
 
 from flask import g
-from flask_security import Security, SQLAlchemyUserDatastore
+from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin
 from flask_wtf.csrf import CsrfProtect
 
 from .database import db
-from ..model.users import WebUser, WebRole
 from db.models.users import Role, User
 from config.db import Config
 
 csrf = CsrfProtect()
 security = Security()
 _demo_user = None
+
+
+class WebRole(db.Model, Role, RoleMixin):
+    pass
+
+
+class WebUser(db.Model, UserMixin, User):
+    pass
 
 
 def setup_security(app):

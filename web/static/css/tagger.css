@@ -42,6 +42,10 @@
     margin-bottom: 0.8em;
 }
 
+.tagger label {
+    color: #fff !important;
+}
+
 #evaluator .tool {
     background-color: white;
     padding: 1em;

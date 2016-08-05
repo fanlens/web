@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from db import flag_modified
 from db.models.facebook import FacebookCommentEntry
-from web.modules.database import db
+from flask_modules.database import db
 from web.model.meta import MetaFields, Defaults, Types, Included
 
 

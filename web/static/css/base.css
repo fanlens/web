@@ -1,9 +1,12 @@
 body {
-    background-color: #ddd;
+    background-color: #f0eceb;
+    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+
 .jumbotron {
     background-color: white;
 }
+
 nav {
     opacity: 0.85;
 }
@@ -58,8 +61,6 @@ footer {
 
 .navbar-brand > img {
     height: 100%;
-    border-radius: 0.7em;
-    border: 2px solid black;
     display: inline;
 }
 
