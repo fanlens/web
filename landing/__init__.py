@@ -7,7 +7,7 @@ from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import InputRequired, Email
 from flask_mail import Message
 
-from flask_modules import mail
+from flask_modules.mail import mail
 
 
 def create_app():
