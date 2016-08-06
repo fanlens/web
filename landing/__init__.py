@@ -56,5 +56,5 @@ def index():
 @app.route('/demo', methods=['GET'])
 def demo():
     random_comment, = TaggerController.get_random_comments(g.demo_user.id, count=1, with_entity=True,
-                                                          with_suggestion=True, sources={'ladygaga'})
+                                                          with_suggestion=True, sources={'adele'})
     return jsonify(random_comment)

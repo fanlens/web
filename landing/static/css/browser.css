@@ -45,7 +45,7 @@
 }
 
 .browser-mockup.with-url.tagger-greeting:after {
-    content: 'Spam detector for Adele. Hit refresh!';
+    content: 'Live demo of Adele\'s page. Hit refresh!';
 }
 
 .browser-mockup.with-url.evaluator-greeting:after {
