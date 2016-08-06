@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, flash, request, session
+from flask import Flask, render_template, flash, request, session, jsonify, g
 from flask_wtf import Form
 from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import InputRequired, Email
 from flask_mail import Message
 
 from flask_modules.mail import mail
+
+from web.controller.tagger import TaggerController
 
 
 def create_app():
@@ -48,5 +50,11 @@ def index():
             mail.send(msg)
             session['already_sent'] = True
 
-    random_comment = {}  # TaggerController.get_random_comments(g.demo_user.id, count=1, with_entity=True, with_suggestion=True, sources={'adele'})
-    return render_template('index.html', contact_form=contact_form, demo=random_comment)
+    return render_template('index.html', contact_form=contact_form)
+
+
+@app.route('/demo', methods=['GET'])
+def demo():
+    random_comment, = TaggerController.get_random_comments(g.demo_user.id, count=1, with_entity=True,
+                                                          with_suggestion=True, sources={'ladygaga'})
+    return jsonify(random_comment)

@@ -66,6 +66,8 @@
         ga('create', 'UA-57470771-6', 'auto');
         ga('send', 'pageview');
     </script>
+    <!-- jQuery -->
+    <script src={{ url_for('static', filename="js/jquery.js") }}></script>
 </head>
 
 <body>
@@ -171,9 +173,11 @@
                     for you!</p>
             </div>
             <div class="col-lg-6 col-lg-offset-1 col-sm-6">
-                <div class="browser-mockup with-url">
-                    <img class="img-responsive" src={{ url_for('static', filename="img/tagger.png") }} alt="">
+                <div class="browser-mockup with-url tagger-greeting">
+                    {% include 'demo.html' %}
                 </div>
+                <p class="small text-center" style="margin-top:0.5em;">(Link to external source! We take no
+                    responsibility for the shown content.)</p>
             </div>
         </div>
 
@@ -202,7 +206,7 @@
                 </p>
             </div>
             <div class="col-lg-6 col-sm-pull-6 col-sm-6">
-                <div class="browser-mockup with-url">
+                <div class="browser-mockup with-url evaluator-greeting">
                     <img class="img-responsive" src={{ url_for('static', filename="img/evaluator.png") }} alt="">
                 </div>
             </div>
@@ -268,7 +272,8 @@
                                 class="network-name">Linkedin</span></a>
                     </li>
                     <li>
-                        <a href="https://angel.co/fanlens/" class="btn btn-default btn-lg"><i class="fa fa-angellist fa-fw"></i> <span
+                        <a href="https://angel.co/fanlens/" class="btn btn-default btn-lg"><i
+                                class="fa fa-angellist fa-fw"></i> <span
                                 class="network-name">AngelList</span></a>
                     </li>
                 </ul>
@@ -371,9 +376,6 @@
     </div>
 </footer>
 
-<!-- jQuery -->
-<script src={{ url_for('static', filename="js/jquery.js") }}></script>
-
 <!-- Bootstrap Core JavaScript -->
 <script src={{ url_for('static', filename="js/bootstrap.min.js") }}></script>
 
@@ -388,6 +390,15 @@
     };
 </script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+
+<!-- Tooltips -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tagger-wrapper').tooltip({
+            selector: "a[rel=tooltip]"
+        });
+    });
+</script>
 </body>
 
 </html>
