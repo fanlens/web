@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block styles %}
+    {{ super() }}
+
+    <link href={{ url_for('static', filename="css/pricing.css") }} rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="intro-header">
+        <div class="wrapper">
+            {#            <h1 class="heading">#}
+            {#                Pricing overview#}
+            {#            </h1>#}
+            <!-- PRICING-TABLE CONTAINER -->
+            <div class="pricing-table group">
+                <!-- PERSONAL -->
+                <div class="block personal">
+                    <h2 class="title">personal</h2>
+                    <!-- CONTENT -->
+                    <div class="content">
+                        <p class="price">
+                            <sup>&euro;</sup>
+                            <span style="text-decoration: line-through;">9</span>
+                            <sub>/mo.</sub>
+                            <br/>
+                        </p>
+                        <p class="hint">A great start.<br/>Perfect for individuals.</p>
+                    </div>
+                    <!-- /CONTENT -->
+                    <!-- FEATURES -->
+                    <ul class="features">
+                        <li><span class="fa fa-fw fa-facebook-square"></span>Add 1 page</li>
+                        <li><span class="fa fa-fw fa-low-vision"></span>Must be page owner</li>
+                        <li><span class="fa fa-fw fa-dashboard"></span>1 concurrent build</li>
+                        <li><span class="fa fa-fw fa-desktop"></span>Consumer app access</li>
+                        <li><span class="fa fa-fw fa-money"></span>Free during Beta!</li>
+                    </ul>
+                    <!-- /FEATURES -->
+                    <!-- PT-FOOTER -->
+                    <a href="#signup" class="plain-link" data-toggle="modal" data-target="#signup-modal"
+                       onclick="
+                        ga('send', {
+                          hitType: 'event',
+                          eventCategory: 'Purchase',
+                          eventAction: 'purchase-personal',
+                          eventLabel: 'First Campaign',
+                          eventValue: 9
+                        });">
+                        <div class="pt-footer">
+                            <p>Purchase</p>
+                        </div>
+                    </a>
+                    <!-- /PT-FOOTER -->
+                </div>
+                <!-- /PERSONAL -->
+                <!-- PROFESSIONAL -->
+                <div class="block professional ribbon-wrap">
+                    <div class="ribbon">Bestseller</div>
+                    <h2 class="title">Professional</h2>
+                    <!-- CONTENT -->
+                    <div class="content">
+                        <p class="price">
+                            <sup>&euro;</sup>
+                            <span>99</span>
+                            <sub>/mo.</sub>
+                        </p>
+                        <p class="hint">Kick your social media game into overdrive.<br/>Great for professionals.</p>
+                    </div>
+                    <!-- /CONTENT -->
+                    <!-- FEATURES -->
+                    <ul class="features">
+                        <li><span class="fa fa-fw fa-facebook-square"></span>Add 10 pages</li>
+                        <li><span class="fa fa-fw fa-eye"></span>Analyze competition</li>
+                        <li><span class="fa fa-fw fa-dashboard"></span><a href="#" rel="tooltip"
+                               class="plain-link"
+                               data-container="body"
+                               data-toggle="tooltip"
+                               data-html="true"
+                               data-delay="300"
+                               title="Depends on system load. Two concurrent builds guaranteed."
+                        >Fair-Use<sup><em class="fa fa-question-circle"></em></sup> concurrent builds
+                            </a></li>
+                        <li><span class="fa fa-fw fa-desktop"></span>Consumer app access</li>
+                        <li><span class="fa fa-fw fa-cloud-download"></span>Consumer API access</li>
+                        <li><span class="fa fa-fw fa-group"></span>Team access</li>
+                    </ul>
+                    <!-- /FEATURES -->
+                    <!-- PT-FOOTER -->
+                    <a href="#signup" class="plain-link" data-toggle="modal" data-target="#signup-modal"
+                       onclick="
+                        ga('send', {
+                          hitType: 'event',
+                          eventCategory: 'Purchase',
+                          eventAction: 'purchase-professional',
+                          eventLabel: 'First Campaign',
+                          eventValue: 99
+                        });">
+                        <div class="pt-footer">
+                            <p>Purchase</p>
+                        </div>
+                    </a>
+                    <!-- /PT-FOOTER -->
+                </div>
+                <!-- /PROFESSIONAL -->
+                <!-- BUSINESS -->
+                <div class="block enterprise">
+                    <h2 class="title">Enterprise</h2>
+                    <!-- CONTENT -->
+                    <div class="content">
+                        <p class="price">
+                            <sup>&euro;</sup>
+                            <span>999</span>
+                            <sub>/mo.</sub>
+                        </p>
+                        <p class="hint">Dominate social media.<br/>Fully integrate Fanlens into your tools and
+                            work-flow.</p>
+                    </div>
+                    <!-- /CONTENT -->
+
+                    <!-- FEATURES -->
+                    <ul id='hello' class="features">
+                        <li><span class="fa fa-fw fa-facebook-square"></span><a href="#" rel="tooltip"
+                               class="plain-link"
+                               data-container="body"
+                               data-toggle="tooltip"
+                               data-html="true"
+                               data-delay="300"
+                               title="Depends on page volume usually at least 100 pages. If you need even more just contact us!"
+                        >Unlimited pages</a><sup><em class="fa fa-question-circle"></em></sup>
+                        </li>
+                        <li><span class="fa fa-fw fa-eye"></span>Analyze competition</li>
+                        <li><span class="fa fa-fw fa-dashboard"></span>Unrestricted concurrent builds</li>
+                        <li><span class="fa fa-fw fa-desktop"></span>Full app access</li>
+                        <li><span class="fa fa-fw fa-cloud"></span>Full API access</li>
+                        <li><span class="fa fa-fw fa-group"></span>Team access</li>
+                        <li><span class="fa fa-fw fa-server"></span>Private instance</li>
+                        <li><span class="fa fa-fw fa-user-secret"></span>No attribution required</li>
+                        <li><span class="fa fa-fw fa-support"></span>Integration Support</li>
+                    </ul>
+
+                    <!-- /FEATURES -->
+
+                    <!-- PT-FOOTER -->
+                    <a href="#signup" class="plain-link" data-toggle="modal" data-target="#signup-modal"
+                       onclick="
+                        ga('send', {
+                          hitType: 'event',
+                          eventCategory: 'Purchase',
+                          eventAction: 'purchase-enterprise',
+                          eventLabel: 'First Campaign',
+                          eventValue: 999
+                        });">
+                        <div class="pt-footer">
+                            <p>Purchase</p>
+                        </div>
+                    </a>
+                    <!-- /PT-FOOTER -->
+                </div>
+                <!-- /BUSINESS -->
+            </div>
+            <!-- /PRICING-TABLE -->
+        </div>
+        <!-- /.intro-header -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+    <div class="modal fade" id="signup-modal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Contact us for details!</h4>
+                </div>
+                <div class="modal-body">
+                    {% include 'contact_form.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <!-- Tooltips -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.features').tooltip({
+                selector: "a[rel=tooltip]"
+            });
+        });
+    </script>
+{% endblock %}

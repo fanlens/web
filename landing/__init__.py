@@ -38,23 +38,35 @@ class ContactForm(Form):
 def index():
     contact_form = ContactForm()
     if request.method == 'POST':
-        if session.get('already_sent', False):
-            flash('Already got your message, thanks!')
-        elif contact_form.validate():
-            flash('Thank you for contacting us!')
-            msg = Message(subject='Message From: %s' % contact_form.email.data,
-                          body="%(sender)s\n%(message)s" % dict(
-                              sender=contact_form.email.data, message=contact_form.message.data),
-                          sender=contact_form.email.data,
-                          recipients=["info@fanlens.io"])
-            mail.send(msg)
-            session['already_sent'] = True
-
+        #        if session.get('already_sent', False):
+        #            flash('Already got your message, thanks!')
+        #        elif contact_form.validate():
+        #            flash('Thank you for contacting us!')
+        #            msg = Message(subject='Message From: %s' % contact_form.email.data,
+        #                          body="%(sender)s\n%(message)s" % dict(
+        #                              sender=contact_form.email.data, message=contact_form.message.data),
+        #                          sender=contact_form.email.data,
+        #                          recipients=["info@fanlens.io"])
+        #            mail.send(msg)
+        #            session['already_sent'] = True
+        msg = Message(subject='Message From: %s' % contact_form.email.data,
+                      body="%(sender)s\n%(message)s" % dict(
+                          sender=contact_form.email.data, message=contact_form.message.data),
+                      sender=contact_form.email.data,
+                      recipients=["info@fanlens.io"])
+        mail.send(msg)
+        flash('Thank you for contacting us!')
     return render_template('index.html', contact_form=contact_form)
+
+
+@app.route('/pricing', methods=['GET'])
+def pricing():
+    contact_form = ContactForm()
+    return render_template('pricing.html', contact_form=contact_form)
 
 
 @app.route('/demo', methods=['GET'])
 def demo():
     random_comment, = TaggerController.get_random_comments(g.demo_user.id, count=1, with_entity=True,
-                                                          with_suggestion=True, sources={'adele'})
+                                                           with_suggestion=True, sources={'adele'})
     return jsonify(random_comment)
