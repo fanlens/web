@@ -70,13 +70,38 @@ h6 {
     padding-bottom: 13.5%;
 }
 
-.intro-message > h1 {
-    margin: 0;
-    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.8);
-    font-size: 5em;
+.intro-message > div {
+    white-space: nowrap;
+    display: inline-block;
+    padding-right: 2em;
 }
 
-.intro-message > h1 > img {
+.intro-message > div > h1 {
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+    font-family: 'Crimson Text  script=all rev=2', serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 8em;
+    letter-spacing: 0.025em;
+    display: block;
+    /*-webkit-font-smoothing: antialiased;*/
+    /*-moz-osx-font-smoothing: grayscale;*/
+    /*-webkit-text-stroke: 0.8px rgba(0,0,0,0.3);*/
+}
+
+.intro-message > div > h1 > em {
+    font-family: 'Crimson Text  script=all rev=2', serif;
+    font-size: 1.9em;
+    font-weight: normal;
+    margin-right: -0.09em;
+    margin-left: 0.125em;
+    top: 0.03em;
+    position: relative;
+    font-style: italic;
+}
+
+.intro-message > div > h1 > img {
     height: 2em;
     width: auto;
     margin-top: -0.45em;
@@ -90,9 +115,18 @@ h6 {
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.intro-message > h3 {
-    margin-top: 0.2em !important;
-    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
+.intro-message > div > h3 {
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+    text-align: right;
+    font-size: 2.5em;
+    font-weight: bold;
+    top: -1em;
+    position: relative;
+    display: block;
+    /*-webkit-font-smoothing: antialiased;*/
+    /*-moz-osx-font-smoothing: grayscale;*/
+    /*-webkit-text-stroke: 1px rgba(0,0,0,0.3);*/
 }
 
 @media (max-width: 767px) {
@@ -100,8 +134,12 @@ h6 {
         padding-bottom: 15%;
     }
 
-    .intro-message > h1 {
-        font-size: 3em;
+    .intro-message > div > h1 {
+        font-size: 15vw;
+    }
+
+    .intro-message > div > h3 {
+        font-size: 4.7vw;
     }
 
     ul.intro-social-buttons > li {
@@ -116,6 +154,16 @@ h6 {
 
     .intro-divider {
         width: 100%;
+    }
+}
+
+@media (max-width: 767px) and (max-device-width: 1024px) {
+    .intro-message > div > h1 {
+        font-size: 15vw;
+    }
+
+    .intro-message > div > h3 {
+        font-size: 5.7vw;
     }
 }
 
