@@ -9,8 +9,6 @@ from flask_mail import Message
 
 from flask_modules.mail import mail
 
-from web.controller.tagger import TaggerController
-
 
 def create_app():
     from flask_modules.mail import setup_mail

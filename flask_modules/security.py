@@ -5,7 +5,7 @@ from flask import g
 from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin
 from flask_wtf.csrf import CsrfProtect
 
-from .database import db
+from flask_modules.database import db
 from db.models.users import Role, User
 from config.db import Config
 
@@ -32,6 +32,8 @@ def setup_security(app):
     app.config['SECURITY_REGISTERABLE'] = False
     app.config['SECURITY_RECOVERABLE'] = False
     app.config['SECURITY_CHANGEABLE'] = False
+    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authorization-Token'
+    app.config['SECURITY_TOKEN_AUTHENTICATION_KEY'] = 'api_key'
 
     csrf.init_app(app)
 

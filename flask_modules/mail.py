@@ -9,7 +9,6 @@ mail = Mail()
 
 def setup_mail(app):
     web_config = Config('web')
-    # todo turn off "allow less secure apps!"
     app.config['MAIL_SERVER'] = web_config['mail']['server']
     app.config['MAIL_PORT'] = web_config['mail']['port']
     app.config['MAIL_USERNAME'] = web_config['mail']['username']

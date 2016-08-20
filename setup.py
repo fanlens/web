@@ -17,6 +17,8 @@ setup(
         'Flask-Bootstrap',
         'flask-security',
         'flask-sqlalchemy',
+        'Flask-Redis',
+        'connexion',
         'celery[redis]',
         'msgpack-python'
     ],
