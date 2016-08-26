@@ -1,0 +1,61 @@
+#app {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    background-color: #f0eceb;
+}
+
+#main {
+    margin-bottom: 1em;
+}
+
+body {
+    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@media (min-width: 768px) {
+    #sidebar {
+        padding-right: 0 !important;
+    }
+
+    #infobar {
+        padding-left: 0 !important;
+    }
+}
+
+.panel {
+    margin-bottom: 15px !important;
+}
+
+.panel {
+    box-shadow: 0px 0px 4px 2px #bbb;
+}
+
+.list-group,
+.panel-body {
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.panel-body > .list-group > .list-group-item:first-child,
+.panel-body > .list-group > .list-group-item {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    border: 0;
+}
+
+.panel-body > .list-group > .list-group-item {
+    border-top: 1px solid #ecf0f1 !important;
+}
+
+.panel-button {
+    display: block;
+}
+
+.panel-body .nav {
+    display: inline
+}
+
+.panel-button {
+    text-align: left;
+}

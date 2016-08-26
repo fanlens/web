@@ -5,7 +5,7 @@
     {% block metas %}
         {% set description = "With a few clicks you can generate personalized models that encapsulate the behaviour of your fans and followers. It's your own little pet robot that reacts in the same ways as your fans!" %}
         {% set title = "Fanlens: Machine Learning + Social Media" %}
-        {% set logo = "https://fanlens.io/static/img/logo.png" %}
+        {% set logo = "https://fanlens.io/cdn/img/logo.png" %}
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,23 +24,22 @@
         <meta name="twitter:image" content="{{ logo }}">
     {% endblock %}
 
-    <title>Fanlens</title>
+    <title>{% block title %}Fanlens{% endblock %}</title>
 
-    <!-- Bootstrap Core CSS -->
-    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="/assets/css/browser.css" rel="stylesheet">
-    <link href={{ url_for('static', filename="css/landing-page.css") }} rel="stylesheet">
+    {% block styles %}
+        <link href="/cdn/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/cdn/css/base.css" rel="stylesheet">
+    {% endblock %}
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="/assets/img/favicon.ico">
-    <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon-precomposed.png">
+    <link rel="shortcut icon" href="/cdn/favicon.ico">
+    <link rel="apple-touch-icon" href="/cdn/apple-touch-icon-precomposed.png">
 
-    <!-- Custom Fonts -->
-    <link href="/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet"
-          type="text/css">
+    {% block fonts %}
+        <!-- Custom Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Lato|Crimson+Text" rel="stylesheet">
+        <link href="/cdn/css/font-awesome.min.css" rel="stylesheet">
+    {% endblock %}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -66,7 +65,7 @@
         ga('send', 'pageview');
     </script>
     <!-- jQuery -->
-    <script src="/assets/js/jquery.js"></script>
+    <script src="/cdn/js/jquery.js"></script>
 </head>
 
 <body>
@@ -84,27 +83,27 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand topnav" href="#">
-                <img src="/assets/img/logo.png"/> Fanlens
+            <a class="navbar-brand topnav" href="/">
+                <img src="/cdn/img/logo.png"/> Fanlens
             </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="#about">About</a>
+                    <a href="/#about">About</a>
                 </li>
                 <li>
-                    <a href="#services">Services</a>
+                    <a href="/#services">Services</a>
                 </li>
                 <li>
-                    <a href="#contact">Contact</a>
+                    <a href="/#contact">Contact</a>
                 </li>
                 <li>
-                    <a href="#contact">Sign Up</a>
+                    <a href="/pricing">Pricing</a>
                 </li>
                 <li>
-                    <a href="/v1/tagger">Login</a>
+                    <a href="/v2/tagger">Demo</a>
                 </li>
             </ul>
         </div>
@@ -113,9 +112,22 @@
     <!-- /.container -->
 </nav>
 
+<main id="app">
+    {% block main %}
+    {% endblock %}
+</main>
 
-{% block app %}{% endblock %}
-
+<!-- #alerts -->
+<div class="container-fluid" id="alerts">
+    {% block alerts %}
+        {% for message in get_flashed_messages() %}
+            <div class="alert fade in alert-success alert-dismissable"><strong>Info!</strong>
+                {{ message }}<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            </div>
+        {% endfor %}
+    {% endblock %}
+</div>
+<!-- /#alerts -->
 
 <!-- Footer -->
 <footer>
@@ -124,34 +136,48 @@
             <div class="col-lg-12">
                 <ul class="list-inline">
                     <li>
-                        <a href="#">Home</a>
+                        <a href="/">Home</a>
                     </li>
                     <li class="footer-menu-divider">&sdot;</li>
                     <li>
-                        <a href="#about">About</a>
+                        <a href="/#about">About</a>
                     </li>
                     <li class="footer-menu-divider">&sdot;</li>
                     <li>
-                        <a href="#services">Services</a>
+                        <a href="/#services">Services</a>
                     </li>
                     <li class="footer-menu-divider">&sdot;</li>
                     <li>
-                        <a href="#contact">Contact</a>
+                        <a href="/#contact">Contact</a>
                     </li>
                     <li class="footer-menu-divider">&sdot;</li>
                     <li>
-                        <a href="#terms" data-toggle="modal" data-target="#termsModal">Terms</a>
+                        <a href="#terms" data-toggle="modal" data-target="#terms-modal"
+                           onclick="
+                            ga('send', {
+                              hitType: 'event',
+                              eventCategory: 'Legal',
+                              eventAction: 'view-terms',
+                              eventLabel: 'First Campaign'
+                            });">Terms</a>
                     </li>
                     <li class="footer-menu-divider">&sdot;</li>
                     <li>
-                        <a href="#legal" data-toggle="modal" data-target="#noticeModal">Legal Notice</a>
+                        <a href="#legal" data-toggle="modal" data-target="#notice-modal"
+                           onclick="
+                            ga('send', {
+                              hitType: 'event',
+                              eventCategory: 'Legal',
+                              eventAction: 'view-legal',
+                              eventLabel: 'First Campaign'
+                            });">Legal Notice</a>
                     </li>
                 </ul>
                 <p class="copyright text-muted small">Copyright &copy; Fanlens 2016. All Rights Reserved.</p>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="termsModal" role="dialog">
+    <div class="modal fade" id="terms-modal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -159,12 +185,12 @@
                     <h4 class="modal-title">Terms of Service</h4>
                 </div>
                 <div class="modal-body">
-                    {% include 'terms.html' %}
+                    {% include 'templating/terms.html' %}
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="noticeModal" role="dialog">
+    <div class="modal fade" id="notice-modal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -172,29 +198,34 @@
                     <h4 class="modal-title">Legal Notice</h4>
                 </div>
                 <div class="modal-body">
-                    {% include 'notice.html' %}
+                    {% include 'templating/notice.html' %}
                 </div>
             </div>
         </div>
     </div>
 </footer>
 
-<!-- Bootstrap Core JavaScript -->
-<script src="/assets/js/bootstrap.min.js"></script>
+{% block scripts %}
+    <script>
+        var CSRFToken = "{{ csrf_token() }}";
+    </script>
 
-<!-- Cookie Consent -->
-<script type="text/javascript">
-    window.cookieconsent_options = {
-        "message": "This website uses cookies to ensure you get the best experience on our website",
-        "dismiss": "Got it!",
-        "learnMore": "More info",
-        "link": null,
-        "theme": "dark-bottom"
-    };
-</script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/cdn/js/bootstrap.min.js"></script>
 
+    <!-- Cookie Consent -->
+    <script type="text/javascript">
+        window.cookieconsent_options = {
+            "message": "This website uses cookies to ensure you get the best experience on our website",
+            "dismiss": "Got it!",
+            "learnMore": "More info",
+            "link": null,
+            "theme": "dark-bottom"
+        };
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+
+{% endblock %}
 </body>
 
 </html>
-

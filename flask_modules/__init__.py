@@ -1,7 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from flask import request
 from connexion.operation import Operation
 from connexion.resolver import Resolver, Resolution
+
+
+def request_wants_json():
+    best = request.accept_mimetypes \
+        .best_match(['application/json', 'text/html'])
+    return best == 'application/json' and \
+           request.accept_mimetypes[best] > \
+           request.accept_mimetypes['text/html']
 
 
 class SimpleResolver(Resolver):

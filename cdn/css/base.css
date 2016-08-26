@@ -1,0 +1,50 @@
+body,
+html {
+    width: 100%;
+    height: 100%;
+    background-color: #f8f8f8;
+}
+
+main {
+    padding-top: 50px;
+}
+
+@media (max-width: 900px) {
+    body {
+        background-size: 55%;
+    }
+}
+
+@media (max-width: 767px) {
+    body {
+        background-size: 70%;
+    }
+}
+
+.topnav {
+    font-size: 14px;
+}
+
+.navbar-brand > img {
+    height: 32px;
+    width: auto;
+    margin-top: -5px;
+    margin-right: -1px;
+    display: inline;
+}
+
+footer {
+    padding: 50px 0;
+    background-color: #f8f8f8;
+}
+
+p.copyright {
+    margin: 15px 0 0;
+}
+
+#alerts {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 999999;
+}

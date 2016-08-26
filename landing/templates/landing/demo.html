@@ -1,10 +1,14 @@
-<link href="/v2/tagger/static/css/tagger.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/v2/tagger/static/css/tagger.css">
 <div id="tagger-wrapper">
     <img id="tagger-placeholder" class="img-responsive" src={{ url_for('static', filename="img/tagger.png") }} alt=""/>
     <script>
         $('#tagger-placeholder').css('opacity', 0.2);
-        $.get("{{ url_for('demo') }}", function (demo) {
-            var html = `
+        $.ajax({
+            url: "{{ url_for('demo') }}",
+            headers: {"Accept": "application/json"},
+            success: function (demo) {
+                demo = demo.comments[0];
+                var html = `
             <div >
             <div class="row">
                 <div class="col-xs-1 text-center fb-icon-col"><a
@@ -23,16 +27,15 @@
             <div class="row">
                 <form class="form-group">
                     <div class="btn-group btn-group-justified" role="group">` +
-                    demo.suggestion.sort().map(function (suggestion) {
-                        var percent = suggestion[0];
-                        var tag = suggestion[1];
-                        var html = `
+                        Object.keys(demo.suggestion).map(function (tag) {
+                            var percent = demo.suggestion[tag]
+                            var html = `
                             <div class="btn-group" role="group">
                                 ${percent <= 0.8 ?
-                                `<label class="btn btn-sm ellipsis btn-primary" type="button"><em
+                                    `<label class="btn btn-sm ellipsis btn-primary" type="button"><em
                                             class="glyphicon glyphicon-tag" aria-hidden="true"></em> ${tag}
                                     </label>` :
-                                `<label class="btn btn-sm ellipsis btn-success" type="button"><em
+                                    `<label class="btn btn-sm ellipsis btn-success" type="button"><em
                                             class="glyphicon glyphicon-tag" aria-hidden="true"></em>
                                         ${tag}
                                         <a href="#" rel="tooltip"
@@ -42,25 +45,27 @@
                                            data-delay="300"
                                            title="<div style='padding:0.8rem 0 0.8rem 0;'> Confidence<br/> <em class='glyphicon glyphicon-certificate' aria-hidden='true'></em>Excellent&nbsp;&nbsp; <em class='glyphicon glyphicon-star' aria-hidden='true'></em>Good&nbsp;&nbsp; <em class='glyphicon glyphicon-star-empty' aria-hidden='true'></em>Fair </div> "><em
                                        ${percent > 0.99 ?
-                                        'class="glyphicon quality glyphicon-certificate"' :
-                                        percent > 0.95 ?
-                                                'class="glyphicon quality glyphicon-star"' :
-                                                'class="glyphicon quality glyphicon-star-empty"'
-                                        }
+                                            'class="glyphicon quality glyphicon-certificate"' :
+                                            percent > 0.95 ?
+                                                    'class="glyphicon quality glyphicon-star"' :
+                                                    'class="glyphicon quality glyphicon-star-empty"'
+                                            }
                                                     aria-hidden="true"></em></a>
                                     </label>`
-                                }
+                                    }
                             </div>`;
-                        return html;
-                    }).join('') +
-                    `</div>
+                            return html;
+                        }).join('') +
+                        `</div>
                 </form>
             </div>`;
-            $('.tagger').html(html);
-            $('.tagger').removeClass('hidden');
-            $('#tagger-placeholder').remove();
+                $('.tagger').html(html);
+                $('.tagger').removeClass('hidden');
+                $('#tagger-placeholder').remove();
+            }
         });
     </script>
     <div class="container-fluid tagger hidden" style="z-index: 100; position:relative; margin-top:16px; bottom: 8px;">
     </div>
 </div>
+

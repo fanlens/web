@@ -71,6 +71,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Comment'
+        403:
+          description: User not authorized for this query or parts of it. See error message.
+          schema:
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -86,6 +90,14 @@ paths:
           description: The comment
           schema:
            $ref: '#/definitions/Comment'
+        403:
+          description: User not authorized for this query or parts of it. See error message.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Comment not found
+          schema:
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -546,7 +558,7 @@ definitions:
   Error:
     type: object
     properties:
-      message:
+      error:
         type: string
 
   Job:
@@ -583,5 +595,4 @@ definitions:
         type: object
         description: The model parameters, restricted access
         additionalProperties:
-          type: string
-          format: string
+          type: [string, number, boolean]

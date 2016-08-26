@@ -14,7 +14,6 @@ setup(
     install_requires=[
         'fl-base',
         'Flask',
-        'Flask-Bootstrap',
         'flask-security',
         'flask-sqlalchemy',
         'Flask-Redis',

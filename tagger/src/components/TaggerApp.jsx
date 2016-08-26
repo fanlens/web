@@ -29,14 +29,14 @@ const TaggerApp = () => (
       <aside className="col-sm-3" id="sidebar">
         <Sidebar />
       </aside>
-      <main className="col-sm-9 tab-content" id="main">
+      <div className="col-sm-9 tab-content" id="main">
         <div id="evaluator" className="tab-pane fade">
           <EvaluatorContainer />
         </div>
         <div id="tagger" className="tab-pane fade in active">
           <TaggerListContainer />
         </div>
-      </main>
+      </div>
     </div>
   </div>
 )

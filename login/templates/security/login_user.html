@@ -14,16 +14,40 @@
             {{ render_field_with_errors(login_user_form.remember) }}
         </div>
         {{ render_field(login_user_form.next) }}
-        <div class=" text-right">
-            {{ render_field(login_user_form.submit, class_="btn btn-primary") }}
+        <div class="text-center">
+            <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Login">
+            <a id='demo' rel="tooltip" class="btn btn-info"
+               data-container="body"
+               data-toggle="tooltip"
+               data-html="true"
+               data-delay="150"
+               title="Use defaults to play with a tagger that's been trained to detect spam!">
+                Demo
+            </a>
         </div>
     </form>
-    <h2>Demo</h2>
-    <p >Play with a tagger that's been trained to detect spam!<br/>(ATM only english is supported)</p>
-    <dl>
-        <dt>Username</dt>
-        <dd>demo@example.com</dd>
-        <dt>Password</dt>
-        <dd>fanlensdemo</dd>
-    </dl>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+
+    <script>
+        $(document).ready(function () {
+            $('form').tooltip({
+                selector: "a[rel=tooltip]"
+            });
+        });
+        $('#demo').click(function () {
+            ga('send', {
+                hitType: 'event',
+                eventCategory: 'Demo',
+                eventAction: 'login-demo',
+                eventLabel: 'First Campaign'
+            });
+            $('#email').val('demo@example.com')
+            $('#password').val('fanlensdemo')
+            $('#remember').prop('checked', false);
+            $("#submit").click();
+        });
+    </script>
 {% endblock %}

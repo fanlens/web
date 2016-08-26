@@ -1,30 +1,6 @@
-/*
- * Start Bootstrap - Landing Page (http://startbootstrap.com/)
- * Copyright 2013-2016 Start Bootstrap
- * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
- */
-
-body,
-html {
-    width: 100%;
-    height: 100%;
-}
-
 body {
-    background: url(/assets/img/logo.png) no-repeat fixed center;
+    background: url(/cdn/img/logo.png) no-repeat fixed center;
     background-size: 40%;
-}
-
-@media (max-width: 900px) {
-    body {
-        background-size: 55%;
-    }
-}
-
-@media (max-width: 767px) {
-    body {
-        background-size: 70%;
-    }
 }
 
 body,
@@ -38,17 +14,6 @@ h6 {
     font-weight: 700;
 }
 
-.topnav {
-    font-size: 14px;
-}
-
-.navbar-brand > img {
-    height: 32px;
-    width: auto;
-    margin-top: -5px;
-    margin-right: -1px;
-    display: inline;
-}
 
 .lead {
     font-size: 18px;
@@ -56,7 +21,6 @@ h6 {
 }
 
 .intro-header {
-    padding-top: 50px; /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
@@ -269,15 +233,6 @@ h6 {
 
 }
 
-footer {
-    padding: 50px 0;
-    background-color: #f8f8f8;
-}
-
-p.copyright {
-    margin: 15px 0 0;
-}
-
 .ul-fa {
     list-style: none;
 }
@@ -290,13 +245,6 @@ p.copyright {
 
 .browser-mockup {
     margin-top: 3em;
-}
-
-#alerts {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    z-index: 999999;
 }
 
 .browser-mockup.with-url.tagger-greeting:after {

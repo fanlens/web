@@ -20,7 +20,7 @@ parser.add_argument('-b', '--bind', type=str, help='the address to bind to', req
 parser.add_argument('-p', '--port', type=int, help='the port to bind to', required=False)
 args = parser.parse_args()
 
-extra_dirs = [os.path.join(os.getcwd(), 'web/login/templates')]
+extra_dirs = [os.path.join(os.getcwd(), 'web/login/static'), os.path.join(os.getcwd(), 'web/login/templates')]
 extra_files = extra_dirs[:]
 
 

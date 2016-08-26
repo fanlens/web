@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "templating/base.html" %}
 
 {% block styles %}
     {{ super() }}
@@ -6,7 +6,7 @@
     <link href={{ url_for('static', filename="css/pricing.css") }} rel="stylesheet">
 {% endblock %}
 
-{% block content %}
+{% block main %}
     <div class="intro-header">
         <div class="wrapper">
             {#            <h1 class="heading">#}
@@ -73,14 +73,14 @@
                         <li><span class="fa fa-fw fa-facebook-square"></span>Add 10 pages</li>
                         <li><span class="fa fa-fw fa-eye"></span>Analyze competition</li>
                         <li><span class="fa fa-fw fa-dashboard"></span><a href="#" rel="tooltip"
-                               class="plain-link"
-                               data-container="body"
-                               data-toggle="tooltip"
-                               data-html="true"
-                               data-delay="300"
-                               title="Depends on system load. Two concurrent builds guaranteed."
+                                                                          class="plain-link"
+                                                                          data-container="body"
+                                                                          data-toggle="tooltip"
+                                                                          data-html="true"
+                                                                          data-delay="300"
+                                                                          title="Depends on system load. Two concurrent builds guaranteed."
                         >Fair-Use<sup><em class="fa fa-question-circle"></em></sup> concurrent builds
-                            </a></li>
+                        </a></li>
                         <li><span class="fa fa-fw fa-desktop"></span>Consumer app access</li>
                         <li><span class="fa fa-fw fa-cloud-download"></span>Consumer API access</li>
                         <li><span class="fa fa-fw fa-group"></span>Team access</li>
@@ -121,12 +121,12 @@
                     <!-- FEATURES -->
                     <ul id='hello' class="features">
                         <li><span class="fa fa-fw fa-facebook-square"></span><a href="#" rel="tooltip"
-                               class="plain-link"
-                               data-container="body"
-                               data-toggle="tooltip"
-                               data-html="true"
-                               data-delay="300"
-                               title="Depends on page volume usually at least 100 pages. If you need even more just contact us!"
+                                                                                class="plain-link"
+                                                                                data-container="body"
+                                                                                data-toggle="tooltip"
+                                                                                data-html="true"
+                                                                                data-delay="300"
+                                                                                title="Depends on page volume usually at least 100 pages. If you need even more just contact us!"
                         >Unlimited pages</a><sup><em class="fa fa-question-circle"></em></sup>
                         </li>
                         <li><span class="fa fa-fw fa-eye"></span>Analyze competition</li>
@@ -174,7 +174,7 @@
                     <h4 class="modal-title">Contact us for details!</h4>
                 </div>
                 <div class="modal-body">
-                    {% include 'contact_form.html' %}
+                    {% include 'landing/contact_form.html' %}
                 </div>
             </div>
         </div>

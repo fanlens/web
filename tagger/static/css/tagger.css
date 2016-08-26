@@ -1,5 +1,16 @@
-.panel-body .nav {
-    display: inline
+.btn-ellipsis, .ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.btn-ellipsis {
+    width: 95%;
+}
+
+.btn:focus, .btn:active:focus, .btn.active:focus,
+.btn.focus, .btn:active.focus, .btn.active.focus {
+    outline: none;
 }
 
 .glyphicon {

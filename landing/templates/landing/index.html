@@ -1,9 +1,10 @@
-{% extends "base.html" %}
+{% extends "templating/base.html" %}
 
 {% block styles %}
     {{ super() }}
 
-    <link href={{ url_for('static', filename="css/browser.css") }} rel="stylesheet">
+    <link href={{ url_for('static', filename="css/landing-page.css") }} rel="stylesheet">
+    <link href="/cdn/css/browser.css" rel="stylesheet">
 {% endblock %}
 
 {% block alerts %}
@@ -15,7 +16,7 @@
     {% endfor %}
 {% endblock %}
 
-{% block content %}
+{% block main %}
     <!-- Header -->
     <a name="about"></a>
     <div class="intro-header">
@@ -35,7 +36,7 @@
                     <div class="intro-message">
                         <div>
                             <h1>
-                                <img src="/static/img/logo.png"><em>f</em>anlens</h1>
+                                <img src="/cdn/img/logo.png"><em>f</em>anlens</h1>
                             <h3>Artificial Intelligence<br>
                                 Social Media Management</h3>
                         </div>
@@ -99,7 +100,7 @@
                 </div>
                 <div class="col-lg-6 col-lg-offset-1 col-sm-6">
                     <div class="browser-mockup with-url tagger-greeting">
-                        {% include 'demo.html' %}
+                        {% include 'landing/demo.html' %}
                     </div>
                     <p class="small text-center" style="margin-top:0.5em;">(Link to external source! We take no
                         responsibility for the shown content.)</p>
@@ -203,7 +204,7 @@
                                     class="network-name">AngelList</span></a>
                         </li>
                     </ul>
-                    {% include 'contact_form.html' %}
+                    {% include 'landing/contact_form.html' %}
                 </div>
             </div>
 
@@ -217,6 +218,7 @@
 
 {% block scripts %}
     {{ super() }}
+
     <!-- Tooltips -->
     <script type="text/javascript">
         $(document).ready(function () {
