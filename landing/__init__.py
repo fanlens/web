@@ -67,9 +67,6 @@ def pricing():
     return render_template('landing/pricing.html', contact_form=contact_form)
 
 
-from tagger.controller.tagger import comments__random_get
-
-
 @app.route('/demo', methods=['GET'])
 def demo():
     if request_wants_json():
