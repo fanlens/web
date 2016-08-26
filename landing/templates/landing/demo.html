@@ -30,7 +30,7 @@
                         Object.keys(demo.suggestion).map(function (tag) {
                             var percent = demo.suggestion[tag]
                             var html = `
-                            <div class="btn-group" role="group">
+                            <div id="labels" class="btn-group" role="group">
                                 ${percent <= 0.8 ?
                                     `<label class="btn btn-sm ellipsis btn-primary" type="button"><em
                                             class="glyphicon glyphicon-tag" aria-hidden="true"></em> ${tag}
@@ -62,6 +62,13 @@
                 $('.tagger').html(html);
                 $('.tagger').removeClass('hidden');
                 $('#tagger-placeholder').remove();
+                $('#labels > label.btn').click(function () {
+                    if ($(this).hasClass('active')) {
+                        $(this).removeClass('active');
+                    } else {
+                        $(this).addClass('active');
+                    }
+                });
             }
         });
     </script>

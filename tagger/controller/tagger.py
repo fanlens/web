@@ -42,6 +42,9 @@ def _check_sources(sources: set):
     return None
 
 
+from celery import group
+
+
 @defaults
 def comments__random_get(count: int = None,
                          sources: set = None,
@@ -65,7 +68,9 @@ def comments__random_get(count: int = None,
               meta :: JSONB ->> 'page'                         AS page,
               data :: JSONB ->> 'message'                      AS message,
               data :: JSONB -> 'from'                          AS user,
-              COALESCE(meta :: JSONB -> 'tags', '[]' :: JSONB) AS tags
+              COALESCE(meta :: JSONB -> 'tags', '[]' :: JSONB) AS tags,
+              meta :: JSONB -> 'fingerprint'                   AS fingerprint,
+              data :: JSONB ->> 'created_time'                 AS created_time
             FROM data.facebook_comments
             WHERE meta :: JSONB ->> 'lang' = :lang AND
                   meta :: JSONB -> 'fingerprint' IS NOT NULL AND
@@ -78,69 +83,58 @@ def comments__random_get(count: int = None,
             LIMIT :limit"""),
         dict(frac=1.0, limit=count, lang='en', ignore_source=ignore_source,
              sources=tuple(sources)))
-
-    if with_entity:
-        comments = [dict((k, v) for k, v in zip(query.keys(), r)) for r in query]
-        for comment in comments:
-            comment.update(comments_comment_id_field_id_get(comment['id'], 'tags', raw=True))
-    else:
-        comments = [{'id': r[0]} for r in query]
-
+    comments = dict((comment['id'], comment)
+                    for comment in [dict((k, v) for k, v in zip(query.keys(), r)) for r in query])
     if with_suggestion:
-        for comment in comments:
-            comment.update(comments_comment_id_field_id_get(comment['id'], 'suggestion', raw=True))
-        for comment in comments:
-            comment['suggestion'] = _resolve_async(comment['suggestion']) or []
-    return dict(comments=comments)
+        suggestions = group([celery.signature('worker.brain.predict',
+                                              args=(comment['message'],),
+                                              kwargs=dict(fingerprint=comment['fingerprint'],
+                                                          created_time=comment['created_time'],
+                                                          model_id='32797cd2-4203-11e6-9215-f45c89bc662f',
+                                                          key_by=comment['id']))
+                             for comment in comments.values()
+                             if comment['fingerprint'] is not None]).apply_async()
+        for suggestion in suggestions.get():
+            comments[suggestion['key']]['suggestion'] = dict((k, v) for [v, k] in suggestion['prediction'])
+    comments = comments.values()
+    for comment in comments:
+        comment['extra'] = dict(
+            fingerprint=comment.get('fingerprint'),
+            created_time=comment.get('created_time')
+        )
+        del comment['fingerprint']
+        del comment['created_time']
+        redis_store.setex(comment['id'], 30, json.dumps(comment).encode('utf-8'))
+        del comment['extra']
+
+    return dict(comments=list(comments))
 
 
-def _resolve_async(async_result: AsyncResult):
-    # switch to better backend
-    try:
-        return dict((k, v) for [v, k] in async_result.get())
-    except Exception as err:
-        logging.exception('error getting asynchronous result')
-        return None
-
-
-def _get_suggestions_for_id(comment_id: str, model_id: str, async=False) -> AsyncResult:
-    comment = db.session.query(FacebookCommentEntry).get(comment_id)
-    if not comment or 'fingerprint' not in comment.meta:
-        return dict(error='no fingerprint for comment'), 503
-    else:
-        error = _check_sources({comment.meta['page']})
-        if error:
-            return error
-        # todo model id is hard coded
-        async_result = celery.send_task('worker.brain.predict', args=(comment.data['message'],),
-                                        kwargs=dict(fingerprint=comment.meta['fingerprint'],
-                                                    created_time=comment.data['created_time'],
-                                                    model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
-        return async_result if async else _resolve_async(async_result)
+def _get_suggestions(comment: dict, model_id: str):
+    # todo model id is hard coded
+    if not comment['extra']['fingerprint']:
+        return dict()
+    async_result = celery.send_task('worker.brain.predict', args=(comment['message'],),
+                                    kwargs=dict(fingerprint=comment['extra']['fingerprint'],
+                                                created_time=comment['extra']['created_time'],
+                                                model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
+    return dict((k, v) for [v, k] in async_result.get())
 
 
 @defaults
-def comments_comment_id_field_id_get(comment_id, field_id, raw=False) -> dict:
-    if field_id == 'suggestion':
-        # todo somewhat weird logic
-        field_data = dict(suggestion=_get_suggestions_for_id(comment_id, '', async=raw is True))
-    else:
-        field_data = comments_comment_id_get(comment_id)
-
-    if isinstance(field_data, tuple):
-        # yeah yeah... for now it's ok
-        raise Exception('wtf')
-        return field_data
-
+def comments_comment_id_field_id_get(comment_id, field_id, no_cache=False) -> dict:
+    comment = comments_comment_id_get(comment_id,
+                                      with_suggestion=field_id == 'suggestion',
+                                      no_cache=no_cache)
     result = dict(id=comment_id)
-    result[field_id] = field_data.get(field_id, None)
+    result[field_id] = comment.get(field_id, None)
     return result
 
 
 @defaults
-def comments_comment_id_get(comment_id, with_suggestion=False) -> dict:
-    comment = redis_store.get(comment_id)
-    if not comment:
+def comments_comment_id_get(comment_id, no_cache=False, with_suggestion=False) -> dict:
+    cached = redis_store.get(comment_id)
+    if not cached or no_cache:
         comment_entry = db.session.query(FacebookCommentEntry).get(comment_id)
         if comment_entry is None:
             return dict(error='No comment for this id found'), 404
@@ -151,18 +145,28 @@ def comments_comment_id_get(comment_id, with_suggestion=False) -> dict:
             message=comment_entry.data['message'],
             page=comment_entry.meta['page'],
             tags=[user_to_tag_to_comment.tag for user_to_tag_to_comment in user_to_tag_to_comments],
-            user=comment_entry.data['from'])
+            user=comment_entry.data['from'],
+            extra=dict(
+                fingerprint=comment_entry.meta.get('fingerprint'),
+                created_time=comment_entry.data.get('created_time')
+            ))
+        if with_suggestion:
+            comment['suggestion'] = _get_suggestions(comment, '')
+        elif cached:
+            cached = json.loads(cached.decode('utf-8'))
+            # protect from cache deletion
+            comment['suggestion'] = cached.get('suggestion')
     else:
-        comment = json.loads(str(comment))
-    if with_suggestion:
-        comment['suggestion'] = _get_suggestions_for_id(comment_id, '', async=False)
-    redis_store.setex(comment_id, 30, json.dumps(comment))
+        comment = json.loads(cached.decode('utf-8'))
+        if with_suggestion and comment.get('suggestion') is None:
+            comment['suggestion'] = _get_suggestions(comment, '')
+    redis_store.setex(comment_id, 30, json.dumps(comment).encode('utf-8'))
+    del cached  # only use comment from here on out
 
-    # check after to prevent ddosing the db
     error = _check_sources({comment['page']})
     if error:
-        raise Exception(error)
         return error
+    del comment['extra']
     return comment
 
 
@@ -181,7 +185,10 @@ def comments_comment_id_tags_patch(comment_id, body: dict, with_entity=False) ->
             db.session.rollback()
             raise ValueError('tag not allowed')
     db.session.commit()
-    return comments_comment_id_get(comment_id) if with_entity else comments_comment_id_field_id_get(comment_id, 'tags')
+    if with_entity:
+        return comments_comment_id_get(comment_id, no_cache=True)
+    else:
+        return comments_comment_id_field_id_get(comment_id, 'tags', no_cache=True)
 
 
 @defaults
@@ -252,11 +259,11 @@ def model_model_id_get(model_id: str) -> dict:
 
 
 @defaults
-def model__search_post(body: dict, raw=False) -> dict:
+def model__search_post(body: dict, internal=False) -> dict:
     tagset_id = body.get('tagsetId')
     sources = body.get('sources')
     if tagset_id is None and sources is None:
-        return None if raw else (dict(error='No criterium specified'), 400)
+        return None if internal else (dict(error='No criterium specified'), 400)
     model_query = db.session.query(Model).filter_by(user_id=current_user.id)
     if tagset_id is not None:
         model_query = model_query.filter_by(tagset_id=tagset_id)
@@ -266,7 +273,7 @@ def model__search_post(body: dict, raw=False) -> dict:
     model_query = model_query.order_by(Model.score.desc())
     model = model_query.first()
     if model is None:
-        return None if raw else (dict(error='No model found for this query'), 404)
+        return None if internal else (dict(error='No model found for this query'), 404)
     return _model_to_result(model)
 
 
@@ -284,7 +291,7 @@ def model_post(body: dict, fast=True) -> dict:
 
     params = None
     if fast:
-        best_model = model__search_post(dict(tagset_id=tagset_id, sources=sources), raw=True)
+        best_model = model__search_post(dict(tagset_id=tagset_id, sources=sources), internal=True)
         params = best_model and best_model['params']
     job = celery.send_task('worker.brain.train_model',
                            args=(current_user.id, tagset_id, tuple(sources)),
