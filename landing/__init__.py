@@ -73,7 +73,7 @@ def demo():
         return jsonify(requests.get('https://lb/v2/tagger/comments/_random',
                                     params=dict(
                                         count=1,
-                                        sources='ladygaga',
+                                        sources='adele',
                                         with_entity=True,
                                         with_suggestion=True,
                                         api_key=g.demo_user.get_auth_token()),
