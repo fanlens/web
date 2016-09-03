@@ -48,7 +48,7 @@ const Evaluator = ({loading, suggestion, onEvaluate, onPost, onDelayed}) => {
                 <div className="form-group">
                   <label htmlFor="inferred-tags">Tags:</label>
                   <ul className="list-unstyled list-inline text-center" name="inferred-tags">
-                    {_.map(suggestion, ([percent, tag]) => (
+                    {_.map(suggestion, (percent, tag) => (
                       <li key={tag}>
                         <span className="badge badge-lg">
                           <em className="glyphicon glyphicon-tag"/> {tag} {(percent * 100).toFixed(0) + '%'}
