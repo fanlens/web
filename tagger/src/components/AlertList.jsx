@@ -27,18 +27,14 @@ const Alert = ({type, text, onDismiss}) => (
 )
 
 const Alerts = ({alerts, onDismiss}) => (
-  <div className="row">
-    <div className="col-md-8 col-md-offset-2">
-      <ul className="list-unstyled">
-        {alerts.map((alert) => (
-          <li key={alert.id} id={'alert-' + alert.id}>
-            <Alert {...alert} onDismiss={() => $('#alert-'+alert.id).fadeOut(100, () => onDismiss(alert.id))}/>
-          </li>
-        ))
-        }
-      </ul>
-    </div>
-  </div>
+  <ul className="list-unstyled">
+    {alerts.map((alert) => (
+      <li key={alert.id} id={'alert-' + alert.id}>
+        <Alert {...alert} onDismiss={() => $('#alert-' + alert.id).fadeOut(100, () => onDismiss(alert.id))}/>
+      </li>
+    ))
+    }
+  </ul>
 )
 
 export default Alerts
