@@ -60,15 +60,12 @@ export const toggleTagSet = (id) => {
   return {type: TaggerActionType.TAGGER_TOGGLE_TAGSET, id};
 }
 
-export function initApp() {
-  return (dispatch, getState) => {
-    dispatch(fetchTagCounts());
-    dispatch(fetchTagSets());
-    return dispatch(fetchSources())
-      .then(() => {
-        const activeSources = _.chain(getState().tagger.sources).filter('active').map('id').value();
-        dispatch(fetchRandomComments(8, activeSources));
-      });
+export function initGlobal() {
+  return (dispatch) => {
+    return Promise.all([
+      dispatch(fetchTagCounts()),
+      dispatch(fetchTagSets()),
+      dispatch(fetchSources())]);
   }
 }
 
@@ -161,7 +158,7 @@ export function fetchTagCounts() {
 
 export function fetchSuggestionForText(text) {
   return (dispatch) => {
-    dispatch(enterSuggestion())
+    dispatch(enterSuggestion());
     return fetch(BASE_URI + 'suggestion', {
       method: 'POST',
       body: JSON.stringify({text}),

@@ -34,8 +34,9 @@ def create_app():
     def send_files(filename):
         return send_from_directory('static', filename)
 
-    from tagger.controller import tagger
+    from tagger.controller import tagger, eev
     app.add_api('tagger.yaml', validate_responses=True, resolver=SimpleResolver(tagger))
+    app.add_api('eev.yaml', validate_responses=True, resolver=SimpleResolver(eev))
 
     return app
 

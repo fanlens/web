@@ -5,16 +5,15 @@ import {fetchRandomComments, resetCommentTags, addCommentTag, fetchTagCounts} fr
 import TaggerList from '../components/TaggerList.jsx'
 
 const mapStateToProps = (state) => {
-  return {comments: _.values(state.tagger.comments), sources: _.values(state.tagger.sources)};
-}
+  return {
+    comments: _.values(state.tagger.comments),
+    sources: _.chain(state.tagger.sources).filter('active').map('id').value()
+  };
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onReload: (sources, count) =>
-      dispatch(fetchRandomComments(count, _.chain(sources)
-        .filter('active')
-        .map('id')
-        .value())),
+    onReload: (count, sources) => dispatch(fetchRandomComments(count, sources)),
     onReset: (comments) => Promise.all(_.chain(comments)
       .map(comment => dispatch(resetCommentTags(comment.id, comment.tags)))
       .value())

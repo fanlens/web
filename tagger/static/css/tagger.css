@@ -62,14 +62,14 @@
     color: #fff !important;
 }
 
-#evaluator .tool {
+#eev .tool {
     background-color: white;
     padding: 1em;
     margin-bottom: 1em;
 }
 
 .tagger,
-#evaluator .tool {
+#eev .tool {
     box-shadow: 0px 0px 4px 2px #bbb;
 }
 

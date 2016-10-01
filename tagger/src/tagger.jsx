@@ -6,28 +6,32 @@ import {Provider} from 'react-redux'
 import createLogger from 'redux-logger'
 import thunkMiddleware from 'redux-thunk'
 
-import {initApp} from './actions/TaggerActions'
+import {initGlobal} from './actions/TaggerActions'
 import alerts from './reducers/alerts'
+import eev from './reducers/eev'
 import tagger from './reducers/tagger'
+import app from './reducers/app'
 
-import TaggerApp from './components/TaggerApp.jsx'
-import AlertsApp from './components/AlertsApp.jsx'
-
-const taggerReducers = combineReducers({
-  alerts,
-  tagger
-});
+import App from './components/App.jsx'
+import AlertsApp from './components/Alerts.jsx'
 
 const store = createStore(
-  taggerReducers,
+  combineReducers({
+    alerts,
+    eev,
+    tagger,
+    app,
+  }),
   applyMiddleware(
     thunkMiddleware,
     createLogger()
   )
-)
+);
+
+
 render(
   <Provider store={store}>
-    <TaggerApp />
+    <App />
   </Provider>,
   document.getElementById('app')
 );
@@ -38,4 +42,4 @@ render(
   document.getElementById('alerts')
 );
 
-store.dispatch(initApp())
+store.dispatch(initGlobal());

@@ -1,6 +1,8 @@
 import React from 'react'
+import {connect} from 'react-redux'
 import classnames from 'classnames'
 
+import {dismiss} from '../actions/AlertActions'
 import {AlertActionType} from '../actions/AlertActions'
 
 const ALERT_TITLES = {};
@@ -26,7 +28,7 @@ const Alert = ({type, text, onDismiss}) => (
   </div>
 )
 
-const Alerts = ({alerts, onDismiss}) => (
+const AlertList = ({alerts, onDismiss}) => (
   <ul className="list-unstyled">
     {alerts.map((alert) => (
       <li key={alert.id} id={'alert-' + alert.id}>
@@ -35,6 +37,35 @@ const Alerts = ({alerts, onDismiss}) => (
     ))
     }
   </ul>
-)
+);
 
-export default Alerts
+const mapStateToProps = (state) => {
+  return {
+    alerts: state.alerts
+  }
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onDismiss: (id) => {
+      dispatch(dismiss(id))
+    }
+  }
+};
+
+const DismissableAlertList = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AlertList);
+
+const AlertApp = () => (
+  <div className="container-fluid">
+    <div className="row">
+      <div className="col-md-8 col-md-offset-2">
+        <DismissableAlertList />
+      </div>
+    </div>
+  </div>
+);
+
+export default AlertApp

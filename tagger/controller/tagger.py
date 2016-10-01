@@ -171,6 +171,47 @@ def comments_comment_id_get(comment_id, no_cache=False, with_suggestion=False) -
 
 
 @defaults
+def comments_comment_id_put(comment_id, comment: dict) -> dict:
+    # todo i don't like checking source access only in web tier, but guess fair enough for now
+    if comment_id != comment.get('id', None):
+        return dict(error='comment id does not match body'), 400
+    error = _check_sources({comment['page']})
+    if error:
+        return error
+    task = celery.send_task('worker.crawler.add_comment', args=(comment,))
+    ok = task.get()
+    if ok:
+        return comment
+    else:
+        return dict(error='can not process request'), 400
+
+
+@defaults
+def comments__bulk_post(bulk: dict) -> dict:
+    # todo i don't like checking source access only in web tier, but guess fair enough for now
+    try:
+        error = _check_sources(set([comment['page'] for comment in bulk['comments']]))
+        if error:
+            return error
+    except KeyError as err:
+        logging.exception('invalid bulk object')
+        return dict(error='invalid bulk object'), 400
+    task = celery.send_task('worker.crawler.add_comment_bulk', args=(bulk,))
+    task.get()
+    return bulk
+
+
+@defaults
+def comments_comment_id_put(comment_id, comment: dict) -> dict:
+    # todo i don't like checking source access only in web tier, but guess fair enough for now
+    error = _check_sources({comment['page']})
+    if error:
+        return error
+    task = celery.send_task('worker.crawler.add_comment', args=(comment,))
+    task.get()
+    return comment
+
+@defaults
 def comments_comment_id_tags_patch(comment_id, body: dict, with_entity=False) -> dict:
     remove = body.get('remove', set())
     add = body.get('add', set())

@@ -102,6 +102,59 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+    put:
+      parameters:
+      - $ref: '#/parameters/CommentId'
+      - name: comment
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Comment'
+      responses:
+        200:
+          description: The comment
+          schema:
+           $ref: '#/definitions/Comment'
+        403:
+          description: User not authorized for this query or parts of it. See error message.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  '/comments/_bulk':
+    post:
+      parameters:
+      - name: bulk
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            comments:
+              type: array
+              items:
+                $ref: '#/definitions/Comment'
+      responses:
+        200:
+          description: The comments
+          schema:
+            type: object
+            properties:
+              comments:
+                type: array
+                items:
+                  $ref: '#/definitions/Comment'
+        403:
+          description: User not authorized for this query or parts of it. See error message.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
   '/comments/{comment_id}/{field_id}':
     get:
