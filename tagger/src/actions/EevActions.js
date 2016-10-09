@@ -101,7 +101,7 @@ export function getMessages() {
 
 export function sendChatbotMessage(text) {
   return (dispatch, getState) => {
-    if (text === "clear") {
+    if (text.trim().toLowerCase() === "clear") {
       return dispatch(receiveClearMessages());
     }
     const {token, conversationId} = getState().eev.conversation;
