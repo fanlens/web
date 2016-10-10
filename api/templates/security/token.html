@@ -1,0 +1,55 @@
+{% extends "security/security_base.html" %}
+
+{% block form_content %}
+    <h2>API Token</h2>
+
+    <div class="text-center">
+        <div id="api-key" class="well text-left">{{ api_key }}</div>
+
+        <button id="copy" class="btn btn-primary" data-clipboard-target="#api-key">
+            Copy to Clipboard
+        </button>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+
+    <script src="/cdn/js/clipboard.min.js"></script>
+    <script>
+        var clipboard = new Clipboard('#copy');
+        clipboard.on('success', function (e) {
+            $('#alerts').append(`
+                    <div class="alert fade in alert-success alert-dismissable"><strong>Info!</strong>
+                        Key copied to clipboard.<a href="#" class="close" data-dismiss="alert"
+                                                   aria-label="close">&times;</a>
+                    </div>
+            `);
+        });
+        clipboard.on('error', function (e) {
+            $('#alerts').append(`
+                    <div class="alert fade in alert-error alert-dismissable"><strong>Error!</strong>
+                        Error while copying key!<a href="#" class="close" data-dismiss="alert"
+                                                   aria-label="close">&times;</a>
+                    </div>
+            `);
+        });
+        $(document).ready(function () {
+            $('form').tooltip({
+                selector: "a[rel=tooltip]"
+            });
+        });
+        $('#demo').click(function () {
+            ga('send', {
+                hitType: 'event',
+                eventCategory: 'Demo',
+                eventAction: 'login-demo',
+                eventLabel: 'First Campaign'
+            });
+            $('#email').val('demo@example.com')
+            $('#password').val('fanlensdemo')
+            $('#remember').prop('checked', false);
+            $("#submit").click();
+        });
+    </script>
+{% endblock %}

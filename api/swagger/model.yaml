@@ -1,0 +1,309 @@
+swagger: "2.0"
+
+info:
+  title: "Fanlens Model API"
+  version: "3.0.0"
+  description: "API handles the intelligence services"
+
+schemes:
+  - https
+
+basePath: /v3/model
+
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: query
+
+security:
+  - api_key: []
+
+produces:
+  - application/json
+
+paths:
+  '/train':
+    post:
+      summary: Train a new model for a tagset based on sources (or all sources)
+      tags: [model]
+      consumes: [application/json]
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required: [sources, tagsetId]
+          properties:
+            sources:
+              type: array
+              items:
+                $ref: '#/definitions/Source'
+              uniqueItems: true
+              description: list of sources to use, empty list means all
+            tagsetId:
+              type: number
+              format: int32
+              description: the tagset id to find, must be accessible by user
+      - name: fast
+        in: query
+        type: boolean
+        required: false
+        default: true
+        description: Reuse model parameters and only use data
+      responses:
+        202:
+          description: Model creation has been initiated.
+          schema:
+            $ref: '#/definitions/Job'
+        409:
+          description: Model creation for this tagset is currently in progress, see job reference.
+          schema:
+            $ref: '#/definitions/Job'
+        403:
+          description: Source or tagset not associated with user
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  '/{model_id}':
+    get:
+      summary: Get meta information about a trained model
+      tags: [model]
+      parameters:
+      - name: model_id
+        in: path
+        type: string
+        format: uuid
+        required: true
+        description: The id of this model
+      responses:
+        200:
+          description: Information about the trained model. Includes 'score' for admin roles
+          schema:
+            $ref: '#/definitions/Model'
+        403:
+          description: Model not associated to user
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  '/search':
+    post:
+      summary: Get meta information about a trained model
+      tags: [model]
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            sources:
+              type: array
+              items:
+                $ref: '#/definitions/Source'
+              uniqueItems: true
+              description: list of sources to use, empty list means all
+            tagsetId:
+              type: number
+              format: int32
+              description: the tagset id to find, must be accessible by user
+      responses:
+        200:
+          description: Information about the best trained model. Includes 'score' for admin roles
+          schema:
+            $ref: '#/definitions/Model'
+        400:
+          description: No criterium specified
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No model found for this query
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  '/jobs/{job_id}':
+    get:
+      summary: Get info about progress of model training. Can be used for auto REST polling.
+      tags: [job]
+      parameters:
+      - $ref: '#/parameters/JobId'
+      responses:
+        201:
+          description: Model creation has finished
+          headers:
+            Location:
+              type: string
+              format: url
+              description: Url of the created model
+        304:
+          description: Model not ready yet. Can be used for automatic polling if the client supports the 'Retry-After' header.
+          headers:
+            Location:
+              type: string
+              format: url
+              description: Loop back to the job status for auto polling.
+            Retry-After:
+              type: number
+              format: int32
+              description: The amount of seconds to wait before retrying.
+        403:
+          description: You are not the owner of this job
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Job does not exist
+          schema:
+            $ref: '#/definitions/Error'
+        410:
+          description: Model creation failed
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Cancel a running job.
+      tags: [job]
+      parameters:
+      - $ref: '#/parameters/JobId'
+      responses:
+        200:
+          description: Job cancelled succesfully
+          schema:
+            type: object
+            required: [jobId]
+            properties:
+              jobId:
+                type: string
+                format: uuid
+                description: The job id provided
+        403:
+          description: You are not the owner of this job
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Job not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /suggestion:
+    post:
+      summary: Get suggestions for a provided text
+      tags: [suggestion]
+      consumes: [application/json]
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required: [text]
+          properties:
+            text:
+              type: string
+              minLength: 64
+              maxLength: 7000
+              description: The text to fetch suggestions for. English only atm.
+      responses:
+        200:
+          description: A Suggestion Bundle
+          schema:
+            type: object
+            required: [suggestion]
+            properties:
+              text:
+                type: string
+              suggestion:
+                $ref: '#/definitions/Suggestion'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+parameters:
+  JobId:
+    name: job_id
+    in: path
+    type: string
+    format: uuid
+    required: true
+    description: The job id provided
+
+definitions:
+  Source:
+    type: string
+    minLength: 1
+    maxLength: 128
+
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
+
+  Job:
+    type: object
+    required: [jobId]
+    properties:
+      jobId:
+        type: string
+        format: uuid
+      jobUrl:
+        type: string
+        format: url
+        description: You can get info about the currently running job or cancel it under this url
+
+  Model:
+    type: object
+    required: [modelId, trainedTs]
+    properties:
+      modelId:
+        type: string
+        format: uuid
+        description: The id of this model
+      trainedTs:
+        type: string
+        format: date-time
+        description: The timestamp when this model was created
+      score:
+        type: number
+        format: float
+        minimum: 0.0
+        maximum: 1.0
+        description: The f1 score of the model, restricted access
+      params:
+        type: object
+        description: The model parameters, restricted access
+        additionalProperties:
+          type: [string, number, boolean]
+
+  Suggestion:
+    type: object
+    additionalProperties:
+      type: number
+      format: float
+      minimum: 0.0
+      maximum: 1.0
+      description: Probability of suggestion

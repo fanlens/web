@@ -1,0 +1,53 @@
+{% extends "security/security_base.html" %}
+
+{% block form_content %}
+    <h2>Login</h2>
+    <form role="form" action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+        {{ login_user_form.hidden_tag() }}
+        <div class="form-group">
+            {{ render_field_with_errors(login_user_form.email, class_="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ render_field_with_errors(login_user_form.password, class_="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ render_field_with_errors(login_user_form.remember) }}
+        </div>
+        {{ render_field(login_user_form.next) }}
+        <div class="text-center">
+            <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Login">
+            <a id='demo' rel="tooltip" class="btn btn-info"
+               data-container="body"
+               data-toggle="tooltip"
+               data-html="true"
+               data-delay="150"
+               title="Use defaults to play with a tagger that's been trained to detect spam!">
+                Demo
+            </a>
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+
+    <script>
+        $(document).ready(function () {
+            $('form').tooltip({
+                selector: "a[rel=tooltip]"
+            });
+        });
+        $('#demo').click(function () {
+            ga('send', {
+                hitType: 'event',
+                eventCategory: 'Demo',
+                eventAction: 'login-demo',
+                eventLabel: 'First Campaign'
+            });
+            $('#email').val('demo@example.com')
+            $('#password').val('fanlensdemo')
+            $('#remember').prop('checked', false);
+            $("#submit").click();
+        });
+    </script>
+{% endblock %}

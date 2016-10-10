@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import g
-from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin
+from flask import g, render_template
+from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin, login_required, current_user
 from flask_wtf.csrf import CsrfProtect
 
 from flask_modules.database import db
@@ -14,7 +14,7 @@ security = Security()
 _demo_user = None
 
 
-class WebRole(db.Model, Role, RoleMixin):
+class WebRole(db.Model, RoleMixin, Role):
     pass
 
 
@@ -27,7 +27,7 @@ def setup_security(app):
     app.config['SECRET_KEY'] = web_config['secret_key']
     app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
     app.config['SECURITY_PASSWORD_SALT'] = web_config['salt']  # unnecessary but required
-    app.config['SECURITY_URL_PREFIX'] = '/user'
+    app.config['SECURITY_URL_PREFIX'] = '/v3/user'
     app.config['SECURITY_CONFIRMABLE'] = True
     app.config['SECURITY_REGISTERABLE'] = True
     app.config['SECURITY_RECOVERABLE'] = False
@@ -39,6 +39,11 @@ def setup_security(app):
 
     user_datastore = SQLAlchemyUserDatastore(db, WebUser, WebRole)
     security.init_app(app, user_datastore)
+
+    @app.route('/v3/user/token', methods=['GET'])
+    @login_required
+    def token():
+        return render_template('security/token.html', api_key=current_user.get_auth_token())
 
     @app.before_first_request
     def fetch_demo_user():

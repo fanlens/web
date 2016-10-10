@@ -1,0 +1,256 @@
+body {
+    background: url(/cdn/img/logo.png) no-repeat fixed center;
+    background-size: 40%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 700;
+}
+
+
+.lead {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.intro-header {
+    padding-bottom: 50px;
+    text-align: center;
+    color: #f8f8f8;
+    background: url(../img/intro-bg.jpg) no-repeat center center;
+    background-size: cover;
+}
+
+.intro-message {
+    position: relative;
+    padding-top: 12%;
+    padding-bottom: 13.5%;
+}
+
+.intro-message > div {
+    white-space: nowrap;
+    display: inline-block;
+    padding-right: 2em;
+}
+
+.intro-message > div > h1 {
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+    font-family: 'Crimson Text  script=all rev=2', serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 8em;
+    letter-spacing: 0.025em;
+    display: block;
+    /*-webkit-font-smoothing: antialiased;*/
+    /*-moz-osx-font-smoothing: grayscale;*/
+    /*-webkit-text-stroke: 0.8px rgba(0,0,0,0.3);*/
+}
+
+.intro-message > div > h1 > em {
+    font-family: 'Crimson Text  script=all rev=2', serif;
+    font-size: 1.9em;
+    font-weight: normal;
+    margin-right: -0.09em;
+    margin-left: 0.125em;
+    top: 0.03em;
+    position: relative;
+    font-style: italic;
+}
+
+.intro-message > div > h1 > img {
+    height: 2em;
+    width: auto;
+    margin-top: -0.45em;
+    margin-right: -0.15em;
+    display: inline;
+}
+
+.intro-divider {
+    width: 400px;
+    border-top: 1px solid #f8f8f8;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.intro-message > div > h3 {
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+    text-align: right;
+    font-size: 2.5em;
+    font-weight: bold;
+    top: -1em;
+    position: relative;
+    display: block;
+    /*-webkit-font-smoothing: antialiased;*/
+    /*-moz-osx-font-smoothing: grayscale;*/
+    /*-webkit-text-stroke: 1px rgba(0,0,0,0.3);*/
+}
+
+@media (max-width: 767px) {
+    .intro-message {
+        padding-bottom: 15%;
+    }
+
+    .intro-message > div > h1 {
+        font-size: 15vw;
+    }
+
+    .intro-message > div > h3 {
+        font-size: 4.7vw;
+    }
+
+    ul.intro-social-buttons > li {
+        display: block;
+        margin-bottom: 20px;
+        padding: 0;
+    }
+
+    ul.intro-social-buttons > li:last-child {
+        margin-bottom: 0;
+    }
+
+    .intro-divider {
+        width: 100%;
+    }
+}
+
+@media (max-width: 767px) and (max-device-width: 1024px) {
+    .intro-message > div > h1 {
+        font-size: 15vw;
+    }
+
+    .intro-message > div > h3 {
+        font-size: 5.7vw;
+    }
+}
+
+.network-name {
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 2px;
+}
+
+.content-section-a {
+    padding: 50px 0;
+    /*background-color:  #f8f8f8;*/
+    background-color: rgba(248, 248, 248, 0.95);
+}
+
+.content-section-b {
+    padding: 50px 0;
+    border-top: 1px solid #e7e7e7;
+    border-bottom: 1px solid #e7e7e7;
+    background-color: rgba(255, 255, 255, 0.90);
+}
+
+.section-heading {
+    margin-bottom: 30px;
+}
+
+.section-heading-spacer {
+    float: left;
+    width: 200px;
+    border-top: 3px solid #e7e7e7;
+}
+
+.banner {
+    padding: 100px 0;
+    color: #f8f8f8;
+    background: url(../img/banner-bg.jpg) no-repeat center center;
+    background-size: cover;
+}
+
+.banner .lead {
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+}
+
+.banner h2 {
+    margin-top: 0;
+    margin-left: -3px;
+    font-size: 3em;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
+}
+
+.banner ul {
+    margin-bottom: 0;
+}
+
+.banner form {
+    margin-top: 1em;
+    float: right;
+    max-width: 96.5%;
+}
+
+.banner-social-buttons {
+    float: right;
+    margin-top: 0;
+}
+
+@media (max-width: 1199px) {
+    ul.banner-social-buttons {
+        float: left;
+        margin-top: 15px;
+    }
+
+    .banner form {
+        float: left;
+        max-width: 66.5%;
+    }
+}
+
+@media (max-width: 991px) {
+
+    .banner form {
+        float: left;
+        max-width: 87%;
+    }
+}
+
+@media (max-width: 767px) {
+    .banner h2 {
+        margin: 0;
+        text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6);
+        font-size: 3em;
+    }
+
+    ul.banner-social-buttons > li {
+        display: block;
+        margin-bottom: 20px;
+        padding: 0;
+    }
+
+    ul.banner-social-buttons > li:last-child {
+        margin-bottom: 0;
+    }
+
+}
+
+.ul-fa {
+    list-style: none;
+}
+
+.li-fa:before {
+    font-family: 'FontAwesome';
+    content: '\f00c';
+    margin: 0 5px 0 -15px;
+}
+
+.browser-mockup {
+    margin-top: 3em;
+}
+
+.browser-mockup.with-url.tagger-greeting:after {
+    content: 'Spam detector for Adele. Hit refresh!';
+}
+
+.browser-mockup.with-url.evaluator-greeting:after {
+    content: 'How will your fanbase react?';
+}

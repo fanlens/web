@@ -1,0 +1,15 @@
+{% extends "security/security_base.html" %}
+
+{% block form_content %}
+    <form role="form" action="{{ url_for_security('send_confirmation', token=send_confirmation_token) }}" method="POST"
+          name="send_confirmation_form">
+        <h1>Resend Confirmation Email</h1>
+        {{ send_confirmation_form.hidden_tag() }}
+        <div class="form-group">
+            {{ render_field_with_errors(send_confirmation_form.email, class_="form-control") }}
+        </div>
+        <div class=" text-right">
+            {{ render_field(send_confirmation_form.submit, class_="btn btn-default") }}
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,54 @@
+swagger: "2.0"
+
+info:
+  title: "Fanlens EEV API"
+  version: "3.0.0"
+  description: "API related to eev activity"
+
+schemes:
+  - https
+
+basePath: /v3/eev
+
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: query
+
+security:
+  - api_key: []
+
+produces:
+  - application/json
+
+paths:
+  /token:
+    get:
+      summary: get a conversation token for eev
+      parameters:
+      - name: renew
+        in: query
+        description: renew current token
+        type: boolean
+        required: false
+        default: true
+      responses:
+        200:
+          description: A token
+          schema:
+            type: object
+            required: [token]
+            properties:
+              token:
+                type: string
+        500:
+          description: could not renew or generate token
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
