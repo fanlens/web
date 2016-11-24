@@ -1,22 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from celery.result import AsyncResult
-from db.models.brain import Model
 from flask import redirect
-from flask_modules.celery import celery
+from flask_modules.celery import celery, Brain
 from flask_modules.database import db
 from flask_security import current_user
 from flask_security.decorators import roles_required
 
-from . import defaults
+from db.models.brain import Model, Job
 
-
-def _internal_job_id(job_id):
-    return '#task-' + job_id
+from . import defaults, check_sources_by_id
 
 
 def _model_to_result(model: Model):
-    result = dict(modelId=model.id, trainedTs=model.trained_ts)
+    result = dict(id=model.id, trained_ts=model.trained_ts)
     if 'admin' in [role.name for role in current_user.roles]:
         result['score'] = model.score
         result['params'] = model.params
@@ -25,11 +21,9 @@ def _model_to_result(model: Model):
 
 @defaults
 def model_id_get(model_id: str) -> dict:
-    try:
-        model_idx = [model.id for model in current_user.models].index(model_id)
-    except ValueError as err:
+    model = current_user.models.filter_by(id=model_id).one_or_none()
+    if not model:
         return dict(error='Model not associated to user'), 403
-    model = current_user.models[model_idx]
     return _model_to_result(model)
 
 
@@ -52,65 +46,68 @@ def search_post(body: dict, internal=False) -> dict:
     return _model_to_result(model)
 
 
-@defaults
 @roles_required('admin')
+@defaults
 def train_post(body: dict, fast=True) -> dict:
-    tagset_id = body['tagsetId']
-    if tagset_id not in [tagset.id for tagset in current_user.tagsets]:
+    jobs = current_user.jobs.all()
+    if jobs:
+        job_url = '/v3/model/jobs/' + str(jobs[0].id)
+        return dict(job=str(jobs[0].id), url=job_url), 409
+
+    tagset_id = body['tagset_id']
+    tagset = current_user.tagsets.filter_by(id=tagset_id).one_or_none()
+    if not tagset:
         return dict(error='Tagset not associated with user'), 403
 
-    sources = set(body['sources'])
-    error = _check_sources(sources)
+    source_ids = set(body['source_ids'])
+    error = check_sources_by_id(source_ids)
     if error:
         return error
 
     params = None
-    if fast:
-        best_model = model__search_post(dict(tagset_id=tagset_id, sources=sources), internal=True)
-        params = best_model and best_model['params']
-    job = celery.send_task('worker.brain.train_model',
-                           args=(current_user.id, tagset_id, tuple(sources)),
-                           kwargs=dict(params=params))
-    job_url = '/model/_jobs/' + job.id
-    return dict(jobId=job.id, jobUrl=job_url), 303, {'Retry-After': 30, 'Location': job_url}
-
-
-def _check_task(job: AsyncResult):
-    job_info = job.info
-    if job_info.get('user_id', None) != current_user.id:
-        return dict(error='not job owner'), 403
-    return None
+    # if fast:
+    #     best_model = model__search_post(dict(tagset_id=tagset_id, sources=sources), internal=True)
+    #     params = best_model and best_model['params']
+    job = Brain.train_model(tagset_id, tuple(source_ids), n_estimators=1, params=params)
+    current_user.jobs.append(Job(id=job.id, user_id=current_user.id))
+    db.session.commit()
+    job_url = '/v3/model/jobs/' + job.id
+    return dict(job=job.id, url=job_url), 202
 
 
 @defaults
 def jobs_job_id_get(job_id) -> dict:
-    job = celery.AsyncResult(job_id)
-    error = _check_task(job)
-    if error:
-        return error
-    if job.ready():
-        if job.successful():
-            tagset_id, version, model_id = job.get(timeout=2)
-            return redirect('/model/%s?version=%s' % (tagset_id, version), code=201)
-        elif job.failed():
+    job = current_user.jobs.filter_by(id=job_id).one_or_none()
+    if not job:
+        return dict(error='not associated to user ' + job_id), 403
+
+    result = celery.AsyncResult(job_id)
+    if result.ready():
+        if result.successful():
+            model_id = result.get(timeout=2)
+            return redirect('/v3/model/%s' % model_id, code=201)
+        elif result.failed():
             return dict(error='model could not be created'), 410
     else:  # still running
-        if job.state == 'PENDING':  # most likely doesn't exist
+        if result.state == 'PENDING':  # most likely doesn't exist
             # todo strictly speaking not 404, the task could be simply not started yet
             return dict(error='no job with id ' + job_id), 404
         else:
-            job_url = '/model/_jobs/' + job_id
-            return dict(jobId=job_id, jobUrl=job_url), 302, {'Retry-After': 30, 'Location': job_url}
+            job_url = '/v3/jobs/' + job_id
+            return dict(job=job_id, url=job_url), 304, {'Retry-After': 30, 'Location': job_url}
 
 
 @defaults
 def jobs_job_id_delete(job_id) -> dict:
-    job = celery.AsyncResult(job_id)
-    error = _check_task(job)
-    if error:
-        return error
-    job.revoke()  # todo: simply revokes the task, does not kill training by default
-    return dict(jobId=job_id)
+    job = current_user.jobs.filter_by(id=job_id).one_or_none()
+    if not job:
+        return dict(error='not associated to user ' + job_id), 403
+
+    result = celery.AsyncResult(job_id)
+    result.revoke()  # todo: simply revokes the task, does not kill training by default
+    current_user.jobs.filter_by(id=job_id).delete()
+    db.session.commit()
+    return dict(job=job_id)
 
 
 @defaults

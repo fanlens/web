@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 import json
 
-from celery import group
+from api.controller import check_sources_by_id
+from db import insert_or_ignore, insert_or_update
+from db.models.activities import Data, Source, Tag, Type, TagSet
 from flask import redirect
 from flask_modules.celery import celery
 from flask_modules.database import db
@@ -11,8 +13,6 @@ from flask_security import current_user
 from sqlalchemy.sql import func
 
 from . import defaults
-from db import insert_or_ignore, insert_or_update
-from db.models.activities import Data, Source, Tag, Tagging, Type, TagSet, Lang
 
 generic_parser = lambda data: dict(
     message=data.text.text or "{in progress}",
@@ -43,17 +43,6 @@ parsers = {
 }
 
 
-def _check_result(result: bool):
-    if not result:
-        return dict(error='User does not have access to all requested sources'), 403
-    return None
-
-
-def _check_sources_by_id(sources: set):
-    is_sub = sources.issubset(source.id for source in current_user.sources)
-    return _check_result(is_sub)
-
-
 def _get_suggestions(activity: dict, model_id: str) -> dict:
     # todo model id is hard coded
     if not activity['extra']['fingerprint']:
@@ -82,7 +71,7 @@ def source_ids_get(source_ids: list = None,
                    max_id: str = None,
                    random: bool = False,
                    with_suggestion: bool = None) -> dict:
-    error = _check_sources_by_id(set(source_ids))
+    error = check_sources_by_id(set(source_ids))
     if error:
         return error
 
@@ -150,7 +139,7 @@ def source_id_activity_id_get(source_id: int, activity_id: str, no_cache=False, 
     redis_store.setex(_to_key(source_id, activity_id), 30, json.dumps(activity).encode('utf-8'))
     del cached  # only use activity from here on out
 
-    error = _check_sources_by_id({activity['source']['id']})
+    error = check_sources_by_id({activity['source']['id']})
     if error:
         return error
     del activity['meta']
@@ -183,7 +172,7 @@ def source_id_activity_id_put(source_id: int, activity_id: str, activity_import:
         db.session.rollback()
         return dict(error="source_id does not match activity"), 400
 
-    err = _check_sources_by_id({source_id})
+    err = check_sources_by_id({source_id})
     if err:
         db.session.rollback()
         return err
@@ -198,7 +187,7 @@ def source_id_activity_id_put(source_id: int, activity_id: str, activity_import:
 
 @defaults
 def source_id_activity_id_delete(source_id: int, activity_id: str, commit=True) -> dict:
-    err = _check_sources_by_id({source_id})
+    err = check_sources_by_id({source_id})
     if err:
         db.session.rollback()
         return err

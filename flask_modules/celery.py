@@ -4,7 +4,7 @@
 from celery import Celery
 from config.db import Config
 
-celery = object
+celery = object  # type: Celery
 
 
 def setup_celery(app):
@@ -29,3 +29,9 @@ def setup_celery(app):
                 return TaskBase.__call__(self, *args, **kwargs)
 
     celery.Task = ContextTask
+
+
+class Brain(object):
+    @staticmethod
+    def train_model(*args, **kwargs) -> Celery.AsyncResult:
+        return celery.send_task('worker.brain.' + Brain.train_model.__name__, args=args, kwargs=kwargs)

@@ -34,18 +34,18 @@ paths:
         required: true
         schema:
           type: object
-          required: [sources, tagsetId]
+          required: [source_ids, tagset_id]
           properties:
-            sources:
+            source_ids:
               type: array
               items:
-                $ref: '#/definitions/Source'
+                $ref: '#/definitions/SourceId'
               uniqueItems: true
               description: list of sources to use, empty list means all
-            tagsetId:
+            tagset_id:
               type: number
               format: int32
-              description: the tagset id to find, must be accessible by user
+              description: the taset id to find, must be accessible by user
       - name: fast
         in: query
         type: boolean
@@ -106,13 +106,13 @@ paths:
         schema:
           type: object
           properties:
-            sources:
+            source_ids:
               type: array
               items:
-                $ref: '#/definitions/Source'
+                $ref: '#/definitions/SourceId'
               uniqueItems: true
               description: list of sources to use, empty list means all
-            tagsetId:
+            tagset_id:
               type: number
               format: int32
               description: the tagset id to find, must be accessible by user
@@ -185,9 +185,9 @@ paths:
           description: Job cancelled succesfully
           schema:
             type: object
-            required: [jobId]
+            required: [job]
             properties:
-              jobId:
+              job:
                 type: string
                 format: uuid
                 description: The job id provided
@@ -252,10 +252,9 @@ parameters:
     description: The job id provided
 
 definitions:
-  Source:
-    type: string
-    minLength: 1
-    maxLength: 128
+  SourceId:
+    type: integer
+    format: int32
 
   Error:
     type: object
@@ -265,25 +264,25 @@ definitions:
 
   Job:
     type: object
-    required: [jobId]
+    required: [job]
     properties:
-      jobId:
+      job:
         type: string
         format: uuid
-      jobUrl:
+      url:
         type: string
         format: url
         description: You can get info about the currently running job or cancel it under this url
 
   Model:
     type: object
-    required: [modelId, trainedTs]
+    required: [id, trained_ts]
     properties:
-      modelId:
+      id:
         type: string
         format: uuid
         description: The id of this model
-      trainedTs:
+      trained_ts:
         type: string
         format: date-time
         description: The timestamp when this model was created
