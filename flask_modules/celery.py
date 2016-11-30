@@ -35,3 +35,7 @@ class Brain(object):
     @staticmethod
     def train_model(*args, **kwargs) -> Celery.AsyncResult:
         return celery.send_task('worker.brain.' + Brain.train_model.__name__, args=args, kwargs=kwargs)
+
+    @staticmethod
+    def predict_text(*args, **kwargs) -> Celery.AsyncResult:
+        return celery.send_task('worker.brain.' + Brain.predict_text.__name__, args=args, kwargs=kwargs)

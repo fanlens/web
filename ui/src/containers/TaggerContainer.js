@@ -2,7 +2,7 @@ import {connect} from 'react-redux'
 import _ from 'lodash'
 
 import {warning, info} from '../actions/AlertActions'
-import {toggleCommentTag, fetchTagCounts} from '../actions/TaggerActions'
+import {toggleCommentTag} from '../actions/TaggerActions'
 
 import Tagger from '../components/Tagger.jsx'
 
@@ -18,7 +18,7 @@ const mapDispatchToProps = (dispatch) => {
     onDuplicate: (text) => {
       dispatch(warning(text));
     },
-    onToggle: (comment, tag) => dispatch(toggleCommentTag(comment, tag)).then(dispatch(fetchTagCounts())),
+    onToggle: (comment, tag) => dispatch(toggleCommentTag(comment, tag)),
     onNewTag: (comment, tag) => {
       dispatch(info('Adding new tags is not possible in the demo. Please choose from the provided tag sets.'))
       //this.onToggle(currentTags, tag)

@@ -44,7 +44,7 @@ const receiveTagCounts = (counts) => {
   return {type: TaggerActionType.TAGGER_RECEIVE_TAGCOUNTS, counts};
 };
 
-export const toggleSource = (source) => {
+const receiveToggleSource = (source) => {
   return {type: TaggerActionType.TAGGER_TOGGLE_SOURCE, source};
 };
 
@@ -55,7 +55,7 @@ export const toggleTagSet = (id) => {
 export function initGlobal() {
   return (dispatch, getState) => {
     return Promise.all([
-      dispatch(fetchTagCounts()),
+      dispatch(fetchTagCounts(false)),
       dispatch(fetchTagSets()),
       dispatch(fetchSources())])
       .then(() => getState().app.tagger ?
@@ -80,12 +80,19 @@ export function fetchSources() {
       .catch((error) => console.log(error)));
 }
 
-export function fetchTagCounts() {
-  return (dispatch) => activitiesApi.then(
-    (api) => api.tags.get_tags({with_count: true})
-      .then(({status, obj}) => obj)
-      .then(({counts}) => dispatch(receiveTagCounts(counts)))
-      .catch((error) => console.log(error)));
+export function fetchTagCounts(filterSources = true) {
+  return (dispatch, getState) => activitiesApi.then(
+    (api) => {
+      const counts = filterSources ?
+        api.tags.get_source_ids_tags({
+          source_ids: _.chain(getState().tagger.sources).filter('active').map('id').value(),
+          with_count: true
+        }) :
+        api.tags.get_tags({with_count: true})
+      counts.then(({status, obj}) => obj)
+        .then(({counts}) => dispatch(receiveTagCounts(counts)))
+        .catch((error) => console.log(error))
+    });
 }
 
 export function fetchRandomComments(count, sources, withSuggestion = false) {
@@ -111,13 +118,16 @@ function manipulateTags(comment, add, remove) {
       }
     }).then(({status, obj}) => obj)
       .then(({tags}) => dispatch(receiveTags(comment, tags)))
+      .then(() => dispatch(fetchTagCounts()))
       .catch((error) => console.log(error)));
 }
 
+export function toggleSource(source) {
+  return (dispatch) => Promise.resolve(dispatch(receiveToggleSource(source))).then(dispatch(fetchTagCounts()));
+}
+
 export function toggleCommentTag(comment, tag) {
-  return manipulateTags(comment,
-    _.difference([tag], comment.tags),
-    _.intersection(comment.tags, [tag]));
+  return manipulateTags(comment, _.difference([tag], comment.tags), _.intersection(comment.tags, [tag]))
 }
 
 export function addCommentTag(comment, tag) {

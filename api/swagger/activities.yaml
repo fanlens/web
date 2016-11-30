@@ -62,7 +62,7 @@ paths:
             $ref: '#/definitions/Error'
 
 
-  '/{source_ids}/':
+  /{source_ids}/:
     get:
       summary: Get a list of random activities
       tags: [activity]
@@ -110,7 +110,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  '/{source_id}/{activity_id}':
+  /{source_id}/{activity_id}:
     get:
       summary: Get this activity
       tags: [activity]
@@ -179,7 +179,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  '/{source_id}/{activity_id}/{field_id}':
+  /{source_id}/{activity_id}/{field_id}:
     get:
       summary: Get specific field of activity
       tags: [activity]
@@ -202,7 +202,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  '/{source_id}/{activity_id}/tags':
+  /{source_id}/{activity_id}/tags:
     patch:
       summary: Modify tags of activity
       tags: [activity]
@@ -344,6 +344,34 @@ paths:
       responses:
         200:
           description: All tags of current user
+          schema:
+            type: object
+            required: [tags]
+            properties:
+              tags:
+                $ref: '#/definitions/Tags'
+              count:
+                $ref: '#/definitions/TagCounts'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /{source_ids}/tags/:
+    get:
+      summary: Get tags of source_ids
+      tags: [tags]
+      parameters:
+      - $ref: '#/parameters/SourceIds'
+      - name: with_count
+        in: query
+        description: should the tag counts be included
+        type: boolean
+        required: false
+        default: true
+      responses:
+        200:
+          description: All tags requested sources
           schema:
             type: object
             required: [tags]

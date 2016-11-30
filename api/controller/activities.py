@@ -55,6 +55,7 @@ def _get_suggestions(activity: dict, model_id: str) -> dict:
 
 
 def _get_by_id(source_id: int, activity_id: str) -> Data:
+    # return current_user.sources.filter_by(id=source_id).data.filter_by(object_id=activity_id).one_or_none()
     return db.session.query(Data).filter(
         Data.source_id.in_({src.id for src in current_user.sources}) &
         (Data.source_id == source_id) &
@@ -211,7 +212,7 @@ def root_post(import_activities: dict) -> dict:
             db.session.rollback()
             return err
     db.session.commit()
-    return dict(activities=[dict(id=activity_id, source_id=source_id) for activity_id, source_id in ids]), 201
+    return dict(activities=[dict(id=activity_id, source_id=source_id) for source_id, activity_id in ids]), 201
 
 
 @defaults
@@ -272,6 +273,23 @@ def tags_get(with_count: bool = False) -> dict:
     tags = dict(tags=[tag.tag for tag in current_user.tags])
     if with_count:
         tags['counts'] = dict((tag.tag, tag.data.count()) for tag in current_user.tags)
+    return tags
+
+
+@defaults
+def source_ids_tags_get(source_ids: list, with_count: bool = True) -> dict:
+    error = check_sources_by_id(set(source_ids))
+    if error:
+        return error
+    current_user.sources.filter(Source.id.in_(source_ids))
+    tags = dict()
+    tags['counts'] = dict((t, c) for t, c in
+                          ((tag.tag, tag.data.filter(Data.source_id.in_(source_ids)).count()) for tag in
+                           current_user.tags)
+                          if c > 0)
+    tags['tags'] = list(tags['counts'].keys())
+    if not with_count:
+        del(tags['counts'])
     return tags
 
 

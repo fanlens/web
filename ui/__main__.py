@@ -7,7 +7,7 @@ import argparse
 import sys
 import os
 
-# fix python path for running as python -mweb
+# fix python path for running as python -mui
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
@@ -20,7 +20,7 @@ parser.add_argument('-b', '--bind', type=str, help='the address to bind to', req
 parser.add_argument('-p', '--port', type=int, help='the port to bind to', required=False)
 args = parser.parse_args()
 
-extra_dirs = [os.path.join(os.getcwd(), 'web/landing/templates'), os.path.join(os.getcwd(), 'web/landing/static/css')]
+extra_dirs = [os.path.join(os.getcwd(), 'web/ui/templates'), os.path.join(os.getcwd(), 'web/ui/static/css')]
 extra_files = extra_dirs[:]
 
 

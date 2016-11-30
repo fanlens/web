@@ -1,5 +1,5 @@
 <form id="contact-target" class="form-horizontal" role="form" method="post"
-      action="{{ url_for('index') }}">
+      action="{{ url_for('landing.root') }}">
     {{ contact_form.hidden_tag() }}
     {{ contact_form.email(placeholder="example@domain.com", class="form-control input-md") }}
     {{ contact_form.message(placeholder="Drop us a message!", class="form-control input-md", rows="4") }}

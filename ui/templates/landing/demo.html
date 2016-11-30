@@ -4,7 +4,7 @@
     <script>
         $('#tagger-placeholder').css('opacity', 0.2);
         $.ajax({
-            url: "{{ url_for('demo') }}",
+            url: "{{ url_for('landing.demo') }}",
             headers: {"Accept": "application/json"},
             success: function (demo) {
                 demo = demo.comments[0];

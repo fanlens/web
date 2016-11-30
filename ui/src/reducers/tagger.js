@@ -49,7 +49,13 @@ const tagSets = (state = {}, action) => {
       }, state);
       break;
     case TaggerActionType.TAGGER_RECEIVE_TAGSETS:
-      return _.keyBy(action.tagSets, 'id');
+      return _.defaults({
+        all: {
+          id: 'all',
+          title: 'All',
+          tags: _.chain(action.tagSets).map('tags').flatten().uniq().value()
+        }
+      }, _.keyBy(action.tagSets, 'id'));
       break;
     default:
       return state;

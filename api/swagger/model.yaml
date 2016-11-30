@@ -70,17 +70,33 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  '/':
+    get:
+      summary: Get all models of user
+      tags: [model]
+      responses:
+        200:
+          description: Information about the trained model. Includes 'score' for admin roles
+          schema:
+            type: object
+            required: [models]
+            properties:
+              models:
+                type: array
+                items:
+                  $ref: '#/definitions/Model'
+                uniqueItems: true
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   '/{model_id}':
     get:
       summary: Get meta information about a trained model
       tags: [model]
       parameters:
-      - name: model_id
-        in: path
-        type: string
-        format: uuid
-        required: true
-        description: The id of this model
+      - $ref: '#/parameters/ModelId'
       responses:
         200:
           description: Information about the trained model. Includes 'score' for admin roles
@@ -88,6 +104,45 @@ paths:
             $ref: '#/definitions/Model'
         403:
           description: Model not associated to user
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /{model_id}/suggestion:
+    post:
+      summary: Get suggestions for a provided text based on a model
+      tags: [suggestion]
+      consumes: [application/json]
+      parameters:
+      - $ref: '#/parameters/ModelId'
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required: [text]
+          properties:
+            text:
+              type: string
+              minLength: 64
+              maxLength: 7000
+              description: The text to fetch suggestions for. English only atm.
+      responses:
+        200:
+          description: A Suggestion Bundle
+          schema:
+            type: object
+            required: [suggestion]
+            properties:
+              text:
+                type: string
+              suggestion:
+                $ref: '#/definitions/Suggestion'
+        400:
+          description: Bad request
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -129,6 +184,27 @@ paths:
           description: No model found for this query
           schema:
             $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  '/jobs/':
+    get:
+      summary: Get all running jobs for user
+      tags: [job]
+      responses:
+        200:
+          description: list of jobs
+          schema:
+            type: object
+            required: [jobs]
+            properties:
+              jobs:
+                type: array
+                items:
+                  $ref: '#/definitions/Job'
+                uniqueItems: true
         default:
           description: Unexpected error
           schema:
@@ -204,45 +280,15 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /suggestion:
-    post:
-      summary: Get suggestions for a provided text
-      tags: [suggestion]
-      consumes: [application/json]
-      parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          required: [text]
-          properties:
-            text:
-              type: string
-              minLength: 64
-              maxLength: 7000
-              description: The text to fetch suggestions for. English only atm.
-      responses:
-        200:
-          description: A Suggestion Bundle
-          schema:
-            type: object
-            required: [suggestion]
-            properties:
-              text:
-                type: string
-              suggestion:
-                $ref: '#/definitions/Suggestion'
-        400:
-          description: Bad request
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
 parameters:
+  ModelId:
+    name: model_id
+    in: path
+    type: string
+    format: uuid
+    required: true
+    description: The id of this model
+
   JobId:
     name: job_id
     in: path
@@ -297,6 +343,12 @@ definitions:
         description: The model parameters, restricted access
         additionalProperties:
           type: [string, number, boolean]
+      source_ids:
+        description: The ids of the sources this model is trained on
+        type: array
+        items:
+          $ref: '#/definitions/SourceId'
+
 
   Suggestion:
     type: object

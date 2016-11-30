@@ -1,22 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import logging
 from flask import redirect
 from flask_modules.celery import celery, Brain
 from flask_modules.database import db
 from flask_security import current_user
 from flask_security.decorators import roles_required
 
+from db.models.activities import Source
 from db.models.brain import Model, Job
 
 from . import defaults, check_sources_by_id
 
 
 def _model_to_result(model: Model):
-    result = dict(id=model.id, trained_ts=model.trained_ts)
+    result = dict(id=model.id, trained_ts=model.trained_ts, source_ids=[source.id for source in model.sources])
     if 'admin' in [role.name for role in current_user.roles]:
         result['score'] = model.score
         result['params'] = model.params
     return result
+
+
+@defaults
+def root_get() -> dict:
+    return dict(models=[_model_to_result(model) for model in current_user.models])
 
 
 @defaults
@@ -29,17 +36,17 @@ def model_id_get(model_id: str) -> dict:
 
 @defaults
 def search_post(body: dict, internal=False) -> dict:
-    tagset_id = body.get('tagsetId')
-    sources = body.get('sources')
-    if tagset_id is None and sources is None:
+    tagset_id = body.get('tagset_id')
+    source_ids = body.get('source_ids')
+    if tagset_id is None and source_ids is None:
         return None if internal else (dict(error='No criterium specified'), 400)
-    model_query = db.session.query(Model).filter_by(user_id=current_user.id)
-    if tagset_id is not None:
-        model_query = model_query.filter_by(tagset_id=tagset_id)
-    # todo: add sources support
-    #    if sources is not None:
-    #        model_query = model_query.filter_by(sources=sources)
-    model_query = model_query.order_by(Model.score.desc())
+    matching = current_user.models
+    if tagset_id:
+        matching = matching.filter_by(tagset_id=tagset_id)
+    if source_ids:
+        matching = matching.filter(Model.sources.any(Source.id.in_(source_ids)))
+    model_query = matching.order_by(Model.score.desc(), Model.trained_ts.desc())
+
     model = model_query.first()
     if model is None:
         return None if internal else (dict(error='No model found for this query'), 404)
@@ -65,14 +72,19 @@ def train_post(body: dict, fast=True) -> dict:
         return error
 
     params = None
-    # if fast:
-    #     best_model = model__search_post(dict(tagset_id=tagset_id, sources=sources), internal=True)
-    #     params = best_model and best_model['params']
-    job = Brain.train_model(tagset_id, tuple(source_ids), n_estimators=1, params=params)
+    if fast:
+        best_model = search_post(dict(tagset_id=tagset_id, source_ids=source_ids), internal=True)
+        params = best_model and best_model['params']
+    job = Brain.train_model(tagset_id, tuple(source_ids), n_estimators=200, params=params)
     current_user.jobs.append(Job(id=job.id, user_id=current_user.id))
     db.session.commit()
     job_url = '/v3/model/jobs/' + job.id
     return dict(job=job.id, url=job_url), 202
+
+
+@defaults
+def jobs_get() -> dict:
+    return dict(jobs=[dict(job=job.id, url='/v3/jobs/%s' % job.id) for job in current_user.jobs])
 
 
 @defaults
@@ -98,27 +110,24 @@ def jobs_job_id_get(job_id) -> dict:
 
 
 @defaults
-def jobs_job_id_delete(job_id) -> dict:
+def jobs_job_id_delete(job_id, revoke: bool = True) -> dict:
     job = current_user.jobs.filter_by(id=job_id).one_or_none()
     if not job:
         return dict(error='not associated to user ' + job_id), 403
 
-    result = celery.AsyncResult(job_id)
-    result.revoke()  # todo: simply revokes the task, does not kill training by default
+    if revoke:
+        result = celery.AsyncResult(job_id)
+        result.revoke()  # todo: simply revokes the task, does not kill training by default
     current_user.jobs.filter_by(id=job_id).delete()
     db.session.commit()
     return dict(job=job_id)
 
 
 @defaults
-def suggestion_post(body: dict) -> dict:
-    try:
-        text = body['text']
-        task = celery.send_task('worker.brain.predict', args=(text,),
-                                kwargs=dict(model_id='32797cd2-4203-11e6-9215-f45c89bc662f'))
-        suggestion = dict((k, v) for [v, k] in task.get())
-        return dict(text=text, suggestion=suggestion)
-    except KeyError:
-        return dict(error='no text field in request'), 400
-    except Exception as err:
-        return dict(error=str(err.args)), 400
+def model_id_suggestion_post(model_id, body: dict) -> dict:
+    text = body['text']
+    predicition = Brain.predict_text(model_id, text).get()
+    logging.error(predicition)
+
+    suggestion = dict((k, v) for [v, k] in predicition)
+    return dict(text=text, suggestion=suggestion)
