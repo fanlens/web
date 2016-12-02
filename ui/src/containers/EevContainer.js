@@ -1,18 +1,15 @@
 import {connect} from 'react-redux'
 
 import Eev from '../components/Eev.jsx'
-import {initEev, sendChatbotMessage, enter, exit} from '../actions/EevActions'
+import {sendMessage} from '../actions/EevActions'
 
 const mapStateToProps = (state) => ({
   messages: state.eev.messages,
-  ready: state.eev.conversation.token != null
+  ready: state.eev.ws != null
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onInit: () => dispatch(initEev()),
-  onSend: (text) => dispatch(sendChatbotMessage(text)),
-  onEnter: () => dispatch(enter()),
-  onExit: () => dispatch(exit()),
+  onSend: (text) => dispatch(senMessage(text))
 });
 
 const EevContainer = connect(

@@ -1,17 +1,17 @@
 import keyMirror from 'keymirror'
 import Swagger from 'swagger-client'
-import io from 'socket.io'
 
 const tokenApi = new Swagger({
   url: '/v3/eev/swagger.json',
   usePromise: true,
   authorizations: {
-    headerAuth: new Swagger.ApiKeyAuthorization('Authorization-Token', apiKey, 'header')
+    headerAuth: new Swagger.ApiKeyAuthorization('Authorization-Token', apiKey, 'header'),
+    headerCsrf: new Swagger.ApiKeyAuthorization('X-CSRFToken', CSRFToken, 'header')
   }
 });
 
 const botApi = (token) => new Swagger({
-  url: 'https://docs.botframework.com/en-us/restapi/directline3/swagger.json',
+  url: '/cdn/js/botframework.directline.v3.swagger.json',
   usePromise: true,
   authorizations: {
     headerAuth: new Swagger.ApiKeyAuthorization('Authorization', `Bearer ${token}`, 'header')
@@ -20,14 +20,16 @@ const botApi = (token) => new Swagger({
 
 
 export const EevActionType = keyMirror({
-  EEV_RECEIVE_TOKEN: null,
+  EEV_RECEIVE_API: null,
+  EEV_RECEIVE_WS: null,
   EEV_RECEIVE_MESSAGES: null,
   EEV_RECEIVE_CLEAR_MESSAGES: null,
-  EEV_RECEIVE_CONVERSATION: null,
 });
 
 
-const receiveConversation = (conversation) => ({type: EevActionType.EEV_RECEIVE_CONVERSATION, conversation});
+const receiveAPI = (api) => ({type: EevActionType.EEV_RECEIVE_API, api});
+
+const receiveWS = (ws) => ({type: EevActionType.EEV_RECEIVE_WS, ws});
 
 const receiveMessages = (messages, watermark) => ({type: EevActionType.EEV_RECEIVE_MESSAGES, messages, watermark});
 
@@ -36,97 +38,51 @@ const receiveMessage = (message, watermark) => receiveMessages([message], waterm
 const receiveClearMessages = () => ({type: EevActionType.EEV_RECEIVE_CLEAR_MESSAGES});
 
 
-function initEev() {
-  return (dispatch, getState) => {
-    const ready = getState().eev.conversation.token !== null;
-    if (ready) {
-      return Promise.resolve();
-    } else {
-      return dispatch(fetchToken())
-        .then(() => dispatch(startConversation()))
-        .then(() => dispatch(receiveMessage({
-          "id": 0,
-          "conversation": 0,
-          "from": "eev",
-          "text": "Hi Christian! How can I help you?"
-        }, 'eev'), null));
-    }
-  }
+export function initEev() {
+  return (dispatch) => dispatch(startConversation())
+    .then(() => dispatch(receiveMessage({
+      "id": 0,
+      "conversation": 0,
+      "from": "eev",
+      "text": "Hi Christian! How can I help you?"
+    }, 'eev'), null));
 }
 
 export function startConversation() {
-  return (dispatch) => {
-    tokenApi.then((api) => api.post_token())
-      .then(({token}) => botApi(token))
-      .then((botApi) => botApi.Conversations_StartConversation())
-      .then(({streamUrl}) => {
-        const ws = io.connect(streamUrl);
-        ws.on('message', (data) => console.log(data));//dispatch(receiveMessage()))
-        ws.on('error', (error) => console.log(error));//dispatch(receiveMessage()))
+  return (dispatch) => tokenApi.then(
+    (api) => api.eev.post_token()
+      .then(({status, obj}) => obj)
+      .then(({token}) => {
+        const api = botApi(token);
+        dispatch(receiveAPI(api));
+        return api;
       })
-      .catch((error) => console.log(error));
-  }
+      .then((botApi) => botApi.Conversations.Conversations_StartConversation()
+        .then(({status, obj}) => obj)
+        .then(({streamUrl}) => {
+          const ws = new WebSocket(streamUrl);
+          ws.onmessage = (data) => console.log(data);
+          ws.onopen = ({type, timeStamp}) => {
+            console.log(`${type} channel to eev on ${timeStamp}`);
+            return dispatch(receiveWS(ws));
+          };
+          ws.onclose = (error) => {
+            console.log(error);
+            return dispatch(receiveWS(null));
+          };
+          ws.onerror = (error) => ws.onclose(error);
+
+        })
+        .catch((error) => console.log(error)))
+      .catch((error) => console.log(error)));
 }
 
-function startConversation() {
-  return (dispatch, getState) => fetch(BASE_URI + '/api/conversations', {
-    method: 'POST',
-    headers: eevHeader(getState().eev.token),
-  }).then(response => response.json())
-    .then(conversation => dispatch(receiveConversation(conversation)))
-}
-
-
-function timeoutPromise(ms, promise) {
-  return new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      reject(new Error("promise timeout"))
-    }, ms);
-    promise.then(
-      (res) => {
-        clearTimeout(timeoutId);
-        resolve(res);
-      },
-      (err) => {
-        clearTimeout(timeoutId);
-        reject(err);
-      }
-    );
-  })
-}
-
-export function getMessages() {
-  return (dispatch, getState) => {
-    const {conversation, watermark} = getState().eev;
-    const {token, conversationId} = conversation;
-    if (conversationId === null) {
-      return Promise.resolve();
+export function sendMessage(message) {
+  return (dispatch, getState) => getState.eev.api.
+    if (!getState.api) {
+      return Promise.reject('there is no connection to eev')
     } else {
-      const watermarkQuery = watermark ? `?watermark=${watermark}` : '';
-      return timeoutPromise(2000, fetch(BASE_URI + `/api/conversations/${conversationId}/messages${watermarkQuery}`, {
-        headers: eevHeader(token)
-      }).then(response => response.json())
-        .then(json => dispatch(receiveMessages(json.messages, json.watermark))))
-        .catch(() => Promise.resolve());
+      ws.send()
     }
   };
 }
-
-export function sendChatbotMessage(text) {
-  return (dispatch, getState) => {
-    if (text.trim().toLowerCase() === "clear") {
-      return dispatch(receiveClearMessages());
-    }
-    const {token, conversationId} = getState().eev.conversation;
-    return fetch(BASE_URI + `/api/conversations/${conversationId}/messages`, {
-      method: 'POST',
-      body: JSON.stringify({
-        from: 'user',
-        text
-      }),
-      headers: eevHeader(token)
-    }).then(() => setTimeout(() => dispatch(getMessages()), 300));
-  }
-}
-
-

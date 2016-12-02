@@ -38,7 +38,7 @@ const receiveToggleSource = (source) => ({type: TaggerActionType.TAGGER_TOGGLE_S
 
 export const toggleTagSet = (id) => ({type: TaggerActionType.TAGGER_TOGGLE_TAGSET, id});
 
-export function initGlobal() {
+export function initTagger() {
   return (dispatch, getState) => {
     return Promise.all([
       dispatch(fetchTagCounts(false)),

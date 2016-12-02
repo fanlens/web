@@ -1,1 +1,1 @@
-console.error("Error: Cannot find module 'bufferutil' from '/Users/chris/Projects/fanlens/web/ui/node_modules/ws/lib'");
+console.error("SyntaxError: /Users/chris/Projects/fanlens/web/ui/src/actions/EevActions.js: Unexpected token (82:23) while parsing file: /Users/chris/Projects/fanlens/web/ui/src/actions/EevActions.js");

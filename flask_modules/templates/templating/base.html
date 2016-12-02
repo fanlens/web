@@ -22,6 +22,7 @@
         <meta name="twitter:creator" content="@fanlens_io">
         <meta name="twitter:title" content="{{ title }}">
         <meta name="twitter:image" content="{{ logo }}">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
     {% endblock %}
 
     <title>{% block title %}Fanlens{% endblock %}</title>

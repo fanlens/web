@@ -3,18 +3,16 @@ import _ from 'lodash';
 import {EevActionType} from '../actions/EevActions';
 
 const eev = (state = {
-  token: null,
-  conversation: {
-    conversationId: null,
-    token: null,
-  },
+  ws: null,
+  api: null,
   watermark: null,
-  messages: [],
-  active: false
+  messages: []
 }, action) => {
   switch (action.type) {
-    case EevActionType.EEV_RECEIVE_TOKEN:
-      return _.defaults({token: action.token}, state);
+    case EevActionType.EEV_RECEIVE_API:
+      return _.defaults({api: action.api}, state);
+    case EevActionType.EEV_RECEIVE_WS:
+      return _.defaults({ws: action.ws}, state);
     case EevActionType.EEV_RECEIVE_MESSAGES:
       if (action.watermark !== state.watermark) {
         return _.defaults({
@@ -26,12 +24,6 @@ const eev = (state = {
       }
     case EevActionType.EEV_RECEIVE_CLEAR_MESSAGES:
       return _.defaults({messages: []}, state);
-    case EevActionType.EEV_RECEIVE_CONVERSATION:
-      return _.defaults({
-        conversation: action.conversation
-      }, state);
-    case EevActionType.EEV_RECEIVE_STATE:
-      return _.defaults({active: action.active}, state)
     default:
       return state;
   }

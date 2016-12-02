@@ -5,7 +5,8 @@ import {Provider} from 'react-redux'
 import createLogger from 'redux-logger'
 import thunkMiddleware from 'redux-thunk'
 
-import {initGlobal} from './actions/TaggerActions'
+import {initEev} from './actions/EevActions'
+import {initTagger} from './actions/TaggerActions'
 import alerts from './reducers/alerts'
 import eev from './reducers/eev'
 import tagger from './reducers/tagger'
@@ -14,6 +15,9 @@ import app from './reducers/app'
 import App from './components/App.jsx'
 import AlertsApp from './components/Alerts.jsx'
 
+function initGlobal() {
+  return (dispatch) => Promise.all([initEev(), initTagger()]);
+}
 
 const store = createStore(
   combineReducers({
@@ -28,8 +32,6 @@ const store = createStore(
   )
 );
 
-store.dispatch(initGlobal());
-
 render(
   <Provider store={store}>
     <App />
@@ -43,3 +45,4 @@ render(
   document.getElementById('alerts')
 );
 
+store.dispatch(initEev());

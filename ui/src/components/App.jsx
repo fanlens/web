@@ -12,8 +12,8 @@ import {toggle} from '../actions/AppActions'
 const ToolsPanel = ({onToggle}) => (
   <Panel id="panel-element-tools" title="Tools">
     <ul className="nav nav-pills nav-stacked">
-      <li><a data-toggle="pill" href="#eev" onClick={() => onToggle()}>Talk to eev</a></li>
-      <li className="active"><a data-toggle="pill" href="#tagger" onClick={() => onToggle()}>Training Center</a></li>
+      <li className="active"><a data-toggle="pill" href="#eev" onClick={() => onToggle()}>Talk to eev</a></li>
+      <li><a data-toggle="pill" href="#tagger" onClick={() => onToggle()}>Training Center</a></li>
     </ul>
   </Panel>
 );

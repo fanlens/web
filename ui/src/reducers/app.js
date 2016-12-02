@@ -2,8 +2,8 @@ import _ from 'lodash'
 import {AppActionType} from '../actions/AppActions'
 
 const app = (state = {
-  eev: false,
-  tagger: true,
+  eev: true,
+  tagger: false,
 }, action) => {
   switch (action.type) {
     case AppActionType.APP_STATE:

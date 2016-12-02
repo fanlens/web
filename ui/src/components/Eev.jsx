@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 import classnames from 'classnames';
 
 const Message = ({from, created, children}) => {
@@ -24,60 +23,45 @@ const Message = ({from, created, children}) => {
   </li>;
 };
 
-class Eev extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
-  componentWillMount() {
-    this.props.onEnter();
-  }
-
-  componentWillUnmount() {
-    this.props.onExit();
-  }
-
-
-  render() {
-    const {ready, messages, onSend} = this.props;
-    let msg = null;
-    const sendAndClear = () => {
-      onSend(msg.value);
-      msg.value = ''
-    };
-    return (<div id="evaluator" className="container-fluid">
-      <div className="row">
-        <div className="col-md-12">
-          <div className="chat-message">
-            <ul className="chat">
-              {messages.map((msg, idx) => (
-                <Message key={idx} {...msg}>
-                  {msg["text"]}
-                </Message>
-              ))}
-            </ul>
-          </div>
-          <div className="chat-input">
-            <div className="input-group">
+const Eev = ({ready, messages, onSend}) => {
+  let msg = null;
+  const sendAndClear = () => {
+    onSend(msg.value);
+    msg.value = ''
+  };
+  return (<div id="evaluator" className="container-fluid">
+    <div className="row">
+      <div className="col-md-12">
+        <div className="chat-message">
+          <ul className="chat">
+            {messages.map((msg, idx) => (
+              <Message key={idx} {...msg}>
+                {msg["text"]}
+              </Message>
+            ))}
+          </ul>
+        </div>
+        <div className="chat-input">
+          <div className="input-group">
             <textarea rows="1"
                       className="form-control border no-shadow no-rounded input-lg"
                       placeholder="Type your message here"
                       ref={(c) => msg = c}
                       onKeyUp={(e) => ready && (e.nativeEvent.keyCode === 13 && e.nativeEvent.shiftKey) && sendAndClear()}/>
-              <span className="input-group-btn">
+            <span className="input-group-btn">
                 <button className={classnames('btn', 'btn-success', 'no-rounded', 'btn-lg', {'disabled': !ready})}
                         type="button"
                         onClick={() => ready && sendAndClear() }>
                   <i className="fa fa-paper-plane" aria-hidden="true"/> Send
                 </button>
             </span>
-            </div>
           </div>
         </div>
       </div>
-    </div>);
-  }
-}
+    </div>
+  </div>);
+};
 
 export default Eev;
 

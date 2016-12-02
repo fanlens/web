@@ -26,13 +26,7 @@ paths:
   /token:
     post:
       summary: get a conversation token for eev
-      parameters:
-      - name: renew
-        in: query
-        description: renew current token
-        type: boolean
-        required: false
-        default: true
+      tags: [eev]
       responses:
         200:
           description: A token and associated conversationId
