@@ -24,33 +24,19 @@ export const TaggerActionType = keyMirror({
   TAGGER_TOGGLE_TAGSET: null
 });
 
-const receiveTags = (comment, tags) => {
-  return {type: TaggerActionType.TAGGER_RECEIVE_TAGS, comment, tags};
-};
+const receiveTags = (comment, tags) => ({type: TaggerActionType.TAGGER_RECEIVE_TAGS, comment, tags});
 
-const receiveTagSets = (tagSets) => {
-  return {type: TaggerActionType.TAGGER_RECEIVE_TAGSETS, tagSets};
-};
+const receiveTagSets = (tagSets) => ({type: TaggerActionType.TAGGER_RECEIVE_TAGSETS, tagSets});
 
-const receiveComments = (comments) => {
-  return {type: TaggerActionType.TAGGER_RECEIVE_COMMENTS, comments};
-};
+const receiveComments = (comments) => ({type: TaggerActionType.TAGGER_RECEIVE_COMMENTS, comments});
 
-const receiveSources = (sources) => {
-  return {type: TaggerActionType.TAGGER_RECEIVE_SOURCES, sources};
-};
+const receiveSources = (sources) => ({type: TaggerActionType.TAGGER_RECEIVE_SOURCES, sources});
 
-const receiveTagCounts = (counts) => {
-  return {type: TaggerActionType.TAGGER_RECEIVE_TAGCOUNTS, counts};
-};
+const receiveTagCounts = (counts) => ({type: TaggerActionType.TAGGER_RECEIVE_TAGCOUNTS, counts});
 
-const receiveToggleSource = (source) => {
-  return {type: TaggerActionType.TAGGER_TOGGLE_SOURCE, source};
-};
+const receiveToggleSource = (source) => ({type: TaggerActionType.TAGGER_TOGGLE_SOURCE, source});
 
-export const toggleTagSet = (id) => {
-  return {type: TaggerActionType.TAGGER_TOGGLE_TAGSET, id};
-};
+export const toggleTagSet = (id) => ({type: TaggerActionType.TAGGER_TOGGLE_TAGSET, id});
 
 export function initGlobal() {
   return (dispatch, getState) => {
@@ -88,20 +74,19 @@ export function fetchTagCounts(filterSources = true) {
           source_ids: _.chain(getState().tagger.sources).filter('active').map('id').value(),
           with_count: true
         }) :
-        api.tags.get_tags({with_count: true})
+        api.tags.get_tags({with_count: true});
       counts.then(({status, obj}) => obj)
         .then(({counts}) => dispatch(receiveTagCounts(counts)))
         .catch((error) => console.log(error))
     });
 }
 
-export function fetchRandomComments(count, sources, withSuggestion = false) {
+export function fetchRandomComments(count, sources) {
   return (dispatch) => activitiesApi.then(
     (api) => api.activity.get_source_ids({
       source_ids: _.chain(sources).filter('active').map('id').value(),
       count: count,
-      random: true,
-      with_suggestion: withSuggestion
+      random: true
     }).then(({status, obj}) => obj)
       .then(({activities}) => dispatch(receiveComments(activities)))
       .catch((error) => console.log(error)));
@@ -131,7 +116,7 @@ export function toggleCommentTag(comment, tag) {
 }
 
 export function addCommentTag(comment, tag) {
-  return manipulateTags(comment, [tag], []);
+  return manipulateTags(comment, Array.isArray(tag) ? tag : [tag], []);
 }
 
 export function resetCommentTags(comment) {

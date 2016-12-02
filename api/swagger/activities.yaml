@@ -52,10 +52,6 @@ paths:
           description: Bad object
           schema:
             $ref: '#/definitions/Error'
-        403:
-          description: User not authorized for this query or parts of it. See error message.
-          schema:
-            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -90,7 +86,6 @@ paths:
         minLength: 1
         maxLength: 128
         required: false
-      - $ref: '#/parameters/WithSuggestion'
       responses:
         200:
           description: A Bundle of Activitys
@@ -101,10 +96,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Activity'
-        403:
-          description: User not authorized for this query or parts of it. See error message.
-          schema:
-            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -117,16 +108,11 @@ paths:
       parameters:
       - $ref: '#/parameters/SourceId'
       - $ref: '#/parameters/ActivityId'
-      - $ref: '#/parameters/WithSuggestion'
       responses:
         200:
           description: The activity
           schema:
            $ref: '#/definitions/Activity'
-        403:
-          description: User not authorized for this query or parts of it. See error message.
-          schema:
-            $ref: '#/definitions/Error'
         404:
           description: Activity not found
           schema:
@@ -153,10 +139,6 @@ paths:
           description: Bad object
           schema:
             $ref: '#/definitions/Error'
-        403:
-          description: User not authorized for this query or parts of it. See error message.
-          schema:
-            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -170,10 +152,6 @@ paths:
       responses:
         200:
           description: Success
-        403:
-          description: User not authorized for this query or parts of it. See error message.
-          schema:
-            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -620,20 +598,13 @@ parameters:
     type: string
     enum:
       - tags
-      - suggestion
-      - message
+      - prediction
+      - text
       - user
       - created_time
       - source
+      - lang
     required: true
-
-  WithSuggestion:
-    name: with_suggestion
-    in: query
-    description: should a predicition be made?
-    type: boolean
-    required: false
-    default: false
 
 definitions:
   Import:
@@ -657,28 +628,32 @@ definitions:
         type: string
         minLength: 1
         maxLength: 128
-      message:
+      text:
         type: string
       source:
         $ref: '#/definitions/Source'
       tags:
         $ref: '#/definitions/Tags'
-      suggestion:
-        $ref: '#/definitions/Suggestion'
+      prediction:
+        $ref: '#/definitions/Prediction'
       user:
         $ref: '#/definitions/User'
+      lang:
+        type: string
+        minLength: 2
+        maxLength: 2
       created_time:
         type: string
         format: date-time
 
-  Suggestion:
+  Prediction:
     type: object
     additionalProperties:
       type: number
       format: float
       minimum: 0.0
       maximum: 1.0
-      description: Probability of suggestion
+      description: Probability of prediction
 
   User:
     type: object

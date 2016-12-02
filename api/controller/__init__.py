@@ -14,5 +14,5 @@ defaults = annotation_composer(
 def check_sources_by_id(sources: set):
     is_sub = sources.issubset(source.id for source in current_user.sources)
     if not is_sub:
-        return dict(error='User does not have access to all requested sources'), 403
+        return dict(error='Not all sources exist for user'), 404
     return None

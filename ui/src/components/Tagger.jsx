@@ -20,26 +20,26 @@ const ToolTip = ({children}) => (
   </a>
 );
 
-const Tag = ({tag, active, suggestion, onToggle}) => {
-  if (suggestion === undefined || suggestion === null) {
-    suggestion = 3
+const Tag = ({tag, active, prediction, onToggle}) => {
+  if (prediction === undefined || prediction === null) {
+    prediction = 3
   }
   // using label buttons to fix focus issues with button
   return (
     <div className="btn-group" role="group">
       <label className={classnames('btn', 'btn-sm', 'ellipsis', {
-        'btn-success': suggestion < 3,
-        'btn-primary': suggestion >= 3,
+        'btn-success': prediction < 3,
+        'btn-primary': prediction >= 3,
         'active': active
       })}
              type="button" onClick={onToggle}>
         <em className="glyphicon glyphicon-tag" aria-hidden="true"/>{tag}
-        {suggestion < 3 ?
+        {prediction < 3 ?
           <ToolTip>
             <em className={classnames('glyphicon', 'quality', {
-              'glyphicon-star-empty': suggestion == 2,
-              'glyphicon-star': suggestion == 1,
-              'glyphicon-certificate': suggestion == 0
+              'glyphicon-star-empty': prediction == 2,
+              'glyphicon-star': prediction == 1,
+              'glyphicon-certificate': prediction == 0
             })}
                 aria-hidden="true"/>
           </ToolTip> : null
@@ -64,7 +64,7 @@ const UrlText = ({text}) => {
   }
 };
 
-const TagList = ({allTags, tags, suggestion, onDuplicate, onToggle, onNewTag}) => {
+const TagList = ({allTags, tags, prediction, onDuplicate, onToggle, onNewTag}) => {
   let input;
   return (
     <form className="form-group" onSubmit={ e => {
@@ -85,7 +85,7 @@ const TagList = ({allTags, tags, suggestion, onDuplicate, onToggle, onNewTag}) =
         {_.sortBy(allTags, 1).map((tag, idx) => {
           return <Tag key={idx} tag={tag}
                       active={_.includes(tags, tag)}
-                      suggestion={suggestion[tag]}
+                      prediction={prediction[tag]}
                       onToggle={() => onToggle(tag)}/>
         })}
 
@@ -99,7 +99,7 @@ const TagList = ({allTags, tags, suggestion, onDuplicate, onToggle, onNewTag}) =
 };
 
 const Tagger = ({comment, tagSet, onDuplicate, onToggle, onNewTag}) => {
-  const {id, user, source, message, tags, suggestion} = comment;
+  const {id, user, source, text, tags, prediction} = comment;
   return (
     <div className="container-fluid tagger">
       <div className="row">
@@ -111,7 +111,7 @@ const Tagger = ({comment, tagSet, onDuplicate, onToggle, onNewTag}) => {
             <SourceIcon type={source.type}/> <UserLink user={user} type={source.type}/>
           </h4>
           <p className="list-group-item-text" id={'tagger-message-' + id}>
-            <UrlText text={message}/>
+            <UrlText text={text}/>
           </p>
         </div>
 
@@ -120,7 +120,7 @@ const Tagger = ({comment, tagSet, onDuplicate, onToggle, onNewTag}) => {
       <div className="row">
         <TagList allTags={_.union(tags, tagSet)}
                  tags={tags}
-                 suggestion={suggestion}
+                 prediction={prediction}
                  onDuplicate={onDuplicate}
                  onNewTag={(tag) => onNewTag(comment, tag)}
                  onToggle={(tag) => onToggle(comment, tag)}

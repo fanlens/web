@@ -24,7 +24,7 @@ produces:
 
 paths:
   /token:
-    get:
+    post:
       summary: get a conversation token for eev
       parameters:
       - name: renew
@@ -35,12 +35,14 @@ paths:
         default: true
       responses:
         200:
-          description: A token
+          description: A token and associated conversationId
           schema:
             type: object
-            required: [token]
+            required: [token, conversationId]
             properties:
               token:
+                type: string
+              conversationId:
                 type: string
         500:
           description: could not renew or generate token

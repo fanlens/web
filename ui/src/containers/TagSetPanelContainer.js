@@ -4,20 +4,16 @@ import _ from 'lodash'
 import {toggleTagSet} from '../actions/TaggerActions'
 import TagSetPanel from '../components/TagSetPanel.jsx'
 
-const mapStateToProps = (state) => {
-  return {
-    tagSets: _.sortBy(_.values(state.tagger.tagSets), 'id'),
-    tagCounts: state.tagger.counts
-  }
-}
+const mapStateToProps = (state) => ({
+  tagSets: _.sortBy(_.values(state.tagger.tagSets), 'id'),
+  tagCounts: state.tagger.counts
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    onTagSetSelected: (id) => {
-      dispatch(toggleTagSet(id));
-    }
+const mapDispatchToProps = (dispatch) => ({
+  onTagSetSelected: (id) => {
+    dispatch(toggleTagSet(id));
   }
-}
+});
 
 const TagSetPanelContainer = connect(
   mapStateToProps,

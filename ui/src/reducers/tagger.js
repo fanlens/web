@@ -8,8 +8,8 @@ const comments = (state = {}, action) => {
     case TaggerActionType.TAGGER_RECEIVE_COMMENTS:
       return _.chain(action.comments)
         .mapValues(comment => _.defaults({
-          suggestion: _.chain(comment.suggestion)
-            .mapValues(s => s > 0.99 ? 0 : s > 0.95 ? 1 : s > 0.8 ? 2 : 3)  // 0 excellent, 1 good, 2 fair, 3 ignore
+          prediction: _.chain(comment.prediction)
+            .mapValues(s => s > 0.9 ? 0 : s > 0.75 ? 1 : s > 0.6 ? 2 : 3)  // 0 excellent, 1 good, 2 fair, 3 ignore
             .value()
         }, comment))
         .mapKeys('id')

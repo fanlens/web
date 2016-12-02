@@ -1,47 +1,71 @@
-import fetch from 'isomorphic-fetch'
 import keyMirror from 'keymirror'
-import jsonheaders from '../utils/jsonheaders'
+import Swagger from 'swagger-client'
+import io from 'socket.io'
+
+const tokenApi = new Swagger({
+  url: '/v3/eev/swagger.json',
+  usePromise: true,
+  authorizations: {
+    headerAuth: new Swagger.ApiKeyAuthorization('Authorization-Token', apiKey, 'header')
+  }
+});
+
+const botApi = (token) => new Swagger({
+  url: 'https://docs.botframework.com/en-us/restapi/directline3/swagger.json',
+  usePromise: true,
+  authorizations: {
+    headerAuth: new Swagger.ApiKeyAuthorization('Authorization', `Bearer ${token}`, 'header')
+  }
+});
+
 
 export const EevActionType = keyMirror({
   EEV_RECEIVE_TOKEN: null,
   EEV_RECEIVE_MESSAGES: null,
   EEV_RECEIVE_CLEAR_MESSAGES: null,
   EEV_RECEIVE_CONVERSATION: null,
-  EEV_RECEIVE_STATE: null
 });
 
-const TOKEN_URI = '/v3/eev/token';
-const BASE_URI = 'https://directline.botframework.com';
-const MAX_TOKEN_LIFETIME = 30 * 60 * 1000;
 
-const receiveToken = (token) => {
-  return {type: EevActionType.EEV_RECEIVE_TOKEN, token};
-};
+const receiveConversation = (conversation) => ({type: EevActionType.EEV_RECEIVE_CONVERSATION, conversation});
 
-const receiveConversation = (conversation) => {
-  return {type: EevActionType.EEV_RECEIVE_CONVERSATION, conversation};
-};
-
-const receiveMessages = (messages, watermark) => {
-  return {type: EevActionType.EEV_RECEIVE_MESSAGES, messages, watermark};
-};
+const receiveMessages = (messages, watermark) => ({type: EevActionType.EEV_RECEIVE_MESSAGES, messages, watermark});
 
 const receiveMessage = (message, watermark) => receiveMessages([message], watermark);
 
-const receiveClearMessages = () => {
-  return {type: EevActionType.EEV_RECEIVE_CLEAR_MESSAGES}
-};
+const receiveClearMessages = () => ({type: EevActionType.EEV_RECEIVE_CLEAR_MESSAGES});
 
-const receiveState = (active) => {
-  return {type: EevActionType.EEV_RECEIVE_STATE, active};
-};
 
-function eevHeader(token) {
-  const headers = new Headers();
-  headers.append("Content-Type", "application/json");
-  headers.append("Accept", "application/json");
-  headers.append("Authorization", `BotConnector ${token}`);
-  return headers;
+function initEev() {
+  return (dispatch, getState) => {
+    const ready = getState().eev.conversation.token !== null;
+    if (ready) {
+      return Promise.resolve();
+    } else {
+      return dispatch(fetchToken())
+        .then(() => dispatch(startConversation()))
+        .then(() => dispatch(receiveMessage({
+          "id": 0,
+          "conversation": 0,
+          "from": "eev",
+          "text": "Hi Christian! How can I help you?"
+        }, 'eev'), null));
+    }
+  }
+}
+
+export function startConversation() {
+  return (dispatch) => {
+    tokenApi.then((api) => api.post_token())
+      .then(({token}) => botApi(token))
+      .then((botApi) => botApi.Conversations_StartConversation())
+      .then(({streamUrl}) => {
+        const ws = io.connect(streamUrl);
+        ws.on('message', (data) => console.log(data));//dispatch(receiveMessage()))
+        ws.on('error', (error) => console.log(error));//dispatch(receiveMessage()))
+      })
+      .catch((error) => console.log(error));
+  }
 }
 
 function startConversation() {
@@ -52,16 +76,6 @@ function startConversation() {
     .then(conversation => dispatch(receiveConversation(conversation)))
 }
 
-
-export function fetchToken() {
-  return (dispatch) => {
-    return fetch(TOKEN_URI, {
-      headers: jsonheaders(),
-    }).then(response => response.json())
-      .then(token => dispatch(receiveToken(token.token)))
-      .then(() => setTimeout(() => dispatch(fetchToken()), MAX_TOKEN_LIFETIME / 3));
-  }
-}
 
 function timeoutPromise(ms, promise) {
   return new Promise((resolve, reject) => {
@@ -115,43 +129,4 @@ export function sendChatbotMessage(text) {
   }
 }
 
-function init() {
-  return (dispatch, getState) => {
-    const ready = getState().eev.conversation.token !== null;
-    if (ready) {
-      return Promise.resolve();
-    } else {
-      return dispatch(fetchToken())
-        .then(() => dispatch(startConversation()))
-        .then(() => dispatch(receiveMessage({
-          "id": 0,
-          "conversation": 0,
-          "from": "eev",
-          "text": "Hi Christian! How can I help you?"
-        }, 'eev'), null));
-    }
-  }
-}
 
-function loop(func, delay = 1000) {
-  return (dispatch, getState) => {
-    const {active} = getState().eev;
-    if (active) {
-      return dispatch(func()).then(() => active && setTimeout(() => dispatch(loop(func)), delay));
-    } else {
-      return Promise.resolve();
-    }
-  }
-}
-
-export function enter() {
-  return (dispatch) => dispatch(init())
-    .then(Promise.all([
-      dispatch(receiveState(true)),
-      dispatch(loop(getMessages)),
-    ]));
-}
-
-export function exit() {
-  return (dispatch) => dispatch(receiveState(false));
-}

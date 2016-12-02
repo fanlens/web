@@ -9,22 +9,12 @@ export const AlertActionType = keyMirror({
 });
 
 let nextId = 0;
-export const info = (text) => {
-  return {id: nextId++, type: AlertActionType.ALERT_INFO, text};
-};
+export const info = (text) => ({id: nextId++, type: AlertActionType.ALERT_INFO, text});
 
-export const success = (text) => {
-  return {id: nextId++, type: AlertActionType.ALERT_SUCCESS, text};
-};
+export const success = (text) => ({id: nextId++, type: AlertActionType.ALERT_SUCCESS, text});
 
-export const warning = (text) => {
-  return {id: nextId++, type: AlertActionType.ALERT_WARNING, text};
-};
+export const warning = (text) => ({id: nextId++, type: AlertActionType.ALERT_WARNING, text});
 
-export const danger = (text) => {
-  return {id: nextId++, type: AlertActionType.ALERT_DANGER, text};
-};
+export const danger = (text) => ({id: nextId++, type: AlertActionType.ALERT_DANGER, text});
 
-export const dismiss = (id) => {
-  return {type: AlertActionType.ALERT_DISMISS, id};
-};
+export const dismiss = (id) => ({type: AlertActionType.ALERT_DISMISS, id});

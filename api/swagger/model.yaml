@@ -61,10 +61,6 @@ paths:
           description: Model creation for this tagset is currently in progress, see job reference.
           schema:
             $ref: '#/definitions/Job'
-        403:
-          description: Source or tagset not associated with user
-          schema:
-            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -102,7 +98,7 @@ paths:
           description: Information about the trained model. Includes 'score' for admin roles
           schema:
             $ref: '#/definitions/Model'
-        403:
+        404:
           description: Model not associated to user
           schema:
             $ref: '#/definitions/Error'
@@ -111,10 +107,10 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /{model_id}/suggestion:
+  /{model_id}/prediction:
     post:
-      summary: Get suggestions for a provided text based on a model
-      tags: [suggestion]
+      summary: Get prediction for a provided text based on a model
+      tags: [prediction]
       consumes: [application/json]
       parameters:
       - $ref: '#/parameters/ModelId'
@@ -129,18 +125,22 @@ paths:
               type: string
               minLength: 64
               maxLength: 7000
-              description: The text to fetch suggestions for. English only atm.
+              description: The text to fetch prediction for. English only atm.
       responses:
         200:
-          description: A Suggestion Bundle
+          description: A prediction Bundle
           schema:
             type: object
-            required: [suggestion]
+            required: [prediction]
             properties:
               text:
                 type: string
-              suggestion:
-                $ref: '#/definitions/Suggestion'
+              prediction:
+                $ref: '#/definitions/Prediction'
+        404:
+          description: Model not associated to user
+          schema:
+            $ref: '#/definitions/Error'
         400:
           description: Bad request
           schema:
@@ -235,10 +235,6 @@ paths:
               type: number
               format: int32
               description: The amount of seconds to wait before retrying.
-        403:
-          description: You are not the owner of this job
-          schema:
-            $ref: '#/definitions/Error'
         404:
           description: Job does not exist
           schema:
@@ -267,10 +263,6 @@ paths:
                 type: string
                 format: uuid
                 description: The job id provided
-        403:
-          description: You are not the owner of this job
-          schema:
-            $ref: '#/definitions/Error'
         404:
           description: Job not found
           schema:
@@ -350,11 +342,11 @@ definitions:
           $ref: '#/definitions/SourceId'
 
 
-  Suggestion:
+  Prediction:
     type: object
     additionalProperties:
       type: number
       format: float
       minimum: 0.0
       maximum: 1.0
-      description: Probability of suggestion
+      description: Probability of prediction

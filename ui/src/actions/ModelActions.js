@@ -16,13 +16,9 @@ export const ModelActionType = keyMirror({
 });
 
 
-const receiveSuggestion = (suggestion) => {
-  return {type: ModelActionType.MODEL_RECEIVE_SUGGESTION, suggestion};
-};
+const receiveSuggestion = (suggestion) => ({type: ModelActionType.MODEL_RECEIVE_SUGGESTION, suggestion});
 
-const enterSuggestion = () => {
-  return {type: ModelActionType.MODEL_ENTER_SUGGESTION};
-};
+const enterSuggestion = () => ({type: ModelActionType.MODEL_ENTER_SUGGESTION});
 
 export function fetchSuggestionForText(text) {
   return (dispatch) => {

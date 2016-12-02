@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import logging
 from flask import redirect
 from flask_modules.celery import celery, Brain
 from flask_modules.database import db
@@ -30,7 +29,7 @@ def root_get() -> dict:
 def model_id_get(model_id: str) -> dict:
     model = current_user.models.filter_by(id=model_id).one_or_none()
     if not model:
-        return dict(error='Model not associated to user'), 403
+        return dict(error='Model not associated to user'), 404
     return _model_to_result(model)
 
 
@@ -64,7 +63,7 @@ def train_post(body: dict, fast=True) -> dict:
     tagset_id = body['tagset_id']
     tagset = current_user.tagsets.filter_by(id=tagset_id).one_or_none()
     if not tagset:
-        return dict(error='Tagset not associated with user'), 403
+        return dict(error='Tagset not associated with user'), 404
 
     source_ids = set(body['source_ids'])
     error = check_sources_by_id(source_ids)
@@ -91,7 +90,7 @@ def jobs_get() -> dict:
 def jobs_job_id_get(job_id) -> dict:
     job = current_user.jobs.filter_by(id=job_id).one_or_none()
     if not job:
-        return dict(error='not associated to user ' + job_id), 403
+        return dict(error='no job for user with ' + job_id), 404
 
     result = celery.AsyncResult(job_id)
     if result.ready():
@@ -103,7 +102,7 @@ def jobs_job_id_get(job_id) -> dict:
     else:  # still running
         if result.state == 'PENDING':  # most likely doesn't exist
             # todo strictly speaking not 404, the task could be simply not started yet
-            return dict(error='no job with id ' + job_id), 404
+            return dict(error='no job for user with ' + job_id), 404
         else:
             job_url = '/v3/jobs/' + job_id
             return dict(job=job_id, url=job_url), 304, {'Retry-After': 30, 'Location': job_url}
@@ -113,7 +112,7 @@ def jobs_job_id_get(job_id) -> dict:
 def jobs_job_id_delete(job_id, revoke: bool = True) -> dict:
     job = current_user.jobs.filter_by(id=job_id).one_or_none()
     if not job:
-        return dict(error='not associated to user ' + job_id), 403
+        return dict(error='no job for user with ' + job_id), 404
 
     if revoke:
         result = celery.AsyncResult(job_id)
@@ -124,10 +123,11 @@ def jobs_job_id_delete(job_id, revoke: bool = True) -> dict:
 
 
 @defaults
-def model_id_suggestion_post(model_id, body: dict) -> dict:
+def model_id_prediction_post(model_id, body: dict) -> dict:
+    model = current_user.models.filter_by(id=model_id).one_or_none()
+    if not model:
+        return dict(error='model not associated with user'), 404
     text = body['text']
-    predicition = Brain.predict_text(model_id, text).get()
-    logging.error(predicition)
-
-    suggestion = dict((k, v) for [v, k] in predicition)
-    return dict(text=text, suggestion=suggestion)
+    prediction = Brain.predict_text(model_id, text).get()
+    prediction = dict((model.tags.filter_by(id=k).one().tag, v) for k, v in prediction)
+    return dict(text=text, prediction=prediction)
