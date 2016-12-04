@@ -44,9 +44,7 @@ export function initTagger() {
       dispatch(fetchTagCounts(false)),
       dispatch(fetchTagSets()),
       dispatch(fetchSources())])
-      .then(() => getState().app.tagger ?
-        dispatch(fetchRandomComments(8, getState().tagger.sources)) :
-        Promise.resolve());
+      .then(() => dispatch(fetchRandomComments(8, getState().tagger.sources)));
   }
 }
 

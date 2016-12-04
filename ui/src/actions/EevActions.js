@@ -22,6 +22,7 @@ const botApi = (token) => new Swagger({
 export const EevActionType = keyMirror({
   EEV_RECEIVE_API: null,
   EEV_RECEIVE_WS: null,
+  EEV_RECEIVE_CONVERSATION_ID: null,
   EEV_RECEIVE_MESSAGES: null,
   EEV_RECEIVE_CLEAR_MESSAGES: null,
 });
@@ -31,9 +32,11 @@ const receiveAPI = (api) => ({type: EevActionType.EEV_RECEIVE_API, api});
 
 const receiveWS = (ws) => ({type: EevActionType.EEV_RECEIVE_WS, ws});
 
-const receiveMessages = (messages, watermark) => ({type: EevActionType.EEV_RECEIVE_MESSAGES, messages, watermark});
+const receiveConversationId = (conversationId) => ({type: EevActionType.EEV_RECEIVE_CONVERSATION_ID, conversationId});
 
-const receiveMessage = (message, watermark) => receiveMessages([message], watermark);
+const receiveMessages = (messages) => ({type: EevActionType.EEV_RECEIVE_MESSAGES, messages});
+
+const receiveMessage = (message) => receiveMessages([message]);
 
 const receiveClearMessages = () => ({type: EevActionType.EEV_RECEIVE_CLEAR_MESSAGES});
 
@@ -43,9 +46,9 @@ export function initEev() {
     .then(() => dispatch(receiveMessage({
       "id": 0,
       "conversation": 0,
-      "from": "eev",
+      "from": {"id": "eev"},
       "text": "Hi Christian! How can I help you?"
-    }, 'eev'), null));
+    }, 'eev')));
 }
 
 export function startConversation() {
@@ -59,9 +62,10 @@ export function startConversation() {
       })
       .then((botApi) => botApi.Conversations.Conversations_StartConversation()
         .then(({status, obj}) => obj)
-        .then(({streamUrl}) => {
+        .then(({conversationId, streamUrl}) => {
+          dispatch(receiveConversationId(conversationId));
           const ws = new WebSocket(streamUrl);
-          ws.onmessage = (data) => console.log(data);
+          ws.onmessage = ({data}) => data && dispatch(receiveMessages(JSON.parse(data).activities))
           ws.onopen = ({type, timeStamp}) => {
             console.log(`${type} channel to eev on ${timeStamp}`);
             return dispatch(receiveWS(ws));
@@ -71,18 +75,25 @@ export function startConversation() {
             return dispatch(receiveWS(null));
           };
           ws.onerror = (error) => ws.onclose(error);
-
         })
         .catch((error) => console.log(error)))
       .catch((error) => console.log(error)));
 }
 
-export function sendMessage(message) {
-  return (dispatch, getState) => getState.eev.api.
-    if (!getState.api) {
-      return Promise.reject('there is no connection to eev')
-    } else {
-      ws.send()
+export function sendMessage(text) {
+  return (dispatch, getState) => {
+    if (text.trim().toLowerCase() === "clear") {
+      return dispatch(receiveClearMessages());
     }
-  };
+    const {conversationId} = getState().eev;
+    return getState().eev.api.then(
+      (api) => api.Conversations.Conversations_PostActivity({
+        conversationId,
+        activity: {
+          type: 'message',
+          from: {id: 'user'},
+          text
+        }
+      }));
+  }
 }

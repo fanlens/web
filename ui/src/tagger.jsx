@@ -15,9 +15,6 @@ import app from './reducers/app'
 import App from './components/App.jsx'
 import AlertsApp from './components/Alerts.jsx'
 
-function initGlobal() {
-  return (dispatch) => Promise.all([initEev(), initTagger()]);
-}
 
 const store = createStore(
   combineReducers({
@@ -45,4 +42,6 @@ render(
   document.getElementById('alerts')
 );
 
-store.dispatch(initEev());
+
+const initGlobal = (dispatch) => Promise.all([dispatch(initEev()), dispatch(initTagger())]);
+store.dispatch(initGlobal);

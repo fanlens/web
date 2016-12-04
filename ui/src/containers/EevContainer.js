@@ -9,7 +9,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onSend: (text) => dispatch(senMessage(text))
+  onSend: (text) => dispatch(sendMessage(text))
 });
 
 const EevContainer = connect(

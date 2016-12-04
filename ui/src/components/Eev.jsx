@@ -2,7 +2,7 @@ import React from 'react';
 import classnames from 'classnames';
 
 const Message = ({from, created, children}) => {
-  const isEev = from === "eev";
+  const isEev = from.id !== "user";
   const icon = isEev ? '/cdn/img/logo.png' : '/cdn/img/logo.png';
   return <li className={classnames('clearfix', {
     'left': isEev,
@@ -13,7 +13,7 @@ const Message = ({from, created, children}) => {
     </span>
     <div className="chat-body clearfix">
       <div className="header">
-        <strong className="primary-font">{from}</strong>
+        <strong className="primary-font">{from.id}</strong>
         <small className="pull-right text-muted"><i className="fa fa-clock-o"/>&nbsp;{created}</small>
       </div>
       <p>
