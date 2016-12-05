@@ -6,8 +6,7 @@ import {toggleCommentTag} from '../actions/TaggerActions'
 
 import Tagger from '../components/Tagger.jsx'
 
-const mapStateToProps = (state, ownProps) => ({
-  comment: state.tagger.comments[ownProps.id],
+const mapStateToProps = (state) => ({
   tagSet: _.chain(state.tagger.tagSets).filter('active').map('tags').flatten().uniq().value()
 });
 

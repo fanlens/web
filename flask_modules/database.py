@@ -16,7 +16,3 @@ def setup_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
 
-    # we're using migrations
-#    @app.before_first_request
-#    def before_first_request():
-#        db.create_all()

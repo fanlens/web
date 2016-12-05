@@ -603,7 +603,7 @@ parameters:
       - user
       - created_time
       - source
-      - lang
+      - language
     required: true
 
 definitions:
@@ -638,7 +638,7 @@ definitions:
         $ref: '#/definitions/Prediction'
       user:
         $ref: '#/definitions/User'
-      lang:
+      language:
         type: string
         minLength: 2
         maxLength: 2

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from flask import render_template, request, flash, jsonify, Blueprint
+import requests
+from flask import render_template, request, flash, jsonify, Blueprint, g
 from flask_mail import Message
 from flask_modules import request_wants_json
 from flask_modules.mail import mail
@@ -8,7 +9,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import InputRequired, Email
 
+from config.env import Environment
+
 landing = Blueprint('landing', __name__)
+web_env = Environment('WEB')
 
 
 class ContactForm(FlaskForm):
@@ -52,14 +56,10 @@ def pricing():
 @landing.route('/demo', methods=['GET'])
 def demo():
     if request_wants_json():
-        return jsonify(dict())
-        # return jsonify(requests.get('https://lb/v3/activities/1/_random',
-        #                             params=dict(
-        #                                 count=1,
-        #                                 sources='adele',
-        #                                 with_entity=True,
-        #                                 with_suggestion=True,
-        #                                 api_key=g.demo_user.get_auth_token()),
-        #                             verify=False).json())
+        return jsonify(requests.get('https://%s/v3/activities/2/' % web_env['DOMAIN'],
+                                    params=dict(
+                                        count=1,
+                                        api_key=g.demo_user.get_auth_token()),
+                                    verify=False).json())
     else:
         return render_template('landing/demo.html')

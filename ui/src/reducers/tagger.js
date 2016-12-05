@@ -7,12 +7,12 @@ const comments = (state = {}, action) => {
   switch (action.type) {
     case TaggerActionType.TAGGER_RECEIVE_COMMENTS:
       return _.chain(action.comments)
-        .mapValues(comment => _.defaults({
+        .map((comment) => _.defaults({
           prediction: _.chain(comment.prediction)
             .mapValues(s => s > 0.9 ? 0 : s > 0.75 ? 1 : s > 0.6 ? 2 : 3)  // 0 excellent, 1 good, 2 fair, 3 ignore
             .value()
         }, comment))
-        .mapKeys('id')
+        .keyBy('id')
         .value();
     case TaggerActionType.TAGGER_RECEIVE_TAGS:
       return _.defaults({

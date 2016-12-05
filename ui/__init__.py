@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, send_from_directory
+from flask import Flask
 
 
 def create_app():
@@ -18,16 +18,12 @@ def create_app():
     setup_security(app)
     setup_templating(app)
 
-    # @app.route('/static/<path:filename>', methods=['GET'])
-    # def static(filename):
-    #     return send_from_directory('static', filename)
-
     @app.route('/', methods=['HEAD'])
     def health():
         return 'ok'
 
+    app.register_blueprint(landing)
     app.register_blueprint(ui, url_prefix='/v3/ui')
-    app.register_blueprint(landing, url_prefix='/')
     return app
 
 

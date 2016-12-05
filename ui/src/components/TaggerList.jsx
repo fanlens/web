@@ -8,13 +8,11 @@ const TaggerList = ({comments, sources, onReload, onAcceptAll, onReset}) => (
   <div className="container-fluid">
     <div className="row">
       <ul className="list-group">
-        {_.map(_.sortBy(comments, 'id'), (comment) => {
-          return (
-            <li key={comment.id} className="list-group-item col-md-6">
-              <TaggerContainer id={comment.id}/>
-            </li>
-          );
-        })}
+        {_.map(comments, (comment) => (
+          <li key={comment.id} className="list-group-item col-md-6">
+            <TaggerContainer comment={comment}/>
+          </li>
+        ))}
       </ul>
     </div>
     <div className="row controls">
