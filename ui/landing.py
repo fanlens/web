@@ -56,10 +56,9 @@ def pricing():
 @landing.route('/demo', methods=['GET'])
 def demo():
     if request_wants_json():
-        return jsonify(requests.get('https://%s/v3/activities/2/' % web_env['DOMAIN'],
-                                    params=dict(
-                                        count=1,
-                                        api_key=g.demo_user.get_auth_token()),
-                                    verify=False).json())
+        return jsonify(requests.get('https://%s/v3/activities/%s/' % (web_env['DOMAIN'], web_env['DEMOSOURCE']),
+                                    params=dict(count=1, random=True),
+                                    headers={'Authorization-Token': g.demo_user.get_auth_token()},
+                                    verify=web_env['VERIFYSSL'] != 'False').json())
     else:
         return render_template('landing/demo.html')

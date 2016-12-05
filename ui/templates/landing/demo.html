@@ -7,7 +7,7 @@
             url: "{{ url_for('landing.demo') }}",
             headers: {"Accept": "application/json"},
             success: function (demo) {
-                demo = demo.comments[0];
+                demo = demo.activities[0];
                 var html = `
             <div >
             <div class="row">
@@ -18,17 +18,17 @@
                 <div class="col-xs-10 fb-main"><h4 class="list-group-item-heading"><a
                         href="https://facebook.com/${demo.user.id}"> ${demo.user.name}</a></h4>
                     <p class="list-group-item-text">
-                        <span>${demo.message}</span>
+                        <span>${demo.text}</span>
                     </p></div>
-                <div class="col-xs-1 text-center fb-icon-col"><a href="https://facebook.com/${demo.page}">
-                    <img src="https://graph.facebook.com/${demo.page}/picture?type=normal"
+                <div class="col-xs-1 text-center fb-icon-col"><a href="https://facebook.com/${demo.source.slug}">
+                    <img src="https://graph.facebook.com/${demo.source.slug}/picture?type=normal"
                          class="img-responsive img-rounded fb-icon"></a></div>
             </div>
             <div class="row">
                 <form class="form-group">
                     <div class="btn-group btn-group-justified" role="group">` +
-                        Object.keys(demo.suggestion).map(function (tag) {
-                            var percent = demo.suggestion[tag]
+                        Object.keys(demo.prediction).map(function (tag) {
+                            var percent = demo.prediction[tag]
                             var html = `
                             <div class="btn-group labels" role="group">
                                 ${percent <= 0.8 ?
