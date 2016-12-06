@@ -20,7 +20,7 @@ def _fetch_new():
                          headers=dict(Authorization="Bearer %s" % eev_config['secret']))
 
     if resp.status_code != 200:
-        return dict(error="could not connect to eev: " + resp.content), 500
+        return dict(error="could not connect to eev: " + resp.text), 500
     else:
         session['eev'] = resp.json()
         return session['eev']
