@@ -29,7 +29,7 @@ def _fetch_new():
 def _refresh():
     assert 'eev' in session
     resp = requests.post(BASE_PATH + "/tokens/refresh",
-                         headers=dict(Authorization="Bearer %s" % session['eev_token']))
+                         headers=dict(Authorization="Bearer %s" % session['eev']['token']))
     if resp.status_code != 200:
         return _fetch_new()
     else:
