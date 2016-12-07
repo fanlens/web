@@ -5,7 +5,7 @@ import {fetchRandomComments, resetCommentTags, addCommentTag, fetchTagCounts} fr
 import TaggerList from '../components/TaggerList.jsx'
 
 const mapStateToProps = (state) => ({
-  comments: _.chain(state.tagger.comments).values().filter('id').value(),
+  comments: _.chain(state.tagger.comments).values().sortBy('id').value(),
   sources: state.tagger.sources
 });
 
