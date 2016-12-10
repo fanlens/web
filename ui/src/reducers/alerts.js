@@ -1,5 +1,5 @@
-import {AlertActionType} from '../actions/AlertActions'
-import _ from 'lodash'
+import {AlertActionType} from '../actions/AlertActions';
+import _ from 'lodash';
 
 const alerts = (state = [], action) => {
   switch (action.type) {
@@ -13,6 +13,6 @@ const alerts = (state = [], action) => {
     default:
       return state;
   }
-}
+};
 
-export default alerts
+export default alerts;

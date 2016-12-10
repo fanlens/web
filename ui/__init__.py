@@ -22,11 +22,9 @@ def create_app():
     def health():
         return 'ok'
 
-    from .ui_ import ui
-    from .landing import landing
+    from .index import index
 
-    app.register_blueprint(landing)
-    app.register_blueprint(ui, url_prefix='/v3/ui')
+    app.register_blueprint(index)
     return app
 
 

@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import g, render_template
-from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin, login_required, current_user
-from flask_wtf.csrf import CsrfProtect
-
-from flask_modules.database import db
-from db.models.users import Role, User
 from config.db import Config
+from db.models.users import Role, User
+from flask import g, jsonify
+from flask_modules.database import db
+from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin, auth_token_required, current_user
+from flask_wtf.csrf import CsrfProtect
 
 csrf = CsrfProtect()
 security = Security()
@@ -40,10 +39,33 @@ def setup_security(app):
     user_datastore = SQLAlchemyUserDatastore(db, WebUser, WebRole)
     security.init_app(app, user_datastore)
 
-    @app.route('/v3/user/token', methods=['GET'])
-    @login_required
-    def token():
-        return render_template('security/token.html', api_key=current_user.get_auth_token())
+    @app.route('/v3/user/swagger.json', methods=['GET'])
+    def get_definition():
+        return jsonify({"swagger": "2.0", "info": {"title": "Fanlens User API", "version": "3.0.0",
+                                                   "description": "API related to users"}, "schemes": ["https"],
+                        "basePath": "/v3", "securityDefinitions": {
+                "api_key": {"type": "apiKey", "name": "Authorization-Token", "in": "header"}},
+                        "security": [{"api_key": []}], "produces": ["application/json"], "paths": {"/user": {
+                "get": {"summary": "get user data", "tags": ["user"], "responses": {
+                    "200": {"description": "A token and associated conversationId",
+                            "schema": {"type": "object", "required": ["active", "confirmed_at", "email", "roles"],
+                                       "properties": {"active": {"type": "boolean"}, "api_key": {"type": "string"},
+                                                      "confirmed_at": {"type": "string", "format": "date-time"},
+                                                      "email": {"type": "string", "format": "email"},
+                                                      "roles": {"type": "array", "uniqueItems": "true",
+                                                                "items": {"type": "string"}}}}},
+                    "403": {"description": "not logged in", "schema": {"$ref": "#/definitions/Error"}}}}}},
+                        "definitions": {"Error": {"type": "object", "properties": {"error": {"type": "string"}}}}})
+
+    @app.route('/v3/user', methods=['GET'])
+    @auth_token_required
+    def get_user():
+        user = (current_user
+                if current_user.has_role('tagger')
+                else g.demo_user)
+        return jsonify(email=user.email, active=user.active, confirmed_at=user.confirmed_at,
+                       api_key=user.get_auth_token(),
+                       roles=[role.name for role in user.roles])
 
     @app.before_first_request
     def fetch_demo_user():

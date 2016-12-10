@@ -1,0 +1,29 @@
+footer {
+    font-size: 0.8rem;
+    background-color: white;
+    color: #444;
+    padding: 0.25em;
+    display: flex !important;
+    flex: 0 0 auto !important;
+}
+
+footer ul#footer-nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+footer ul#footer-nav li {
+    display: inline
+}
+
+footer ul#footer-nav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: bold;
+}
+
+footer ul#footer-nav li:nth-child(n + 2):before {
+    content: '•';
+    margin: 0 0.5em;
+}

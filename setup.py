@@ -16,6 +16,7 @@ setup(
         'Flask',
         'flask-security',
         'flask-sqlalchemy',
+        'psycopg2',
         'Flask-Redis',
         'connexion',
         'celery[redis]',

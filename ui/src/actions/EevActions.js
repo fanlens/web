@@ -1,5 +1,9 @@
-import keyMirror from 'keymirror'
-import Swagger from 'swagger-client'
+import _ from 'lodash';
+import keyMirror from 'keymirror';
+import Swagger from 'swagger-client';
+import uuid from 'node-uuid';
+
+import {fetchUser} from './AppActions';
 
 const tokenApi = new Swagger({
   url: '/v3/eev/swagger.json',
@@ -25,6 +29,7 @@ export const EevActionType = keyMirror({
   EEV_RECEIVE_CONVERSATION_ID: null,
   EEV_RECEIVE_MESSAGES: null,
   EEV_RECEIVE_CLEAR_MESSAGES: null,
+  EEV_RECEIVE_LOADINGSTATE: null,
 });
 
 
@@ -40,15 +45,13 @@ const receiveMessage = (message) => receiveMessages([message]);
 
 const receiveClearMessages = () => ({type: EevActionType.EEV_RECEIVE_CLEAR_MESSAGES});
 
+const receiveLoadingState = (loading) => ({type: EevActionType.EEV_RECEIVE_LOADINGSTATE, loading});
+
 
 export function initEev() {
-  return (dispatch) => dispatch(startConversation())
-    .then(() => dispatch(receiveMessage({
-      "id": 0,
-      "conversation": 0,
-      "from": {"id": "eev"},
-      "text": "Hi Christian! How can I help you?"
-    }, 'eev')));
+  return (dispatch) => dispatch(fetchUser())
+    .then(dispatch(startConversation()))
+    .then(() => dispatch(receiveLoadingState(false)));
 }
 
 export function startConversation() {
@@ -65,7 +68,19 @@ export function startConversation() {
         .then(({conversationId, streamUrl}) => {
           dispatch(receiveConversationId(conversationId));
           const ws = new WebSocket(streamUrl);
-          ws.onmessage = ({data}) => data && dispatch(receiveMessages(JSON.parse(data).activities))
+          ws.onmessage = ({data}) => {
+            const {activities} = data ? JSON.parse(data) : {activities: []};
+            const loadingStates = activities.map((activity) => {
+              switch (activity.type) {
+                case 'message':
+                  dispatch(receiveMessage(activity));
+                  return !activity.from.id.startsWith('eev');
+                case 'typing':
+                  return true;
+              }
+            });
+            dispatch(receiveLoadingState(_.last(loadingStates) || false));
+          };
           ws.onopen = ({type, timeStamp}) => {
             console.log(`${type} channel to eev on ${timeStamp}`);
             return dispatch(receiveWS(ws));
@@ -86,14 +101,18 @@ export function sendMessage(text) {
       return dispatch(receiveClearMessages());
     }
     const {conversationId} = getState().eev;
+    dispatch(receiveLoadingState(true));
+    const activity = {
+      type: 'message',
+      from: {id: 'user'},
+      pending: uuid.v1(),
+      text
+    };
+    dispatch(receiveMessage(activity));
     return getState().eev.api.then(
       (api) => api.Conversations.Conversations_PostActivity({
         conversationId,
-        activity: {
-          type: 'message',
-          from: {id: 'user'},
-          text
-        }
+        activity
       }));
   }
 }

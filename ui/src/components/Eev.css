@@ -1,0 +1,6 @@
+@media screen and (max-width: 1024px) {
+    #message-list {
+        flex-basis: 100%;
+        max-width: 100%;
+    }
+}

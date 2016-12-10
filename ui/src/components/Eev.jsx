@@ -1,68 +1,29 @@
-import React from 'react';
-import classnames from 'classnames';
+import React from "react";
+import Paper from "material-ui/Paper";
+import ChatInput from "./chat/ChatInput.jsx";
+import MessageList from "./chat/MessageList.jsx";
+import "./Eev.css";
 
-const Message = ({from, created, children}) => {
-  const isEev = from.id !== "user";
-  const icon = isEev ? '/cdn/img/logo.png' : '/cdn/img/logo.png';
-  return <li className={classnames('clearfix', {
-    'left': isEev,
-    'right': !isEev
-  })}>
-    <span className={classnames('chat-img', {'pull-left': isEev, 'pull-right': !isEev})}>
-      <img src={icon} alt="User Avatar"/>
-    </span>
-    <div className="chat-body clearfix">
-      <div className="header">
-        <strong className="primary-font">{from.id}</strong>
-        <small className="pull-right text-muted"><i className="fa fa-clock-o"/>&nbsp;{created}</small>
-      </div>
-      <p>
-        {children}
-      </p>
-    </div>
-  </li>;
-};
-
-
-const Eev = ({ready, messages, onSend}) => {
-  let msg = null;
-  const sendAndClear = () => {
-    onSend(msg.value);
-    msg.value = ''
-  };
-  return (<div id="evaluator" className="container-fluid">
-    <div className="row">
-      <div className="col-md-12">
-        <div className="chat-message">
-          <ul className="chat">
-            {messages.map((msg, idx) => (
-              <Message key={idx} {...msg}>
-                {msg["text"]}
-              </Message>
-            ))}
-          </ul>
+const Eev = ({messages}) => (
+  <main id="eev" style={{display: 'flex', flexDirection: 'column', flex: '1 1 auto'}}>
+      <Paper className="row center-xs"
+             style={{zIndex: 1, display: 'flex', flex: '0 0 auto', flexDirection: 'row', backgroundColor: 'white'}}
+             zDepth={1}>
+        <div className="col-md-10 col-xs-12">
+          <ChatInput />
         </div>
-        <div className="chat-input">
-          <div className="input-group">
-            <textarea rows="1"
-                      className="form-control border no-shadow no-rounded input-lg"
-                      placeholder="Type your message here"
-                      ref={(c) => msg = c}
-                      onKeyUp={(e) => ready && (e.nativeEvent.keyCode === 13 && e.nativeEvent.shiftKey) && sendAndClear()}/>
-            <span className="input-group-btn">
-                <button className={classnames('btn', 'btn-success', 'no-rounded', 'btn-lg', {'disabled': !ready})}
-                        type="button"
-                        onClick={() => ready && sendAndClear() }>
-                  <i className="fa fa-paper-plane" aria-hidden="true"/> Send
-                </button>
-            </span>
+      </Paper>
+      <div className="row center-sm">
+        <div id="message-list" className="col-sm-8" style={{display: 'flex', flexDirection: 'column'}}>
+          <div className="row" style={{display: 'flex', flex: '1 1 auto', overflowY: 'scroll'}}>
+            <div className="col-xs-12">
+              <MessageList/>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>);
-};
+  </main>
+);
+
 
 export default Eev;
-
-

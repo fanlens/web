@@ -3,8 +3,19 @@
 
 {% block styles %}
     {{ super() }}
+    <style>
+        body {
+            background: rgb(255, 255, 255) none;
+        }
 
-    <link href="/v3/static/css/security.css" rel="stylesheet">
+        .jumbotron {
+            margin: 30px;
+        }
+
+        .well {
+            overflow-wrap: break-word;
+        }
+    </style>
 {% endblock %}
 
 {% block main %}

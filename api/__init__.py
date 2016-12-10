@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""base module for web guis"""
-
 
 def create_app():
     import connexion
-    from flask import send_from_directory
 
     from flask_modules import SimpleResolver
     from flask_modules.celery import setup_celery
@@ -32,8 +29,6 @@ def create_app():
     app.add_api('eev.yaml', validate_responses=True, resolver=SimpleResolver(eev))
     app.add_api('model.yaml', validate_responses=True, resolver=SimpleResolver(model))
     app.add_url_rule('/', 'health', lambda: 'ok')
-    app.add_url_rule('/v3/static/<path:filename>', 'send_files',
-                     lambda filename: send_from_directory('static', filename))
 
     return app
 
