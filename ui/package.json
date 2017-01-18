@@ -34,8 +34,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-app": "node_modules/browserify/bin/cmd.js -i jquery -i bootstrap -t browserify-css -t babelify src/app.jsx -o ../cdn/js/app.js --debug",
-    "build-app-watch": "node_modules/watchify/bin/cmd.js -i jquery -i bootstrap -t browserify-css -t babelify src/app.jsx -o ../cdn/js/app.js --debug"
+    "build-app": "node_modules/browserify/bin/cmd.js -i jquery -i bootstrap -t browserify-css -t babelify src/app.jsx -o ./static/app.js --debug",
+    "build-app-watch": "node_modules/watchify/bin/cmd.js -i jquery -i bootstrap -t browserify-css -t babelify src/app.jsx -o ./static/app.js --debug"
   },
   "author": "Christian Junker"
 }
