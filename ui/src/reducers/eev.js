@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import {EevActionType} from '../actions/EevActions';
 
-const messageComparator = (a, b) => a.pending && b.pending && a.pending == b.pending || a.id == b.id;
+const messageComparator = (a, b) => a.pending && b.pending && a.pending === b.pending || a.id === b.id;
 
 const eev = (state = {
   ws: null,

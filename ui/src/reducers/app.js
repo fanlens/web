@@ -57,7 +57,7 @@ const help = (state = {
   }
 };
 
-const _makeSuggestion = (text, icon = <SvgIconReplay />) => ({text, icon});
+const _makeSuggestion = (text, icon = <SvgIconReplay/>) => ({text, icon});
 const _compareSuggestion = ({text: a}, {text: b}) => _.isEqual(a, b);
 
 const suggestions = (state = {

@@ -1,0 +1,49 @@
+{
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "env": {
+    "es6": true,
+    "node": true,
+    "mocha": true
+  },
+  "globals": {
+    "apiKey": false,
+    "CSRFToken": false,
+    "WebSocket": false
+  },
+  "plugins": [
+    "react"
+  ],
+  "extends": "eslint:recommended",
+  "rules": {
+    "no-case-declarations": "off",
+    "curly": "error",
+    "eqeqeq": "error",
+    "no-console": "off",
+    "strict": "off",
+    "quotmark": "off",
+    "no-redeclare": "error",
+    "indent": [
+      "warn",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "linebreak-style": [
+      "warn",
+      "unix"
+    ],
+    "semi": [
+      "warn",
+      "always"
+    ],
+    "no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ]
+  }
+}

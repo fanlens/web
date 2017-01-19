@@ -1,6 +1,6 @@
-import keyMirror from 'keymirror'
-import Swagger from 'swagger-client'
-import {warning} from './AlertActions'
+import keyMirror from "keymirror";
+import Swagger from "swagger-client";
+import {warning} from "./AlertActions";
 
 const modelApi = new Swagger({
   url: '/v3/model/swagger.json',
@@ -32,5 +32,5 @@ export function fetchSuggestionForText(text) {
             dispatch(warning("There was a problem with the provided text! Is it in english?"))
               .then(dispatch(receiveSuggestion([])));
           })));
-  }
+  };
 }

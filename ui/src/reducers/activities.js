@@ -46,7 +46,6 @@ const tagSets = (state = {}, action) => {
       return _.defaults({
         [action.id]: _.defaults({active: !state[action.id].active}, state[action.id])
       }, state);
-      break;
     case ActivitiesActionType.ACTIVITIES_RECEIVE_TAGSETS:
       return _.defaults({
         all: {
@@ -55,7 +54,6 @@ const tagSets = (state = {}, action) => {
           tags: _.chain(action.tagSets).map('tags').flatten().uniq().value()
         }
       }, _.keyBy(action.tagSets, 'id'));
-      break;
     default:
       return state;
   }

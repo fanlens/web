@@ -1,6 +1,6 @@
-import keyMirror from 'keymirror'
-import _ from 'lodash'
-import Swagger from 'swagger-client'
+import keyMirror from 'keymirror';
+import _ from 'lodash';
+import Swagger from 'swagger-client';
 
 const activitiesApi = new Swagger({
   url: '/v3/activities/swagger.json',
@@ -41,8 +41,8 @@ export function initActivities() {
     return Promise.all([
       dispatch(fetchTagCounts(false)),
       dispatch(fetchTagSets()),
-      dispatch(fetchSources())])
-  }
+      dispatch(fetchSources())]);
+  };
 }
 
 export function fetchTagSets() {
@@ -72,7 +72,7 @@ export function fetchTagCounts(filterSources = true) {
         api.tags.get_tags({with_count: true});
       counts.then(({status, obj}) => obj)
         .then(({counts}) => dispatch(receiveTagCounts(counts)))
-        .catch((error) => console.log(error))
+        .catch((error) => console.log(error));
     });
 }
 
@@ -107,7 +107,7 @@ export function toggleSource(source) {
 }
 
 export function toggleCommentTag(comment, tag) {
-  return manipulateTags(comment, _.difference([tag], comment.tags), _.intersection(comment.tags, [tag]))
+  return manipulateTags(comment, _.difference([tag], comment.tags), _.intersection(comment.tags, [tag]));
 }
 
 export function addCommentTag(comment, tag) {

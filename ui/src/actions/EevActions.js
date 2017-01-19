@@ -114,5 +114,5 @@ export function sendMessage(text) {
         conversationId,
         activity
       }));
-  }
+  };
 }
