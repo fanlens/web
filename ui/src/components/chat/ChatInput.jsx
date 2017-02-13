@@ -1,14 +1,10 @@
 import _ from "lodash";
 import React from "react";
-import ReactDOM from "react-dom";
 import {connect} from "react-redux";
 import AutoComplete from "material-ui/AutoComplete";
 import RaisedButton from "material-ui/RaisedButton";
 import MenuItem from "material-ui/MenuItem";
-import Toggle from "material-ui/Toggle";
 import SvgIconNavigationMenu from "material-ui/svg-icons/navigation/menu";
-import SvgIconHelp from "material-ui/svg-icons/action/help";
-import SvgIconHelpOutline from "material-ui/svg-icons/action/help-outline";
 import IconButton from "material-ui/IconButton";
 import {sendMessage} from "../../actions/EevActions";
 import * as AppActions from "../../actions/AppActions";

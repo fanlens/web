@@ -1,6 +1,6 @@
-import keyMirror from 'keymirror';
-import _ from 'lodash';
-import Swagger from 'swagger-client';
+import keyMirror from "keymirror";
+import _ from "lodash";
+import Swagger from "swagger-client";
 
 const activitiesApi = new Swagger({
   url: '/v3/activities/swagger.json',
@@ -36,33 +36,39 @@ const receiveToggleSource = (source) => ({type: ActivitiesActionType.ACTIVITIES_
 
 export const toggleTagSet = (id) => ({type: ActivitiesActionType.ACTIVITIES_TOGGLE_TAGSET, id});
 
-export function initActivities() {
-  return (dispatch) => {
+
+let initialized = false; // ugly but no better idea atm
+
+export const initActivities = (force = false) => initialized && !force ? Promise.resolve() :
+  (dispatch) => {
+    initialized = true;
     return Promise.all([
       dispatch(fetchTagCounts(false)),
       dispatch(fetchTagSets()),
-      dispatch(fetchSources())]);
+      dispatch(fetchSources())])
+      .catch(() => initialized = false);
   };
-}
 
-export function fetchTagSets() {
-  return (dispatch) => activitiesApi.then(
+export const fetchTagSets = () =>
+  (dispatch) => activitiesApi.then(
     (api) => api.tagsets.get_tagsets()
       .then(({status, obj}) => obj)
       .then(({tagSets}) => dispatch(receiveTagSets(tagSets)))
       .catch((error) => console.log(error)));
-}
 
-export function fetchSources() {
-  return (dispatch) => activitiesApi.then(
+export const fetchSources = () =>
+  (dispatch) => activitiesApi.then(
     (api) => api.sources.get_sources()
       .then(({status, obj}) => obj)
       .then(({sources}) => dispatch(receiveSources(sources)))
       .catch((error) => console.log(error)));
-}
 
-export function fetchTagCounts(filterSources = true) {
-  return (dispatch, getState) => activitiesApi.then(
+export const toggleSource = (source) =>
+  (dispatch) => Promise.resolve(dispatch(receiveToggleSource(source)))
+    .then(dispatch(fetchTagCounts()));
+
+export const fetchTagCounts = (filterSources = true) =>
+  (dispatch, getState) => activitiesApi.then(
     (api) => {
       const counts = filterSources ?
         api.tags.get_source_ids_tags({
@@ -74,10 +80,9 @@ export function fetchTagCounts(filterSources = true) {
         .then(({counts}) => dispatch(receiveTagCounts(counts)))
         .catch((error) => console.log(error));
     });
-}
 
-export function fetchRandomComments(count, sources) {
-  return (dispatch) => activitiesApi.then(
+export const fetchRandomComments = (count, sources) =>
+  (dispatch) => activitiesApi.then(
     (api) => api.activity.get_source_ids({
       source_ids: _.chain(sources).filter('active').map('id').value(),
       count: count,
@@ -85,10 +90,9 @@ export function fetchRandomComments(count, sources) {
     }).then(({status, obj}) => obj)
       .then(({activities}) => dispatch(receiveComments(activities)))
       .catch((error) => console.log(error)));
-}
 
-function manipulateTags(comment, add, remove) {
-  return (dispatch) => activitiesApi.then(
+const manipulateTags = (comment, add, remove) =>
+  (dispatch) => activitiesApi.then(
     (api) => api.activity.patch_source_id_activity_id_tags({
       source_id: comment.source.id,
       activity_id: comment.id,
@@ -100,20 +104,10 @@ function manipulateTags(comment, add, remove) {
       .then(({tags}) => dispatch(receiveTags(comment, tags)))
       .then(() => dispatch(fetchTagCounts()))
       .catch((error) => console.log(error)));
-}
 
-export function toggleSource(source) {
-  return (dispatch) => Promise.resolve(dispatch(receiveToggleSource(source))).then(dispatch(fetchTagCounts()));
-}
+export const toggleCommentTag = (comment, tag) =>
+  manipulateTags(comment, _.difference([tag], comment.tags), _.intersection(comment.tags, [tag]));
 
-export function toggleCommentTag(comment, tag) {
-  return manipulateTags(comment, _.difference([tag], comment.tags), _.intersection(comment.tags, [tag]));
-}
+export const addCommentTag = (comment, tag) => manipulateTags(comment, Array.isArray(tag) ? tag : [tag], []);
 
-export function addCommentTag(comment, tag) {
-  return manipulateTags(comment, Array.isArray(tag) ? tag : [tag], []);
-}
-
-export function resetCommentTags(comment) {
-  return manipulateTags(comment, [], comment.tags);
-}
+export const resetCommentTags = (comment) => manipulateTags(comment, [], comment.tags);

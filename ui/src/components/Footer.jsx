@@ -20,7 +20,7 @@ const Footer = () => (
         </ul>
       </div>
       <div className="col-xs end-xs">
-        <div className="copyright">Copyright © Fanlens 2017. All Rights Reserved.</div>
+        <div className="copyright">© Fanlens 2017. All Rights Reserved.</div>
       </div>
     </Paper>
   </footer>

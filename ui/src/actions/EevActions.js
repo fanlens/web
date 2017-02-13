@@ -1,9 +1,8 @@
-import _ from 'lodash';
-import keyMirror from 'keymirror';
-import Swagger from 'swagger-client';
-import uuid from 'node-uuid';
-
-import {fetchUser} from './AppActions';
+import _ from "lodash";
+import keyMirror from "keymirror";
+import Swagger from "swagger-client";
+import uuid from "node-uuid";
+import {fetchUser} from "./AppActions";
 
 const tokenApi = new Swagger({
   url: '/v3/eev/swagger.json',
@@ -48,14 +47,19 @@ const receiveClearMessages = () => ({type: EevActionType.EEV_RECEIVE_CLEAR_MESSA
 const receiveLoadingState = (loading) => ({type: EevActionType.EEV_RECEIVE_LOADINGSTATE, loading});
 
 
-export function initEev() {
-  return (dispatch) => dispatch(fetchUser())
-    .then(dispatch(startConversation()))
-    .then(() => dispatch(receiveLoadingState(false)));
-}
+let initialized = false; // ugly but no better idea atm
 
-export function startConversation() {
-  return (dispatch) => tokenApi.then(
+export const initEev = (force = false) => initialized && !force ? Promise.resolve() :
+  (dispatch) => {
+    initialized = true;
+    return dispatch(fetchUser())
+      .then(dispatch(startConversation()))
+      .then(dispatch(receiveLoadingState(false)))
+      .catch(() => initialized = false);
+  };
+
+export const startConversation = () =>
+  (dispatch) => tokenApi.then(
     (api) => api.eev.post_token()
       .then(({status, obj}) => obj)
       .then(({token}) => {
@@ -93,10 +97,9 @@ export function startConversation() {
         })
         .catch((error) => console.log(error)))
       .catch((error) => console.log(error)));
-}
 
-export function sendMessage(text) {
-  return (dispatch, getState) => {
+export const sendMessage = (text) =>
+  (dispatch, getState) => {
     if (text.trim().toLowerCase() === "clear") {
       return dispatch(receiveClearMessages());
     }
@@ -115,4 +118,3 @@ export function sendMessage(text) {
         activity
       }));
   };
-}

@@ -1,0 +1,51 @@
+div#team-bg,
+div#team {
+    background-size: contain;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+div#team-bg {
+    background-image: url(/cdn/img/enterprise-bg-pattern-1080.jpg)
+}
+
+div#team {
+    background-image: url(/cdn/img/enterprise-bg-1080.jpg);
+    background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 779px) {
+    div#team {
+        background-size: cover;
+        background-position: center;
+    }
+}
+
+div#offers-container {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    margin-top: 10%;
+}
+
+div#offers {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    text-align: left;
+}
+
+div#signup {
+    position: relative;
+    margin: 0;
+    margin-top: 10%;
+    padding: 0;
+}
+
+div#signup > .signup-fields {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    padding: 0.25em 1em;
+    margin: 0;
+}
+
+

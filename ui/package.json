@@ -29,13 +29,16 @@
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "browserify-css": "^0.9.1",
+    "eslint": "^3.15.0",
     "redux-logger": "^2.6.1",
+    "uglifyify": "^3.0.4",
     "watchify": "^3.7.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-app": "node_modules/browserify/bin/cmd.js -i jquery -i bootstrap -t browserify-css -t babelify src/app.jsx -o ./static/app.js --debug",
-    "build-app-watch": "node_modules/watchify/bin/cmd.js -i jquery -i bootstrap -t browserify-css -t babelify src/app.jsx -o ./static/app.js --debug"
+    "build-app-dev": "node_modules/browserify/bin/cmd.js -t browserify-css -t babelify src/app.jsx -o ./static/app.js --debug",
+    "build-app-watch": "node_modules/watchify/bin/cmd.js -t browserify-css -t babelify src/app.jsx -o ./static/app.js --debug",
+    "build-app": "NODE_ENV=production node_modules/browserify/bin/cmd.js -t browserify-css -t babelify -g uglifyify src/app.jsx -o ./static/app.js"
   },
   "author": "Christian Junker"
 }
