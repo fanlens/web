@@ -18,7 +18,8 @@ const rgba = (amount) => `rgba(${new Array(3).fill(amount).join()}, 0.87)`;
 const arrowColor = (theme) => rgba(theme === 'light' ? 255 : 0);
 
 class Endless extends React.Component {
-  state = {index: 0, offset: randomInt(0, 100)};
+  state = {index: null, offset: randomInt(0, 100)};
+
   idxMapper = (index) => {
     const offset = this.props.random ? this.state.offset : 0;
     return (Math.abs(index) + offset) % this.props.children.length;
@@ -35,6 +36,12 @@ class Endless extends React.Component {
       {this.props.children[this.idxMapper(index)]}
     </div>
   );
+
+  componentWillMount() {
+    if (this.state.index === null) {
+      this.setState({index: this.props.initialIndex || 0});
+    }
+  }
 
   render() {
     return (

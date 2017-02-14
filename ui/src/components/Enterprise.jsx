@@ -70,13 +70,16 @@ const offers = [
     theme: 'theme-violet'
   }];
 
-const OffersList = ({onChangeIndex}) => (
+const findOffer = (frag) => _.findIndex(offers, {head: frag.substring(1)});
+
+const OffersList = ({initialIndex, onChangeIndex}) => (
   <div id="offers-container" className="row end-sm center-xs">
     <div className="spacer col-lg-5 col-xs-1"></div>
     <div id="offers" className="col-lg-6 col-xs-10">
       <Endless
         tight={true}
         theme={'light'}
+        initialIndex={initialIndex}
         onChangeIndex={onChangeIndex}>
         {_.map(offers, (offer, idx) => <Offer key={idx} {...offer}/>)}
       </Endless>
@@ -120,14 +123,17 @@ const Team = () => (
 );
 
 class Enterprise extends React.Component {
-  state = {theme: offers[0].theme};
-
   render() {
+    const frag = this.props.location.hash;
+    const offerIndex = Math.max(findOffer(frag), 0);
     return (
       <main id="legal" style={{display: 'flex', flexDirection: 'column', flex: '1 1 auto'}}>
         <Team/>
-        <OffersList onChangeIndex={(idx) => this.setState({theme: offers[idx].theme})}/>
-        <Signup theme={this.state.theme}/>
+        <OffersList
+          initialIndex={offerIndex}
+          onChangeIndex={(idx) => this.props.router.replace({pathname: this.props.location.pathname, hash: '#'+offers[idx].head})}/>
+          />
+        <Signup theme={offers[offerIndex].theme}/>
       </main>
     );
   }
