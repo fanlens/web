@@ -3,6 +3,7 @@ import keyMirror from "keymirror";
 import Swagger from "swagger-client";
 import uuid from "node-uuid";
 import {fetchUser} from "./AppActions";
+import {orNop} from "./nop";
 
 const tokenApi = new Swagger({
   url: '/v3/eev/swagger.json',
@@ -49,14 +50,14 @@ const receiveLoadingState = (loading) => ({type: EevActionType.EEV_RECEIVE_LOADI
 
 let initialized = false; // ugly but no better idea atm
 
-export const initEev = (force = false) => initialized && !force ? Promise.resolve() :
+export const initEev = (force = false) => orNop(!initialized || force)(
   (dispatch) => {
     initialized = true;
-    return dispatch(fetchUser())
+    dispatch(fetchUser())
       .then(dispatch(startConversation()))
       .then(dispatch(receiveLoadingState(false)))
       .catch(() => initialized = false);
-  };
+  });
 
 export const startConversation = () =>
   (dispatch) => tokenApi.then(

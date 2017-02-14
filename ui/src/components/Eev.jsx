@@ -40,7 +40,10 @@ class Eev extends React.Component {
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = (dispatch) => ({
-  init: (force = false) => Promise.all([dispatch(initEev(force)), dispatch(initActivities(force))])
+  init: (force = false) => {
+    dispatch(initEev(force));
+    dispatch(initActivities(force));
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Eev);

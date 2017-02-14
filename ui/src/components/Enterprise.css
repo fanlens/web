@@ -27,19 +27,168 @@ div#offers-container {
     position: relative;
     padding: 0;
     margin: 0;
-    margin-top: 10%;
+    margin-top: 11em;
+}
+
+.offer {
+    border-radius: 0.5em !important;
+    margin: 5px;
+    background-color: rgba(255, 255, 255, 0.87) !important;
+}
+
+.offer-header,
+.offer-title {
+    text-align: center;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.offer-header {
+    border-top-left-radius: 0.5em !important;
+    border-top-right-radius: 0.5em !important;
+}
+
+.offer-header > div {
+    padding: 0 !important;
+}
+
+.lighter.theme-red:not(.no-bg) > button,
+.lighter.theme-red:not(.no-bg) {
+    background-color: rgba(235, 99, 121, 0.87) !important;
+}
+
+.lighter.theme-red > label {
+    color: rgba(235, 99, 121, 0.87) !important;
+}
+
+.lighter.theme-red hr {
+    border-top: none rgba(235, 99, 121, 0.87) !important;
+    border-left: none rgba(235, 99, 121, 0.87) !important;
+    border-right: none rgba(235, 99, 121, 0.87) !important;
+    border-bottom: 2px solid rgba(235, 99, 121, 0.87) !important;
+}
+
+.darker.theme-red:not(.no-bg) > button,
+.darker.theme-red:not(.no-bg) {
+    background-color: rgba(227, 83, 108, 0.87) !important;
+}
+
+.darker.theme-red > label {
+    color: rgba(227, 83, 108, 0.87) !important;
+}
+
+.darker.theme-red hr {
+    border-top: none rgba(227, 83, 108, 0.87) !important;
+    border-left: none rgba(227, 83, 108, 0.87) !important;
+    border-right: none rgba(227, 83, 108, 0.87) !important;
+    border-bottom: 2px solid rgba(227, 83, 108, 0.87) !important;
+}
+
+.lighter.theme-green:not(.no-bg) > button,
+.lighter.theme-green:not(.no-bg) {
+    background-color: rgba(130, 218, 202, 0.87) !important;
+}
+
+.lighter.theme-green > label {
+    color: rgba(130, 218, 202, 0.87) !important;
+}
+
+.lighter.theme-green hr {
+    border-top: none rgba(130, 218, 202, 0.87) !important;
+    border-left: none rgba(130, 218, 202, 0.87) !important;
+    border-right: none rgba(130, 218, 202, 0.87) !important;
+    border-bottom: 2px solid rgba(130, 218, 202, 0.87) !important;
+}
+
+.darker.theme-green:not(.no-bg) > button,
+.darker.theme-green:not(.no-bg) {
+    background-color: rgba(120, 207, 191, 0.87) !important;
+}
+
+.darker.theme-green > label {
+    color: rgba(120, 207, 191, 0.87) !important;
+}
+
+.darker.theme-green hr {
+    border-top: none rgba(120, 207, 191, 0.87) !important;
+    border-left: none rgba(120, 207, 191, 0.87) !important;
+    border-right: none rgba(120, 207, 191, 0.87) !important;
+    border-bottom: 2px solid rgba(120, 207, 191, 0.87) !important;
+}
+
+.lighter.theme-blue:not(.no-bg) > button,
+.lighter.theme-blue:not(.no-bg) {
+    background-color: rgba(83, 207, 233, 0.87) !important;
+}
+
+.lighter.theme-blue > label {
+    color: rgba(83, 207, 233, 0.87) !important;
+}
+
+.lighter.theme-blue hr {
+    border-top: none rgba(83, 207, 233, 0.87) !important;
+    border-left: none rgba(83, 207, 233, 0.87) !important;
+    border-right: none rgba(83, 207, 233, 0.87) !important;
+    border-bottom: 2px solid rgba(83, 207, 233, 0.87) !important;
+}
+
+.darker.theme-blue:not(.no-bg) > button,
+.darker.theme-blue:not(.no-bg) {
+    background-color: rgba(62, 198, 224, 0.87) !important;
+}
+
+.darker.theme-blue > label {
+    color: rgba(62, 198, 224, 0.87) !important;
+}
+
+.darker.theme-blue hr {
+    border-top: none rgba(62, 198, 224, 0.87) !important;
+    border-left: none rgba(62, 198, 224, 0.87) !important;
+    border-right: none rgba(62, 198, 224, 0.87) !important;
+    border-bottom: 2px solid rgba(62, 198, 224, 0.87) !important;
+}
+
+.lighter.theme-violet:not(.no-bg) > button,
+.lighter.theme-violet:not(.no-bg) {
+    background-color: rgba(202, 167, 255, 0.87) !important;
+}
+
+.lighter.theme-violet > label {
+    color: rgba(202, 167, 255, 0.87) !important;
+}
+
+.lighter.theme-violet hr {
+    border-top: none rgba(202, 167, 255, 0.87) !important;
+    border-left: none rgba(202, 167, 255, 0.87) !important;
+    border-right: none rgba(202, 167, 255, 0.87) !important;
+    border-bottom: 2px solid rgba(202, 167, 255, 0.87) !important;
+}
+
+.darker.theme-violet:not(.no-bg) > button,
+.darker.theme-violet:not(.no-bg) {
+    background-color: rgba(202, 132, 255, 0.87) !important;
+}
+
+.darker.theme-violet > label {
+    color: rgba(202, 132, 255, 0.87) !important;
+}
+
+.darker.theme-violet hr {
+    border-top: none rgba(202, 132, 255, 0.87) !important;
+    border-left: none rgba(202, 132, 255, 0.87) !important;
+    border-right: none rgba(202, 132, 255, 0.87) !important;
+    border-bottom: 2px solid rgba(202, 132, 255, 0.87) !important;
 }
 
 div#offers {
-    background-color: rgba(255, 255, 255, 0.85) !important;
     text-align: left;
 }
 
 div#signup {
-    position: relative;
+    position: absolute;
     margin: 0;
-    margin-top: 10%;
     padding: 0;
+    bottom: 20%;
+    width: 100%;
 }
 
 div#signup > .signup-fields {

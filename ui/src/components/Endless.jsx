@@ -13,41 +13,48 @@ const randomInt = (min, max) => {
 
 const VirtualizeSwipeableViews = bindKeyboard(virtualize(SwipeableViews));
 
-const slideRenderer = ({children, offset}) => ({key, index}) => (
-  <div key={key}>
-    {children[(Math.abs(index) + offset) % children.length]}
-  </div>
-);
+
+const rgba = (amount) => `rgba(${new Array(3).fill(amount).join()}, 0.87)`;
+const arrowColor = (theme) => rgba(theme === 'light' ? 255 : 0);
 
 class Endless extends React.Component {
-  state = {idx: 0, offset: randomInt(0, 100)};
-  _onChangeIndex = (idx) => this.setState({idx});
-  _next = () => this._onChangeIndex(this.state.idx + 1, this.state.idx);
-  _prev = () => this._onChangeIndex(this.state.idx - 1, this.state.idx);
+  state = {index: 0, offset: randomInt(0, 100)};
+  idxMapper = (index) => {
+    const offset = this.props.random ? this.state.offset : 0;
+    return (Math.abs(index) + offset) % this.props.children.length;
+  };
+  _onChangeIndex = (index) => {
+    this.setState({index});
+    this.props.onChangeIndex && this.props.onChangeIndex(this.idxMapper(index));
+  };
+  _next = () => this._onChangeIndex(this.state.index + 1, this.state.index);
+  _prev = () => this._onChangeIndex(this.state.index - 1, this.state.index);
+
+  slideRenderer = ({key, index}) => (
+    <div key={key}>
+      {this.props.children[this.idxMapper(index)]}
+    </div>
+  );
 
   render() {
-    const renderer = slideRenderer({
-      children: this.props.children,
-      offset: this.state.offset
-    });
     return (
       <div className="row middle-xs">
-        <div className="col-xs-2 start-xs">
+        <div className={`col-xs-2 ${this.props.tight ? 'end' : 'start'}-xs`}>
           <IconButton
             onTouchTap={this._prev}>
-            <SVGNavPrev/>
+            <SVGNavPrev color={arrowColor(this.props.theme)}/>
           </IconButton>
         </div>
         <div className="col-xs-8">
           <VirtualizeSwipeableViews
-            index={this.state.idx}
+            index={this.state.index}
             onChangeIndex={this._onChangeIndex}
-            slideRenderer={renderer}/>
+            slideRenderer={this.slideRenderer}/>
         </div>
-        <div className="col-xs-2 end-xs">
+        <div className={`col-xs-2 ${this.props.tight ? 'start' : 'end'}-xs`}>
           <IconButton
             onTouchTap={this._next}>
-            <SVGNavNext/>
+            <SVGNavNext color={arrowColor(this.props.theme)}/>
           </IconButton>
         </div>
       </div>

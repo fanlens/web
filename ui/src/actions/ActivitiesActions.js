@@ -1,6 +1,7 @@
 import keyMirror from "keymirror";
 import _ from "lodash";
 import Swagger from "swagger-client";
+import {orNop} from "./nop";
 
 const activitiesApi = new Swagger({
   url: '/v3/activities/swagger.json',
@@ -34,12 +35,10 @@ const receiveTagCounts = (counts) => ({type: ActivitiesActionType.ACTIVITIES_REC
 
 const receiveToggleSource = (source) => ({type: ActivitiesActionType.ACTIVITIES_TOGGLE_SOURCE, source});
 
-export const toggleTagSet = (id) => ({type: ActivitiesActionType.ACTIVITIES_TOGGLE_TAGSET, id});
-
 
 let initialized = false; // ugly but no better idea atm
 
-export const initActivities = (force = false) => initialized && !force ? Promise.resolve() :
+export const initActivities = (force = false) => orNop(!initialized || force)(
   (dispatch) => {
     initialized = true;
     return Promise.all([
@@ -47,7 +46,8 @@ export const initActivities = (force = false) => initialized && !force ? Promise
       dispatch(fetchTagSets()),
       dispatch(fetchSources())])
       .catch(() => initialized = false);
-  };
+  }
+);
 
 export const fetchTagSets = () =>
   (dispatch) => activitiesApi.then(
@@ -55,6 +55,8 @@ export const fetchTagSets = () =>
       .then(({status, obj}) => obj)
       .then(({tagSets}) => dispatch(receiveTagSets(tagSets)))
       .catch((error) => console.log(error)));
+
+export const toggleTagSet = (id) => ({type: ActivitiesActionType.ACTIVITIES_TOGGLE_TAGSET, id});
 
 export const fetchSources = () =>
   (dispatch) => activitiesApi.then(

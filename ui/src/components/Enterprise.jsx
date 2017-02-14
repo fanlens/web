@@ -1,80 +1,99 @@
 import _ from "lodash";
 import React from "react";
 import Paper from "material-ui/Paper";
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from "material-ui/Card";
 import TextField from "material-ui/TextField";
 import RaisedButton from "material-ui/RaisedButton";
 import Endless from "./Endless.jsx";
 import "./Enterprise.css";
 
-const Offer = ({head, tagline, features, children}) => (
-  <div className="offer">
-    <h1 className="head">{head}</h1>
-    <h2 className="tagline">{tagline}</h2>
-    <ul className="features">
-      {_.map(features,
-        (feature, idx) => <li key={idx}>{feature}</li>)
-      }
-    </ul>
-    <p className="content-area">{children}</p>
-  </div>
+const Offer = ({head, tagline, features, theme, children}) => (
+  <Card className="offer">
+    <CardHeader
+      titleStyle={{color: 'white', textShadow: 'black 0px 0px 2px'}}
+      className={theme + " darker offer-header"}
+      title={tagline}/>
+    <CardTitle
+      titleStyle={{color: 'white', textShadow: 'black 0px 0px 2px'}}
+      className={theme + " lighter offer-title"}
+      title={head}/>
+    <CardText>
+      <ul className="features">
+        {_.map(features,
+          (feature, idx) => <li key={idx}>{feature}</li>)
+        }
+      </ul>
+      {children}
+    </CardText>
+  </Card>
 );
 
-const Offers = () => (
+const offers = [
+  {
+    head: "Greetings",
+    tagline: "The only limit is yourself",
+    features: [
+      "here",
+      "at",
+      "zombocom"
+    ],
+    theme: 'theme-green'
+  },
+  {
+    head: "Enterprise",
+    tagline: "The infinite is unkown",
+    features: [
+      "here",
+      "at",
+      "zombocom"
+    ],
+    theme: 'theme-blue'
+  },
+  {
+    head: "Reseller",
+    tagline: "The infinite is unkown",
+    features: [
+      "here",
+      "at",
+      "zombocom"
+    ],
+    theme: 'theme-red'
+  },
+  {
+    head: "Special Forces",
+    tagline: "The infinite is unkown",
+    features: [
+      "here",
+      "at",
+      "zombocom"
+    ],
+    theme: 'theme-violet'
+  }];
+
+const OffersList = ({onChangeIndex}) => (
   <div id="offers-container" className="row end-sm center-xs">
-    <div className="spacer col-sm-6 col-xs-1"></div>
-    <Paper id="offers" className="col-sm-5 col-xs-10">
-      <Endless>
-        {_.map([
-          {
-            head: "Greetings",
-            tagline: "The only limit is yourself",
-            features: [
-              "here",
-              "at",
-              "zombocom"
-            ]
-          },
-          {
-            head: "Enterprise",
-            tagline: "The infinite is unkown",
-            features: [
-              "here",
-              "at",
-              "zombocom"
-            ]
-          },
-          {
-            head: "Reseller",
-            tagline: "The infinite is unkown",
-            features: [
-              "here",
-              "at",
-              "zombocom"
-            ]
-          },
-          {
-            head: "Special Forces",
-            tagline: "The infinite is unkown",
-            features: [
-              "here",
-              "at",
-              "zombocom"
-            ]
-          }], (offer, idx) => <Offer key={idx} {...offer}/>)}
+    <div className="spacer col-lg-5 col-xs-1"></div>
+    <div id="offers" className="col-lg-6 col-xs-10">
+      <Endless
+        tight={true}
+        theme={'light'}
+        onChangeIndex={onChangeIndex}>
+        {_.map(offers, (offer, idx) => <Offer key={idx} {...offer}/>)}
       </Endless>
-    </Paper>
-    <div className="spacer col-sm-1 col-xs-1"></div>
+    </div>
+    <div className="spacer col-lg-1 col-xs-1"></div>
   </div>
 );
 
-const Signup = () => (
+const Signup = ({theme}) => (
   <div id="signup" className="row end-lg middle-xs center-xs">
-    <div className="spacer col-lg-6 col-xs-1"/>
-    <Paper className="signup-fields col-lg-5 col-xs-10">
+    <div className="spacer col-lg-5 col-xs-1"/>
+    <Paper className="signup-fields col-lg-6 col-xs-10">
       <div className="row middle-xs center-xs">
         <div className="col-sm col-xs-12">
           <TextField
             hintText="jane@example.com"
+            className={theme + " darker no-bg"}
             floatingLabelText="Enter your Email"
             fullWidth={true}
           />
@@ -82,6 +101,7 @@ const Signup = () => (
         <div className="col-sm-3 col-xs-12">
           <RaisedButton
             label="Enquire"
+            className={theme + " darker"}
             primary={true}
             fullWidth={true}
           />
@@ -99,12 +119,18 @@ const Team = () => (
   </div>
 );
 
-const Enterprise = ({messages}) => (
-  <main id="legal" style={{display: 'flex', flexDirection: 'column', flex: '1 1 auto'}}>
-    <Team/>
-    <Offers/>
-    <Signup/>
-  </main>
-);
+class Enterprise extends React.Component {
+  state = {theme: offers[0].theme};
+
+  render() {
+    return (
+      <main id="legal" style={{display: 'flex', flexDirection: 'column', flex: '1 1 auto'}}>
+        <Team/>
+        <OffersList onChangeIndex={(idx) => this.setState({theme: offers[idx].theme})}/>
+        <Signup theme={this.state.theme}/>
+      </main>
+    );
+  }
+}
 
 export default Enterprise;

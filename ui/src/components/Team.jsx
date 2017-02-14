@@ -107,7 +107,7 @@ const Customers = () => (
     <div className="col-md-7 col-xs-12" style={{marginBottom: '16px'}}>
       <Card style={{textAlign: 'left'}}>
         <CardHeader title="A Word from Our Customers"/>
-        <Endless>
+        <Endless random={true}>
           {_.map([
               {
                 name: "Allan Lund Hansen",
@@ -151,7 +151,7 @@ const Sponsors = () => (
     <div className="col-md-7 col-xs-12">
       <Card style={{textAlign: 'left'}}>
         <CardHeader title="Our Awesome Partners & Sponsors"/>
-        <Endless>
+        <Endless random={true}>
           {_.map([
               {
                 name: "Land Tirol",
