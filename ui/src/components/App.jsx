@@ -3,6 +3,7 @@ import {Router, Route, IndexRoute, browserHistory, DefaultRoute} from "react-rou
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import Footer from "./Footer.jsx";
 import Sidebar from "./sidebar/Sidebar.jsx";
+import Alerts from "./Alerts.jsx";
 
 const App = ({children}) => (
   <MuiThemeProvider>
@@ -10,6 +11,7 @@ const App = ({children}) => (
       <Sidebar/>
       {children}
       <Footer/>
+      <Alerts/>
     </div>
   </MuiThemeProvider>
 );

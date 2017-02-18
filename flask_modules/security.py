@@ -6,9 +6,9 @@ from db.models.users import Role, User
 from flask import g, jsonify
 from flask_modules.database import db
 from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin, auth_token_required, current_user
-from flask_wtf.csrf import CsrfProtect
+from flask_wtf.csrf import CSRFProtect
 
-csrf = CsrfProtect()
+csrf = CSRFProtect()
 security = Security()
 _demo_user = None
 

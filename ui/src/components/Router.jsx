@@ -5,7 +5,7 @@ import NotFound from "./NotFound.jsx";
 import Eev from "./Eev.jsx";
 import Team from "./Team.jsx";
 import Legal from "./Legal.jsx";
-import Enterprise from "./Enterprise.jsx";
+import Enterprise from "./enterprise/Enterprise.jsx";
 
 const AppRouter = () => (
   <Router history={browserHistory}>

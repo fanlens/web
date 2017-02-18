@@ -1,30 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask
-
 
 def create_app():
+    import connexion
+
     from flask_modules.mail import setup_mail
     from flask_modules.security import setup_security
     from flask_modules.database import setup_db
     from flask_modules.templating import setup_templating
     from flask_modules.logging import setup_logging
 
-    app = Flask(__name__)
-    setup_logging(app)
-    setup_db(app)
-    setup_mail(app)
-    setup_security(app)
-    setup_templating(app)
+    app = connexion.App(__name__, specification_dir='swagger')
 
-    @app.route('/', methods=['HEAD'])
-    def health():
-        return 'ok'
+    setup_logging(app.app)
+    setup_db(app.app)
+    setup_mail(app.app)
+    setup_security(app.app)
+    setup_templating(app.app)
 
-    from .index import index
+    from flask_modules import SimpleResolver
+    from .controller.catchall import catchall
+    from .controller import ui
 
-    app.register_blueprint(index)
+    app.app.register_blueprint(catchall)
+    app.add_api('ui.yaml', validate_responses=True, resolver=SimpleResolver(ui))
     return app
 
 

@@ -5,7 +5,6 @@
 def create_app():
     import connexion
 
-    from flask_modules import SimpleResolver
     from flask_modules.celery import setup_celery
     from flask_modules.database import setup_db
     from flask_modules.redis import setup_redis
@@ -24,6 +23,7 @@ def create_app():
     setup_celery(app.app)
     setup_templating(app.app)
 
+    from flask_modules import SimpleResolver
     from .controller import activities, model, eev
     app.add_api('activities.yaml', validate_responses=True, resolver=SimpleResolver(activities))
     app.add_api('eev.yaml', validate_responses=True, resolver=SimpleResolver(eev))
