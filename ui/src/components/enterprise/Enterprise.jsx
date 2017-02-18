@@ -95,7 +95,7 @@ const Team = () => (
 
 class Enterprise extends React.Component {
   render() {
-    const frag = this.props.location.hash || offers[0].head;
+    const frag = this.props.location.hash || ('#' + offers[0].head);
     const tag = frag.trim().substring(1).toLowerCase().replace(" ", "_");
     const offerIndex = Math.max(findOffer(frag), 0);
     return (
