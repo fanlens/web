@@ -3,7 +3,7 @@
 from flask import render_template, Blueprint, g
 from flask_security import current_user
 
-catchall = Blueprint('index', __name__)
+catchall = Blueprint('catchall', __name__)
 
 
 @catchall.route('/', defaults={'path': ''})
