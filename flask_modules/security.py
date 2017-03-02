@@ -5,7 +5,7 @@ from config.db import Config
 from db.models.users import Role, User
 from flask import g, jsonify
 from flask_modules.database import db
-from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin, auth_token_required, current_user
+from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin, auth_required, current_user
 from flask_wtf.csrf import CSRFProtect
 
 csrf = CSRFProtect()
@@ -58,7 +58,7 @@ def setup_security(app):
                         "definitions": {"Error": {"type": "object", "properties": {"error": {"type": "string"}}}}})
 
     @app.route('/v3/user', methods=['GET'])
-    @auth_token_required
+    @auth_required('token', 'session')
     def get_user():
         user = (current_user
                 if current_user.has_role('tagger')
@@ -66,6 +66,7 @@ def setup_security(app):
         return jsonify(email=user.email, active=user.active, confirmed_at=user.confirmed_at,
                        api_key=user.get_auth_token(),
                        roles=[role.name for role in user.roles])
+
 
     @app.before_first_request
     def fetch_demo_user():

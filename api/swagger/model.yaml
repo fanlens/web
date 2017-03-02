@@ -312,6 +312,49 @@ definitions:
         format: url
         description: You can get info about the currently running job or cancel it under this url
 
+  Tag:
+    type: string
+    minLength: 1
+    maxLength: 32
+
+  Tags:
+    type: array
+    items:
+      $ref: '#/definitions/Tag'
+    uniqueItems: true
+    maxItems: 100
+
+  TagSet:
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+        format: string
+      tags:
+        $ref: '#/definitions/Tags'
+
+  Source:
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/SourceId'
+      type:
+        type: string
+        enum:
+        - facebook
+        - twitter
+        - crunchbase
+        - generic
+      uri:
+        type: string
+        format: url
+      slug:
+        type: string
+        minLength: 1
+        maxLength: 128
+
   Model:
     type: object
     required: [id, trained_ts]
@@ -335,11 +378,14 @@ definitions:
         description: The model parameters, restricted access
         additionalProperties:
           type: [string, number, boolean]
-      source_ids:
-        description: The ids of the sources this model is trained on
+      tagset:
+        $ref: '#/definitions/TagSet'
+      sources:
+        description: The sources this model is trained on
         type: array
         items:
-          $ref: '#/definitions/SourceId'
+          $ref: '#/definitions/Source'
+        uniqueItems: true
 
 
   Prediction:
