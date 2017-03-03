@@ -57,7 +57,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-
   /{source_ids}/:
     get:
       summary: Get a list of random activities
@@ -667,6 +666,13 @@ definitions:
     minLength: 1
     maxLength: 32
 
+  Tags:
+    type: array
+    items:
+      $ref: '#/definitions/Tag'
+    uniqueItems: true
+    maxItems: 100
+
   TagSet:
     type: object
     properties:
@@ -677,13 +683,6 @@ definitions:
         format: string
       tags:
         $ref: '#/definitions/Tags'
-
-  Tags:
-    type: array
-    items:
-      $ref: '#/definitions/Tag'
-    uniqueItems: true
-    maxItems: 100
 
   TagCounts:
     type: object

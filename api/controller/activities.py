@@ -13,6 +13,21 @@ from sqlalchemy.sql import func
 from . import defaults
 
 
+def source_to_json(source: Source):
+    return dict(
+        id=source.id,
+        type=source.type.value,
+        uri=source.uri,
+        slug=source.slug)
+
+
+def tagset_to_json(tagset: TagSet):
+    return dict(
+        id=tagset.id,
+        title=tagset.title,
+        tags=[tag.tag for tag in tagset.tags])
+
+
 def generic_parser(data: Data) -> dict:
     return dict(
         text=data.text.text if data.text else "",
@@ -159,11 +174,7 @@ def root_post(import_activities: dict) -> typing.Union[dict, tuple]:
 
 @defaults
 def sources_get() -> dict:
-    return dict(sources=[dict(id=source.id,
-                              type=source.type.value,
-                              uri=source.uri,
-                              slug=source.slug)
-                         for source in current_user.sources.all()])
+    return dict(sources=[source_to_json(source) for source in current_user.sources.all()])
 
 
 @defaults
@@ -261,8 +272,7 @@ def tags_tag_delete(tag: str) -> dict:
 
 @defaults
 def tagsets_get() -> dict:
-    tagsets = [dict(id=tagset.id, title=tagset.title, tags=[tag.tag for tag in tagset.tags])
-               for tagset in current_user.tagsets]
+    tagsets = [tagset_to_json(tagset) for tagset in current_user.tagsets]
     return dict(tagSets=tagsets)
 
 

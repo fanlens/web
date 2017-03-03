@@ -5,6 +5,7 @@ import FlatButton from "material-ui/FlatButton";
 import FontIcon from "material-ui/FontIcon";
 import Endless from "./Endless.jsx";
 import Avatar from "material-ui/Avatar";
+import './Team.css';
 
 const firstUpper = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -109,23 +110,23 @@ const Customers = () => (
         <CardHeader title="A Word from Our Customers"/>
         <Endless random={true} tight={true}>
           {_.map([
-              {
-                name: "Allan Lund Hansen",
-                context: "CEO of Sirenio",
-                href: "https://sirenio.com",
-                comment: "I've come to know the Fanlens team as highly motivated and intelligent individuals. We are currently tasking Fanlens with the R&D of our machine learning features and couldn't be happier!",
-                img: "allan",
-              },
-              {
-                name: "Christoph Holz",
-                context: "CEO of Visalyze",
-                href: "https://visalyze.com",
-                comment: "Fanlens ist eine äußerst interessante Firma und Technologie, die es ermöglicht Machine Learning Probleme mittels simplen Plug&Play Komponenten zu lösen.",
-                img: "christoph",
-              }
-            ], (customer, idx) => (
-              <Customer key={idx} {... customer}/>
-            ))}
+            {
+              name: "Allan Lund Hansen",
+              context: "CEO of Sirenio",
+              href: "https://sirenio.com",
+              comment: "I've come to know the Fanlens team as highly motivated and intelligent individuals. We are currently tasking Fanlens with the R&D of our machine learning features and couldn't be happier!",
+              img: "allan",
+            },
+            {
+              name: "Christoph Holz",
+              context: "CEO of Visalyze",
+              href: "https://visalyze.com",
+              comment: "Fanlens ist eine äußerst interessante Firma und Technologie, die es ermöglicht Machine Learning Probleme mittels simplen Plug&Play Komponenten zu lösen.",
+              img: "christoph",
+            }
+          ], (customer, idx) => (
+            <Customer key={idx} {... customer}/>
+          ))}
         </Endless>
       </Card>
     </div>
@@ -187,6 +188,9 @@ const TeamPage = () => (
   <main id="team"
         style={{display: 'flex', flexDirection: 'column', flex: '1 1 auto'}}>
     <div style={{overflowY: 'scroll', padding: '16px'}}>
+      <h1 style={{textAlign: 'center'}}>
+        <a style={{color: 'white', fontWeight: 'bold'}} className="awesome" href="/jobs/cgo" target="_blank">!!! WE ARE HIRING A CGO !!!</a>
+      </h1>
       <Team/>
       <Customers/>
       <Sponsors/>

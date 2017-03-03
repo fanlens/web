@@ -1,19 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from db.models.activities import Source
+from db.models.brain import Model, Job
 from flask import redirect
 from flask_modules.celery import celery, Brain
 from flask_modules.database import db
 from flask_security import current_user
 from flask_security.decorators import roles_required
 
-from db.models.activities import Source
-from db.models.brain import Model, Job
-
 from . import defaults, check_sources_by_id
+from .activities import source_to_json, tagset_to_json
 
 
 def _model_to_result(model: Model):
-    result = dict(id=model.id, trained_ts=model.trained_ts, source_ids=[source.id for source in model.sources])
+    result = dict(
+        id=model.id,
+        trained_ts=model.trained_ts,
+        tagset=tagset_to_json(model.tagset),
+        sources=[source_to_json(source) for source in model.sources])
     if 'admin' in [role.name for role in current_user.roles]:
         result['score'] = model.score
         result['params'] = model.params
