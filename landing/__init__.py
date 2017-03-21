@@ -18,6 +18,10 @@ def create_app():
     setup_db(app)
     setup_mail(app)
     setup_security(app)
+
+    from .forwards import forwards
+    app.register_blueprint(forwards)
+
     return app
 
 

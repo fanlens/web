@@ -19,10 +19,8 @@ def create_app():
 
     from flask_modules import SimpleResolver
     from .controller.catchall import catchall
-    from .controller.forwards import forwards
     from .controller import ui
 
-    app.app.register_blueprint(forwards)
     app.app.register_blueprint(catchall)
     app.add_api('ui.yaml', validate_responses=True, resolver=SimpleResolver(ui))
     app.add_url_rule('/', 'health', lambda: 'ok')
