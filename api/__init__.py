@@ -10,7 +10,6 @@ def create_app():
     from flask_modules.redis import setup_redis
     from flask_modules.mail import setup_mail
     from flask_modules.security import setup_security
-    from flask_modules.templating import setup_templating
     from flask_modules.logging import setup_logging
 
     app = connexion.App(__name__, specification_dir='swagger')
@@ -21,7 +20,6 @@ def create_app():
     setup_mail(app.app)
     setup_security(app.app)
     setup_celery(app.app)
-    setup_templating(app.app)
 
     from flask_modules import SimpleResolver
     from .controller import activities, model, eev

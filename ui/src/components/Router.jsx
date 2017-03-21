@@ -9,7 +9,7 @@ import Enterprise from "./enterprise/Enterprise.jsx";
 
 const AppRouter = () => (
   <Router history={browserHistory}>
-    <Route path='/' component={App}>
+    <Route path='/v3/ui/' component={App}>
       <IndexRoute component={Eev}/>
       <Route path='team' component={Team}/>
       <Route path='legal' component={Legal}/>

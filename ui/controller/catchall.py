@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from flask import render_template, Blueprint, g
+from flask import render_template, Blueprint, g, send_file
 from flask_security import current_user
 
-catchall = Blueprint('catchall', __name__)
+catchall = Blueprint('catchall', __name__, url_prefix='/v3/ui')
+
+
+@catchall.route('/static/app.js')
+def appjs():
+    return send_file('static/app.js')
 
 
 @catchall.route('/', defaults={'path': ''})
