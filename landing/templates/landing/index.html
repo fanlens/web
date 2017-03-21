@@ -1,0 +1,258 @@
+{% extends "/base.html" %}
+
+{% block styles %}
+    {{ super() }}
+
+    <link href="/cdn/css/landing-page.css" rel="stylesheet">
+    <link href="/cdn/css/browser.css" rel="stylesheet">
+{% endblock %}
+
+{% block alerts %}
+    {{ super() }}
+    {% for message in contact_form.email.errors + contact_form.message.errors %}
+        <div class="alert fade in alert-info alert-dismissable"><strong>Warning!</strong>
+            {{ message }}<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block main %}
+    <!-- Header -->
+    <a name="about"></a>
+    <div class="intro-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="intro-message">
+                        <div>
+                            <h1>
+                                <img src="/cdn/img/logo.png"><em>f</em>anlens</h1>
+                            <h3>Artificial Intelligence<br>
+                                Social Media Management</h3>
+                        </div>
+                        <hr class="intro-divider">
+                        <ul class="list-inline intro-social-buttons">
+                            <li>
+                                <a href="https://twitter.com/fanlens_io" class="btn btn-default btn-lg"><i
+                                        class="fa fa-twitter fa-fw"></i> <span
+                                        class="network-name">Twitter</span></a>
+                            </li>
+                            <li>
+                                <a href="https://www.facebook.com/fanlens/"
+                                   class="btn btn-default btn-lg"><i
+                                        class="fa fa-facebook fa-fw"></i> <span class="network-name">Facebook</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://linkedin.com/company/fanlens"
+                                   class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span
+                                        class="network-name">Linkedin</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.intro-header -->
+
+    <!-- Page Content -->
+
+    <a name="services"></a>
+
+    <div class="content-section-b">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Meet Eev!</h2>
+                    <p class="lead">
+                        The newest addition to our family of tools. Eev combines all our power tools below into a
+                        seamless and supportive <strong>Cognitive Expert Advisor</strong>.
+                    </p>
+                    <ul class="lead ul-fa">
+                        <li class="li-fa">Get warnings about situations as they happen!</li>
+                        <li class="li-fa">Get recommendations on what to post!</li>
+                        <li class="li-fa">Test out new ideas and simulate how your community will react!</li>
+                    </ul>
+                    <p class="lead">And much more. Eev is there to support you.</p>
+                    <p class="lead"><strong>Supported Platforms</strong></p>
+                    <ul class="lead ul-fa">
+                        <li><span style="width: 1.2em;" class="fa fa-facebook-square"></span> Facebook Messenger</li>
+                        <li><span style="width: 1.2em;" class="fa fa-skype"></span> Skype</li>
+                        <li><span style="width: 1.2em;" class="fa fa-slack"></span> Slack</li>
+                        <li><span style="width: 1.2em;" class="fa fa-envelope"></span> Email</li>
+                        <li><span style="width: 1.2em;" class="fa fa-globe"></span> and our custom Web App</li>
+                    </ul>
+
+                </div>
+                <div class="col-lg-6 col-sm-pull-6 col-sm-6">
+                    <div>
+                        <img class="img-responsive" style="margin: -4em"
+                             src="/cdn/img/screenshot_proactive_framed-768.png"/>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-b -->
+
+    <div class="content-section-a">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Tagger</h2>
+                    <p class="lead">Add any Facebook page you want and <strong>immediately</strong> get your own
+                        <strong>personalized</strong>
+                        machine learning model.</p>
+                    <ul class="lead ul-fa">
+                        <li class="li-fa">Smart filtering of comments and postings!</li>
+                        <li class="li-fa">Gain insights about the mood in your community!</li>
+                        <li class="li-fa">Detect fraud and scams!</li>
+                    </ul>
+                    <p class="lead">There is <strong>no limit!</strong> Add any tags you want and let the Tagger do the
+                        work
+                        for you!</p>
+                </div>
+                <div class="col-lg-6 col-lg-offset-1 col-sm-6">
+                    <div class="browser-mockup with-url tagger-greeting">
+                        {#                        {% include 'landing/demo.html' %}#}
+                        <img class="img-responsive" src="/cdn/img/tagger-orig.png"/>
+                    </div>
+{#                    <p class="small text-center" style="margin-top:0.5em;">(Link to external source! We take no#}
+{#                        responsibility for the shown content.)</p>#}
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+    <div class="content-section-b">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Evaluator</h2>
+                    <p class="lead">
+                        <strong>No more uncertainty</strong> before you post! Fanlens isn't limited to analyzing your
+                        fan base, your Tagger models can be used to <strong>evaluate</strong> your own postings as well.
+                    </p>
+                    <p class="lead">Enter your post, press Evaluate and <strong>immediately know how your post will be
+                        received</strong>. If you're happy with it you can post it right away or batch it up and
+                        delay it until a better time.
+                    </p>
+                </div>
+                <div class="col-lg-6 col-sm-pull-6 col-sm-6">
+                    <div class="browser-mockup with-url evaluator-greeting">
+                        <img class="img-responsive" src="/cdn/img/evaluator-768.png"/>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-b -->
+
+    <div class="content-section-a">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Your Ideas Are Our Opportunities!</h2>
+                    <p class="lead">Fanlens is not only a product. We are a highly motivated and skilled team that wants
+                        to
+                        <strong>solve your challenges!</strong> We firmly believe that the only way to stay relevant is
+                        by solving <strong>real world</strong> problems.
+                        <br/>Had over to our <strong><a href="/enterprise" target="_blank">Enterprise
+                            Page</a></strong> and get in touch!.
+                    </p>
+                </div>
+                <div class="col-lg-6 col-lg-offset-1 col-sm-6">
+                    <img class="img-responsive" src="/cdn/img/contract.png" />
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+    <a name="contact"></a>
+    <div class="banner">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5">
+                    <h2>Connect to Fanlens:</h2>
+                    <p class="lead">Questions about the product?<br/>
+                        A challenge needing to be solved?<br/>
+                        Funny pictures of humanoid robots in precarious situations?</p>
+                </div>
+                <div class="col-lg-7">
+                    <ul class="list-inline banner-social-buttons">
+                        <li>
+                            <a href="https://twitter.com/fanlens_io" class="btn btn-default btn-lg"><i
+                                    class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                        </li>
+                        <li>
+                            <a href="https://www.facebook.com/fanlens/" class="btn btn-default btn-lg"><i
+                                    class="fa fa-facebook fa-fw"></i> <span class="network-name">Facebook</span> </a>
+                        </li>
+                        <li>
+                            <a href="https://linkedin.com/company/fanlens"
+                               class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span
+                                    class="network-name">Linkedin</span></a>
+                        </li>
+                        <li>
+                            <a href="https://angel.co/fanlens/" class="btn btn-default btn-lg"><i
+                                    class="fa fa-angellist fa-fw"></i> <span
+                                    class="network-name">AngelList</span></a>
+                        </li>
+                    </ul>
+                    {% include 'landing/contact_form.html' %}
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.banner -->
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+
+    <!-- Tooltips -->
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#tagger-wrapper').tooltip({
+          selector: "a[rel=tooltip]"
+        });
+      });
+    </script>
+{% endblock %}

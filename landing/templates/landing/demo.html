@@ -1,0 +1,78 @@
+<link rel="stylesheet" type="text/css" href="/v2/tagger/static/css/tagger.css">
+<div id="tagger-wrapper">
+    <img id="tagger-placeholder" class="img-responsive" src={{ url_for('static', filename="img/tagger.png") }} alt=""/>
+    <script>
+        $('#tagger-placeholder').css('opacity', 0.2);
+        $.ajax({
+            url: "{{ url_for('demo') }}",
+            headers: {"Accept": "application/json"},
+            success: function (demo) {
+                demo = demo.comments[0];
+                var html = `
+            <div >
+            <div class="row">
+                <div class="col-xs-1 text-center fb-icon-col"><a
+                        href="https://facebook.com/${demo.user.id}"><img
+                        src="https://graph.facebook.com/${demo.user.id}/picture?type=normal"
+                        class="img-responsive img-rounded fb-icon"></a></div>
+                <div class="col-xs-10 fb-main"><h4 class="list-group-item-heading"><a
+                        href="https://facebook.com/${demo.user.id}"> ${demo.user.name}</a></h4>
+                    <p class="list-group-item-text">
+                        <span>${demo.message}</span>
+                    </p></div>
+                <div class="col-xs-1 text-center fb-icon-col"><a href="https://facebook.com/${demo.page}">
+                    <img src="https://graph.facebook.com/${demo.page}/picture?type=normal"
+                         class="img-responsive img-rounded fb-icon"></a></div>
+            </div>
+            <div class="row">
+                <form class="form-group">
+                    <div class="btn-group btn-group-justified" role="group">` +
+                        Object.keys(demo.suggestion).map(function (tag) {
+                            var percent = demo.suggestion[tag]
+                            var html = `
+                            <div class="btn-group labels" role="group">
+                                ${percent <= 0.8 ?
+                                    `<label class="btn btn-sm ellipsis btn-primary" type="button"><em
+                                            class="glyphicon glyphicon-tag" aria-hidden="true"></em> ${tag}
+                                    </label>` :
+                                    `<label class="btn btn-sm ellipsis btn-success" type="button"><em
+                                            class="glyphicon glyphicon-tag" aria-hidden="true"></em>
+                                        ${tag}
+                                        <a href="#" rel="tooltip"
+                                           data-container="body"
+                                           data-toggle="tooltip"
+                                           data-html="true"
+                                           data-delay="300"
+                                           title="<div style='padding:0.8rem 0 0.8rem 0;'> Confidence<br/> <em class='glyphicon glyphicon-certificate' aria-hidden='true'></em>Excellent&nbsp;&nbsp; <em class='glyphicon glyphicon-star' aria-hidden='true'></em>Good&nbsp;&nbsp; <em class='glyphicon glyphicon-star-empty' aria-hidden='true'></em>Fair </div> "><em
+                                       ${percent > 0.99 ?
+                                            'class="glyphicon quality glyphicon-certificate"' :
+                                            percent > 0.95 ?
+                                                    'class="glyphicon quality glyphicon-star"' :
+                                                    'class="glyphicon quality glyphicon-star-empty"'
+                                            }
+                                                    aria-hidden="true"></em></a>
+                                    </label>`
+                                    }
+                            </div>`;
+                            return html;
+                        }).join('') +
+                        `</div>
+                </form>
+            </div>`;
+                $('.tagger').html(html);
+                $('.tagger').removeClass('hidden');
+                $('#tagger-placeholder').remove();
+                $('.labels > label.btn').click(function () {
+                    if ($(this).hasClass('active')) {
+                        $(this).removeClass('active');
+                    } else {
+                        $(this).addClass('active');
+                    }
+                });
+            }
+        });
+    </script>
+    <div class="container-fluid tagger hidden" style="z-index: 100; position:relative; margin-top:16px; bottom: 8px;">
+    </div>
+</div>
+
