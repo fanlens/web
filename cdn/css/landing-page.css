@@ -1,6 +1,52 @@
-body {
-    background: url(/cdn/img/logo.png) no-repeat fixed center;
-    background-size: 40%;
+body,
+html {
+    width: 100%;
+    height: 100%;
+    background-color: #f8f8f8;
+}
+
+main {
+    padding-top: 50px;
+}
+
+@media (max-width: 900px) {
+    body {
+        background-size: 55%;
+    }
+}
+
+@media (max-width: 767px) {
+    body {
+        background-size: 70%;
+    }
+}
+
+.topnav {
+    font-size: 14px;
+}
+
+.navbar-brand > img {
+    height: 32px;
+    width: auto;
+    margin-top: -5px;
+    margin-right: -1px;
+    display: inline;
+}
+
+footer {
+    padding: 50px 0;
+    background-color: #f8f8f8;
+}
+
+p.copyright {
+    margin: 15px 0 0;
+}
+
+#alerts {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 999999;
 }
 
 body,
@@ -24,8 +70,9 @@ h6 {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background: url(../img/intro-bg.jpg) no-repeat center center;
-    background-size: cover;
+    background: url(../img/intro-bg-cropped-512.jpg) no-repeat bottom right;
+    background-color: #d2dcff;
+    background-size: contain;
 }
 
 .intro-message {
@@ -164,7 +211,7 @@ h6 {
 .banner {
     padding: 100px 0;
     color: #f8f8f8;
-    background: url(../img/banner-bg.jpg) no-repeat center center;
+    background: url(../img/banner-bg-1024.jpg) no-repeat center center;
     background-size: cover;
 }
 

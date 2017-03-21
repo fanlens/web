@@ -3,7 +3,7 @@
 {% block styles %}
     {{ super() }}
 
-    <link href={{ url_for('static', filename="css/landing-page.css") }} rel="stylesheet">
+    <link href="/cdn/css/landing-page.css" rel="stylesheet">
     <link href="/cdn/css/browser.css" rel="stylesheet">
 {% endblock %}
 
@@ -61,6 +61,49 @@
     <!-- Page Content -->
 
     <a name="services"></a>
+
+    <div class="content-section-b">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Meet Eev!</h2>
+                    <p class="lead">
+                        The newest addition to our family of tools. Eev combines all our power tools below into a
+                        seamless and supportive <strong>Cognitive Expert Advisor</strong>.
+                    </p>
+                    <ul class="lead ul-fa">
+                        <li class="li-fa">Get warnings about situations as they happen!</li>
+                        <li class="li-fa">Get recommendations on what to post!</li>
+                        <li class="li-fa">Test out new ideas and simulate how your community will react!</li>
+                    </ul>
+                    <p class="lead">And much more. Eev is there to support you.</p>
+                    <p class="lead"><strong>Supported Platforms</strong></p>
+                    <ul class="lead ul-fa">
+                        <li><span style="width: 1.2em;" class="fa fa-facebook-square"></span> Facebook Messenger</li>
+                        <li><span style="width: 1.2em;" class="fa fa-skype"></span> Skype</li>
+                        <li><span style="width: 1.2em;" class="fa fa-slack"></span> Slack</li>
+                        <li><span style="width: 1.2em;" class="fa fa-envelope"></span> Email</li>
+                        <li><span style="width: 1.2em;" class="fa fa-globe"></span> and our custom Web App</li>
+                    </ul>
+
+                </div>
+                <div class="col-lg-6 col-sm-pull-6 col-sm-6">
+                    <div>
+                        <img class="img-responsive" style="margin: -4em"
+                             src="/cdn/img/screenshot_proactive_framed-768.png"/>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-b -->
+
     <div class="content-section-a">
 
         <div class="container">
@@ -76,7 +119,6 @@
                         <li class="li-fa">Smart filtering of comments and postings!</li>
                         <li class="li-fa">Gain insights about the mood in your community!</li>
                         <li class="li-fa">Detect fraud and scams!</li>
-
                     </ul>
                     <p class="lead">There is <strong>no limit!</strong> Add any tags you want and let the Tagger do the
                         work
@@ -84,10 +126,11 @@
                 </div>
                 <div class="col-lg-6 col-lg-offset-1 col-sm-6">
                     <div class="browser-mockup with-url tagger-greeting">
-{#                        {% include 'landing/demo.html' %}#}
+                        {#                        {% include 'landing/demo.html' %}#}
+                        <img class="img-responsive" src="/cdn/img/tagger-orig.png"/>
                     </div>
-                    <p class="small text-center" style="margin-top:0.5em;">(Link to external source! We take no
-                        responsibility for the shown content.)</p>
+{#                    <p class="small text-center" style="margin-top:0.5em;">(Link to external source! We take no#}
+{#                        responsibility for the shown content.)</p>#}
                 </div>
             </div>
 
@@ -117,7 +160,7 @@
                 </div>
                 <div class="col-lg-6 col-sm-pull-6 col-sm-6">
                     <div class="browser-mockup with-url evaluator-greeting">
-                        <img class="img-responsive" src={{ url_for('static', filename="img/evaluator.png") }} alt="">
+                        <img class="img-responsive" src="/cdn/img/evaluator-768.png"/>
                     </div>
                 </div>
             </div>
@@ -136,16 +179,17 @@
                 <div class="col-lg-5 col-sm-6">
                     <hr class="section-heading-spacer">
                     <div class="clearfix"></div>
-                    <h2 class="section-heading">Your ideas are our opportunities!</h2>
+                    <h2 class="section-heading">Your Ideas Are Our Opportunities!</h2>
                     <p class="lead">Fanlens is not only a product. We are a highly motivated and skilled team that wants
                         to
                         <strong>solve your challenges!</strong> We firmly believe that the only way to stay relevant is
                         by solving <strong>real world</strong> problems.
-                        <br/>Let's get in touch and see how we can <strong>work together</strong>.
+                        <br/>Had over to our <strong><a href="/enterprise" target="_blank">Enterprise
+                            Page</a></strong> and get in touch!.
                     </p>
                 </div>
                 <div class="col-lg-6 col-lg-offset-1 col-sm-6">
-                    <img class="img-responsive" src={{ url_for('static', filename="img/contract.png") }} alt="">
+                    <img class="img-responsive" src="/cdn/img/contract.png" />
                 </div>
             </div>
 
@@ -209,42 +253,6 @@
         $('#tagger-wrapper').tooltip({
           selector: "a[rel=tooltip]"
         });
-      });
-    </script>
-    <script>
-      function carouselNormalization() {
-        var items = $('#intro-carousel .item'),              // grab all the slides
-          heights = [],                                   // array to store heights
-          tallest;                                        // tallest slide
-
-        if (items.length) {
-          function normalizeHeights() {
-            items.each(function () {
-              heights.push($(this).height());               // add each slide's height
-            });                                             // to the array
-
-            tallest = Math.max.apply(null, heights);        // find the largest height
-
-            items.each(function () {
-              $(this).css('min-height', tallest + 'px');    // set each slide's minimum
-            });                                             // height to the largest
-          };
-
-          normalizeHeights();
-
-          $(window).on('resize orientationchange', function () {
-            tallest = 0, heights.length = 0;               // reset the variables
-
-            items.each(function () {
-              $(this).css('min-height', '0');              // reset each slide's height
-            });
-
-            normalizeHeights();                            // run it again
-          });
-        }
-      }
-      $(document).ready(function () {
-        carouselNormalization();
       });
     </script>
 {% endblock %}

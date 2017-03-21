@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, flash, request
+from flask import Flask, render_template, flash, request, redirect
 from flask_mail import Message
 from flask_modules.mail import mail
 from flask_wtf import FlaskForm
@@ -62,17 +62,6 @@ def pricing():
     return render_template('landing/pricing.html', contact_form=contact_form)
 
 
-    # @app.route('/demo', methods=['GET'])
-    # def demo():
-    #     if request_wants_json():
-    #         return jsonify(requests.get('https://lb/v2/tagger/comments/_random',
-    #                                     params=dict(
-    #                                         count=1,
-    #                                         sources='ladygaga',
-    #                                         with_entity=True,
-    #                                         with_suggestion=True,
-    #                                         api_key=g.demo_user.get_auth_token()),
-    #                                     verify=False).json())
-    #     else:
-    #         return render_template('landing/demo.html')
-    #
+@app.route('/<path:path>')
+def root(path):
+    return redirect('/v3/ui/' + path)
