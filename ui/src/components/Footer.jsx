@@ -9,13 +9,13 @@ const Footer = () => (
       <div className="col-xs-4 start-xs">
         <ul id="footer-nav">
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/v3/ui/">Home</Link>
           </li>
           <li>
-            <Link to="/team">Team</Link>
+            <Link to="/v3/ui/team">Team</Link>
           </li>
           <li>
-            <Link to="/legal">Legal</Link>
+            <Link to="/v3/ui/legal">Legal</Link>
           </li>
         </ul>
       </div>

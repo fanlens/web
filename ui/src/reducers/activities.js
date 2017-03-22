@@ -6,11 +6,11 @@ const comments = (state = {}, action) => {
   switch (action.type) {
     case ActivitiesActionType.ACTIVITIES_RECEIVE_COMMENTS:
       return _.chain(action.comments)
-        .map((comment) => _.defaults({
-          prediction: _.chain(comment.prediction)
-            .mapValues(s => s > 0.9 ? 0 : s > 0.75 ? 1 : s > 0.6 ? 2 : 3)  // 0 excellent, 1 good, 2 fair, 3 ignore
-            .value()
-        }, comment))
+        // .map((comment) => _.defaults({
+        //   prediction: _.chain(comment.prediction)
+        //     .mapValues(s => s > 0.9 ? 0 : s > 0.75 ? 1 : s > 0.6 ? 2 : 3)  // 0 excellent, 1 good, 2 fair, 3 ignore
+        //     .value()
+        // }, comment))
         .keyBy('id')
         .value();
     case ActivitiesActionType.ACTIVITIES_RECEIVE_TAGS:
