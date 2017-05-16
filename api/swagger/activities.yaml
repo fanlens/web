@@ -671,7 +671,6 @@ definitions:
     items:
       $ref: '#/definitions/Tag'
     uniqueItems: true
-    maxItems: 100
 
   TagSet:
     type: object

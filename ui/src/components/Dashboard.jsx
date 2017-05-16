@@ -6,8 +6,8 @@ import {GridList, GridTile} from "material-ui/GridList";
 import Avatar from "material-ui/Avatar";
 import Chip from "material-ui/Chip";
 import SvgTag from "material-ui/svg-icons/maps/local-offer";
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from "material-ui/Card";
-import {initActivities, fetchRandomComments} from "../actions/ActivitiesActions";
+import {Card, CardActions, CardHeader, CardText} from "material-ui/Card";
+import {fetchRandomComments, initActivities} from "../actions/ActivitiesActions";
 
 const styles = {
   root: {
@@ -99,7 +99,8 @@ class Dashboard extends React.Component {
 
 const mapStateToProps = (state) => ({
   comments: state.activities.comments,
-  sources: state.activities.sources,
+  // sources: state.activities.sources,
+  sources: _.pickBy(state.activities.sources, (_, k) => k == 9)
 });
 
 const mapDispatchToProps = (dispatch) => ({

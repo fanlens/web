@@ -56,9 +56,9 @@ def search_post(body: dict, internal=False) -> dict:
     return _model_to_result(model)
 
 
-@roles_required('admin')
 @defaults
-def train_post(body: dict, fast=True) -> dict:
+@roles_required('admin')
+def train_post(body: dict, fast=True) -> tuple:
     jobs = current_user.jobs.all()
     if jobs:
         job_url = '/v3/model/jobs/' + str(jobs[0].id)

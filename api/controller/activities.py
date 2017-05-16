@@ -54,7 +54,11 @@ _parsers = {
         **generic_parser(data)
     ),
     Type.crunchbase: lambda _: None,
-    Type.generic: lambda _: None,
+    Type.generic: lambda data: dict(
+        id=str(data.data['comment_id']),
+        user=dict(id=str(data.data['user']['id']), name='Anonymous'),
+        **generic_parser(data)
+    ),
 }
 
 
@@ -72,9 +76,11 @@ def source_ids_get(source_ids: list = None, count: int = None, max_id: str = Non
     data_query = db.session.query(Data)
     if random:
         data_query = data_query.filter(
-            Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{en}', source_ids)])))
+            # Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{en}', source_ids)])))
+            Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{de, en}', source_ids)])))
     else:
-        data_query = data_query.filter(Data.language.has(language='en')).order_by(Data.object_id)
+        # data_query = data_query.filter((Data.language.has(language='en')) & (Data.source_id.in_(source_ids))).order_by(Data.object_id)
+        data_query = data_query.filter(Data.source_id.in_(source_ids)).order_by(Data.object_id)
 
     if max_id:
         data_query = data_query.filter(Data.object_id < max_id)
