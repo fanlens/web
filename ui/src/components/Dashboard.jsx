@@ -48,7 +48,7 @@ const Comment = ({comment}) => (
           <Avatar
             color={score >= 0.75 ? 'green' : score >= 0.5 ? 'orange' : 'grey'}
             icon={<SvgTag />}/>
-          {tag} {Math.round(score * 100)}%
+          {tag} {Math.round(score * 100)}% {comment.tags.length > 0 && _.includes(comment.tags, tag) && (score > 0.5 ? '✓' : '⚡')}
         </Chip>
       ))}
     </CardActions>
