@@ -4,7 +4,7 @@ import typing
 
 from api.controller import check_sources_by_id
 from db import insert_or_ignore, insert_or_update
-from db.models.activities import Data, Source, Tag, Type, TagSet
+from db.models.activities import Data, Source, Tag, Type, TagSet, Tagging, TagTagSet
 from flask import redirect
 from flask_modules.database import db
 from flask_security import current_user
@@ -274,6 +274,53 @@ def tags_tag_put(tag: str, commit=True) -> dict:
 def tags_tag_delete(tag: str) -> dict:
     db.session.query(Tag).filter_by(user_id=current_user.id, tag=tag).delete()
     db.session.commit()
+
+
+@defaults
+def tags_tag_activities_get(tag: str, count: int = 10) -> dict:
+    data_query = (db.session.query(Data)
+                  .join(Tagging, Data.id == Tagging.data_id)
+                  .join(Tag, (Tag.user_id == current_user.id) & (Tag.tag == tag) & (Tag.id == Tagging.tag_id))
+                  .limit(count))
+    data = [parser(data) for data in data_query]
+    return dict(activities=list(data))
+
+
+@defaults
+def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 10) -> dict:
+    error = check_sources_by_id(set(source_ids))
+    if error:
+        return error
+    data_query = (db.session.query(Data)
+                  .join(Source, (Data.source_id == Source.id) & (Source.id.in_(source_ids)))
+                  .join(Tagging, Data.id == Tagging.data_id)
+                  .join(Tag, (Tag.user_id == current_user.id) & (Tag.tag == tag) & (Tag.id == Tagging.tag_id))
+                  .limit(count))
+    data = [parser(data) for data in data_query]
+    return dict(activities=list(data))
+
+
+
+
+@defaults
+def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int, count: int = 10) -> dict:
+    tag_id_query = (db.session.query(TagTagSet.tag_id)
+                    .join(TagSet, TagSet.user_id == current_user.id)
+                    .filter(TagTagSet.tagset_id == tagset_id))
+    data_query = (db.session.query(Data)
+                  .distinct(Data.id)
+                  .join(Source, (Data.source_id == Source.id) & (Source.id.in_(source_ids)))
+                  .join(Tagging, (Data.id == Tagging.data_id) & (Tagging.tag_id.in_(tag_id_query)))
+                  .limit(count))
+    data = [parser(data) for data in data_query]
+    return dict(activities=list(data))
+
+@defaults
+def tagsets_tagset_id_activities_get(tagset_id: int, count: int = 10) -> dict:
+    return source_ids_tagsets_tagset_id_activities_get(current_user.sources.with_entities(Source.id),
+                                                       tagset_id=tagset_id,
+                                                       count=count)
+
 
 
 @defaults
