@@ -93,6 +93,16 @@ export const fetchRandomComments = (count, sources) =>
       .then(({activities}) => dispatch(receiveComments(activities)))
       .catch((error) => console.log(error)));
 
+export const fetchRandomCommentsTagSet = (count, tagSetId) =>
+  (dispatch) => activitiesApi.then(
+    (api) => api.activity.get_tagsets_tagset_id_activities({
+      tagset_id: tagSetId,
+      count: count,
+      random: true
+    }).then(({status, obj}) => obj)
+      .then(({activities}) => dispatch(receiveComments(activities)))
+      .catch((error) => console.log(error)));
+
 const manipulateTags = (comment, add, remove) =>
   (dispatch) => activitiesApi.then(
     (api) => api.activity.patch_source_id_activity_id_tags({

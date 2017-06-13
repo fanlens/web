@@ -57,22 +57,12 @@ def token_post() -> str:
         return _fetch_new()
 
 
-def _set_auth_token(channel_id, user_id, auth_token) -> bool:
+def _set_session_data(channel_id, user_id, auth_token, name) -> bool:
     eev_config = _get_eev_config()
-    data_obj = {"data": {"auth_token": auth_token}, "etag": "*"}
+    data_obj = {"data": {"auth_token": auth_token, "name": name}, "etag": "*"}
     token_req = requests.post(TOKEN_API,
                               data=GRANT_TYPE % dict(client_id=eev_config['client_id'],
                                                      client_secret=eev_config['client_secret']))
-
-    req = token_req.request
-    command = "curl -X {method} -H {headers} -d '{data}' '{uri}'"
-    method = req.method
-    uri = req.url
-    data = str(req.body)
-    headers = ['"{0}: {1}"'.format(k, v) for k, v in req.headers.items()]
-    headers = " -H ".join(headers)
-    print(command.format(method=method, headers=headers, data=data, uri=uri))
-
 
     access_token = token_req.json().get('access_token', '')
 
@@ -88,5 +78,5 @@ def _set_auth_token(channel_id, user_id, auth_token) -> bool:
 @roles_accepted('admin', 'tagger')
 def login_channel_id_user_id_get(channel_id: str, user_id: str) -> tuple:
     token = current_user.get_auth_token() if current_user.has_role('tagger') else g.demo_user.get_auth_token()
-    success = _set_auth_token(channel_id, user_id, token)
+    success = _set_session_data(channel_id, user_id, token, current_user.email)
     return ('ok', 200) if success else ('failed', 403)

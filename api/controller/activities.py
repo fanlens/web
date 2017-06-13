@@ -277,28 +277,33 @@ def tags_tag_delete(tag: str) -> dict:
 
 
 @defaults
-def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 10) -> dict:
+def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 10, random = False) -> dict:
     data_query = (db.session.query(Data)
                   .join(Source,
                         (Data.source_id == Source.id) &
                         (Source.id.in_(source_ids)) &
                         (Source.id.in_(current_user.sources.with_entities(Source.id))))
                   .join(Tagging, Data.id == Tagging.data_id)
-                  .join(Tag, (Tag.user_id == current_user.id) & (Tag.tag == tag) & (Tag.id == Tagging.tag_id))
-                  .limit(count))
+                  .join(Tag, (Tag.user_id == current_user.id) & (Tag.tag == tag) & (Tag.id == Tagging.tag_id)))
+
+    if random: # todo: order_by random a bit inefficient
+        data_query = data_query.from_self().order_by(func.random())
+
+    data_query = data_query.limit(count)
     data = [parser(data) for data in data_query]
     return dict(activities=list(data))
 
 
 @defaults
-def tags_tag_activities_get(tag: str, count: int = 10) -> dict:
+def tags_tag_activities_get(tag: str, count: int = 10, random = False) -> dict:
     return source_ids_tags_tag_activities_get(current_user.sources.with_entities(Source.id),
                                               tag=tag,
-                                              count=count)
+                                              count=count,
+                                              random=random)
 
 
 @defaults
-def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int, count: int = 10) -> dict:
+def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int, count: int = 10, random = False) -> dict:
     tag_id_query = (db.session.query(TagTagSet.tag_id)
                     .join(TagSet, TagSet.user_id == current_user.id)
                     .filter(TagTagSet.tagset_id == tagset_id))
@@ -308,17 +313,22 @@ def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int
                         (Data.source_id == Source.id) &
                         (Source.id.in_(source_ids)) &
                         (Source.id.in_(current_user.sources.with_entities(Source.id))))
-                  .join(Tagging, (Data.id == Tagging.data_id) & (Tagging.tag_id.in_(tag_id_query)))
-                  .limit(count))
+                  .join(Tagging, (Data.id == Tagging.data_id) & (Tagging.tag_id.in_(tag_id_query))))
+
+    if random: # todo: order_by random a bit inefficient
+        data_query = data_query.from_self().order_by(func.random())
+
+    data_query = data_query.limit(count)
     data = [parser(data) for data in data_query]
     return dict(activities=list(data))
 
 
 @defaults
-def tagsets_tagset_id_activities_get(tagset_id: int, count: int = 10) -> dict:
+def tagsets_tagset_id_activities_get(tagset_id: int, count: int = 10, random = False) -> dict:
     return source_ids_tagsets_tagset_id_activities_get(current_user.sources.with_entities(Source.id),
                                                        tagset_id=tagset_id,
-                                                       count=count)
+                                                       count=count,
+                                                       random=random)
 
 
 @defaults

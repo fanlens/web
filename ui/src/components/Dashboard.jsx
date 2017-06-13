@@ -7,7 +7,7 @@ import Avatar from "material-ui/Avatar";
 import Chip from "material-ui/Chip";
 import SvgTag from "material-ui/svg-icons/maps/local-offer";
 import {Card, CardActions, CardHeader, CardText} from "material-ui/Card";
-import {fetchRandomComments, initActivities} from "../actions/ActivitiesActions";
+import {fetchRandomCommentsTagSet, initActivities} from "../actions/ActivitiesActions";
 
 const styles = {
   root: {
@@ -43,14 +43,20 @@ const Comment = ({comment}) => (
       {comment.text}
     </CardText>
     <CardActions style={{flex: '0 1 auto', textAlign: 'right'}}>
-      {_.map(comment.prediction, (score, tag) => (
-        <Chip key={tag} style={{display: 'inline-flex'}}>
-          <Avatar
-            color={score >= 0.75 ? 'green' : score >= 0.5 ? 'orange' : 'grey'}
-            icon={<SvgTag />}/>
-          {tag} {Math.round(score * 100)}% {comment.tags.length > 0 && _.includes(comment.tags, tag) && (score > 0.5 ? '✓' : '⚡')}
-        </Chip>
-      ))}
+      {_.map(
+        _.defaults(comment.prediction,
+          _.chain(comment.tags)
+            .keyBy()
+            .mapValues(_ => 0)
+            .value()),
+        (score, tag) => (
+          <Chip key={tag} style={{display: 'inline-flex'}}>
+            <Avatar
+              color={score >= 0.75 ? 'green' : score >= 0.5 ? 'orange' : score > 0 ? 'grey' : 'red'}
+              icon={<SvgTag />}/>
+            {tag} {Math.round(score * 100)}% {_.includes(comment.tags, tag) && (score > 0.5 ? '✓' : '⚡')}
+          </Chip>
+        ))}
     </CardActions>
   </Card>
 );
@@ -71,7 +77,8 @@ class Dashboard extends React.Component {
 
   render() {
     const {comments, sources} = this.props;
-    const onFetch = () => this.props.onFetch(Math.floor(this.state.height / tileHeight) * Math.floor(this.state.width / tileWidth), sources);
+    const count = Math.floor(this.state.height / tileHeight) * Math.floor(this.state.width / tileWidth)
+    const onFetch = () => count && this.props.onFetch(count, sources);
     if (_.values(comments).length === 0) {
       onFetch();
     }
@@ -100,12 +107,13 @@ class Dashboard extends React.Component {
 const mapStateToProps = (state) => ({
   comments: state.activities.comments,
   // sources: state.activities.sources,
-  sources: _.pickBy(state.activities.sources, (_, k) => k == 9)
+  sources: _.pickBy(state.activities.sources, (_, k) => k == 9),
 });
 
 const mapDispatchToProps = (dispatch) => ({
   init: (force = false) => dispatch(initActivities(force)),
-  onFetch: (count, sources) => (_.values(sources).length > 0) && dispatch(fetchRandomComments(count, sources))
+  //onFetch: (count, sources) => (_.values(sources).length > 0) && dispatch(fetchRandomComments(count, sources))
+  onFetch: (count, sources) => dispatch(fetchRandomCommentsTagSet(count, 6))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

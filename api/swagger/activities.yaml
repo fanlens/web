@@ -72,12 +72,7 @@ paths:
         default: 8
         minimum: 0
         maximum: 30
-      - name: random
-        in: query
-        description: should a random sample be drawn
-        type: boolean
-        required: false
-        default: false
+      - $ref: '#/parameters/Random'
       - name: max_id
         in: query
         description: used for cursoring
@@ -426,6 +421,7 @@ paths:
       tags: [tags, activity]
       parameters:
       - $ref: '#/parameters/Tag'
+      - $ref: '#/parameters/Random'
       - name: count
         in: query
         type: integer
@@ -454,6 +450,7 @@ paths:
       parameters:
       - $ref: '#/parameters/SourceIds'
       - $ref: '#/parameters/Tag'
+      - $ref: '#/parameters/Random'
       - name: count
         in: query
         type: integer
@@ -575,6 +572,7 @@ paths:
       tags: [tagsets, activity]
       parameters:
       - $ref: '#/parameters/TagsetId'
+      - $ref: '#/parameters/Random'
       - name: count
         in: query
         type: integer
@@ -603,6 +601,7 @@ paths:
       parameters:
       - $ref: '#/parameters/TagsetId'
       - $ref: '#/parameters/SourceIds'
+      - $ref: '#/parameters/Random'
       - name: count
         in: query
         type: integer
@@ -715,6 +714,14 @@ parameters:
       - source
       - language
     required: true
+
+  Random:
+    name: random
+    in: query
+    description: should a random sample be drawn
+    type: boolean
+    required: false
+    default: false
 
 definitions:
   Import:
