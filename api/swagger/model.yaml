@@ -189,89 +189,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  '/jobs/':
-    get:
-      summary: Get all running jobs for user
-      tags: [job]
-      responses:
-        200:
-          description: list of jobs
-          schema:
-            type: object
-            required: [jobs]
-            properties:
-              jobs:
-                type: array
-                items:
-                  $ref: '#/definitions/Job'
-                uniqueItems: true
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
-  '/jobs/{job_id}':
-    get:
-      summary: Get info about progress of model training. Can be used for auto REST polling.
-      tags: [job]
-      parameters:
-      - $ref: '#/parameters/JobId'
-      responses:
-        201:
-          description: Model creation has finished
-          headers:
-            Location:
-              type: string
-              format: url
-              description: Url of the created model
-        304:
-          description: Model not ready yet. Can be used for automatic polling if the client supports the 'Retry-After' header.
-          headers:
-            Location:
-              type: string
-              format: url
-              description: Loop back to the job status for auto polling.
-            Retry-After:
-              type: number
-              format: int32
-              description: The amount of seconds to wait before retrying.
-        404:
-          description: Job does not exist
-          schema:
-            $ref: '#/definitions/Error'
-        410:
-          description: Model creation failed
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    delete:
-      summary: Cancel a running job.
-      tags: [job]
-      parameters:
-      - $ref: '#/parameters/JobId'
-      responses:
-        200:
-          description: Job cancelled succesfully
-          schema:
-            type: object
-            required: [job]
-            properties:
-              job:
-                type: string
-                format: uuid
-                description: The job id provided
-        404:
-          description: Job not found
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
 parameters:
   ModelId:
     name: model_id
@@ -280,14 +197,6 @@ parameters:
     format: uuid
     required: true
     description: The id of this model
-
-  JobId:
-    name: job_id
-    in: path
-    type: string
-    format: uuid
-    required: true
-    description: The job id provided
 
 definitions:
   SourceId:
@@ -377,7 +286,7 @@ definitions:
         type: object
         description: The model parameters, restricted access
         additionalProperties:
-          type: [string, number, boolean]
+          type: [string, number, boolean, object]
       tagset:
         $ref: '#/definitions/TagSet'
       sources:
