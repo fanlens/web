@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from db.models.activities import Source
-from db.models.brain import Model, Job
+from db.models.brain import Model
+from db.models.job import Job
 from flask import redirect
 from flask_modules.celery import celery, Brain
 from flask_modules.database import db
@@ -56,14 +57,9 @@ def search_post(body: dict, internal=False) -> dict:
     return _model_to_result(model)
 
 
-@roles_required('admin')
 @defaults
-def train_post(body: dict, fast=True) -> dict:
-    jobs = current_user.jobs.all()
-    if jobs:
-        job_url = '/v3/model/jobs/' + str(jobs[0].id)
-        return dict(job=str(jobs[0].id), url=job_url), 409
-
+@roles_required('admin')
+def train_post(body: dict, fast=True) -> tuple:
     tagset_id = body['tagset_id']
     tagset = current_user.tagsets.filter_by(id=tagset_id).one_or_none()
     if not tagset:
@@ -75,55 +71,18 @@ def train_post(body: dict, fast=True) -> dict:
         return error
 
     params = None
+    score = None
     if fast:
-        best_model = search_post(dict(tagset_id=tagset_id, source_ids=source_ids), internal=True)
-        params = best_model and best_model['params']
-    job = Brain.train_model(tagset_id, tuple(source_ids), n_estimators=200, params=params)
-    current_user.jobs.append(Job(id=job.id, user_id=current_user.id))
-    db.session.commit()
-    job_url = '/v3/model/jobs/' + job.id
-    return dict(job=job.id, url=job_url), 202
-
-
-@defaults
-def jobs_get() -> dict:
-    return dict(jobs=[dict(job=job.id, url='/v3/jobs/%s' % job.id) for job in current_user.jobs])
-
-
-@defaults
-def jobs_job_id_get(job_id) -> dict:
-    job = current_user.jobs.filter_by(id=job_id).one_or_none()
-    if not job:
-        return dict(error='no job for user with ' + job_id), 404
-
-    result = celery.AsyncResult(job_id)
-    if result.ready():
-        if result.successful():
-            model_id = result.get(timeout=2)
-            return redirect('/v3/model/%s' % model_id, code=201)
-        elif result.failed():
-            return dict(error='model could not be created'), 410
-    else:  # still running
-        if result.state == 'PENDING':  # most likely doesn't exist
-            # todo strictly speaking not 404, the task could be simply not started yet
-            return dict(error='no job for user with ' + job_id), 404
-        else:
-            job_url = '/v3/jobs/' + job_id
-            return dict(job=job_id, url=job_url), 304, {'Retry-After': 30, 'Location': job_url}
-
-
-@defaults
-def jobs_job_id_delete(job_id, revoke: bool = True) -> dict:
-    job = current_user.jobs.filter_by(id=job_id).one_or_none()
-    if not job:
-        return dict(error='no job for user with ' + job_id), 404
-
-    if revoke:
-        result = celery.AsyncResult(job_id)
-        result.revoke()  # todo: simply revokes the task, does not kill training by default
-    current_user.jobs.filter_by(id=job_id).delete()
-    db.session.commit()
-    return dict(job=job_id)
+        best_model = search_post(dict(tagset_id=tagset_id, source_ids=source_ids), internal=True) or dict()
+        params = best_model.get('params')
+        score = best_model.get('score')
+    job = Brain.train_model(tagset_id, tuple(source_ids), n_estimators=10, _params=params, _score=score)
+    best_model_id = best_model.get(id)
+    if fast and best_model_id is not None:
+        redir_url = '/v3/model/' + best_model_id
+    else:
+        redir_url = '/v3/search'
+    return dict(job=job.id, url=redir_url), 202
 
 
 @defaults

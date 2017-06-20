@@ -42,6 +42,26 @@ paths:
           description: could not renew or generate token
           schema:
             $ref: '#/definitions/Error'
+  /login/{channel_id}/{user_id}:
+    get:
+      summary: login to chat service
+      tags: [eev]
+      produces:
+      - text/html
+      parameters:
+      - name: channel_id
+        in: path
+        type: string
+        required: true
+      - name: user_id
+        in: path
+        type: string
+        required: true
+      responses:
+        200:
+          description: successfully logged in
+        403:
+          description: could not log in
 definitions:
   Error:
     type: object

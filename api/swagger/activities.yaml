@@ -72,12 +72,7 @@ paths:
         default: 8
         minimum: 0
         maximum: 30
-      - name: random
-        in: query
-        description: should a random sample be drawn
-        type: boolean
-        required: false
-        default: false
+      - $ref: '#/parameters/Random'
       - name: max_id
         in: query
         description: used for cursoring
@@ -420,6 +415,64 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /tags/{tag}/activities/:
+    get:
+      summary: Get activities tagged with this tag
+      tags: [tags, activity]
+      parameters:
+      - $ref: '#/parameters/Tag'
+      - $ref: '#/parameters/Random'
+      - name: count
+        in: query
+        type: integer
+        format: int32
+        minimum: 1
+        required: true
+        default: 10
+      responses:
+        200:
+          description: A Bundle of Activitys
+          schema:
+            type: object
+            properties:
+              activities:
+                type: array
+                items:
+                  $ref: '#/definitions/Activity'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /{source_ids}/tags/{tag}/activities/:
+    get:
+      summary: Get activities tagged with this tag for source_id
+      tags: [tags, activity]
+      parameters:
+      - $ref: '#/parameters/SourceIds'
+      - $ref: '#/parameters/Tag'
+      - $ref: '#/parameters/Random'
+      - name: count
+        in: query
+        type: integer
+        format: int32
+        minimum: 1
+        required: true
+        default: 10
+      responses:
+        200:
+          description: A Bundle of Activitys
+          schema:
+            type: object
+            properties:
+              activities:
+                type: array
+                items:
+                  $ref: '#/definitions/Activity'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
 
   /tagsets/:
     get:
@@ -509,6 +562,63 @@ paths:
       responses:
         200:
           description: Tagset removed from the system
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /tagsets/{tagset_id}/activities/:
+    get:
+      summary: Get activities tagged with this tagset
+      tags: [tagsets, activity]
+      parameters:
+      - $ref: '#/parameters/TagsetId'
+      - $ref: '#/parameters/Random'
+      - name: count
+        in: query
+        type: integer
+        format: int32
+        minimum: 1
+        required: true
+        default: 10
+      responses:
+        200:
+          description: A Bundle of Activitys
+          schema:
+            type: object
+            properties:
+              activities:
+                type: array
+                items:
+                  $ref: '#/definitions/Activity'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /{source_ids}/tagsets/{tagset_id}/activities/:
+    get:
+      summary: Get activities tagged with this tagset
+      tags: [tagsets, activity]
+      parameters:
+      - $ref: '#/parameters/TagsetId'
+      - $ref: '#/parameters/SourceIds'
+      - $ref: '#/parameters/Random'
+      - name: count
+        in: query
+        type: integer
+        format: int32
+        minimum: 1
+        required: true
+        default: 10
+      responses:
+        200:
+          description: A Bundle of Activitys
+          schema:
+            type: object
+            properties:
+              activities:
+                type: array
+                items:
+                  $ref: '#/definitions/Activity'
         default:
           description: Unexpected error
           schema:
@@ -605,6 +715,14 @@ parameters:
       - language
     required: true
 
+  Random:
+    name: random
+    in: query
+    description: should a random sample be drawn
+    type: boolean
+    required: false
+    default: false
+
 definitions:
   Import:
     type: object
@@ -671,7 +789,6 @@ definitions:
     items:
       $ref: '#/definitions/Tag'
     uniqueItems: true
-    maxItems: 100
 
   TagSet:
     type: object

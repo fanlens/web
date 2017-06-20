@@ -4,7 +4,7 @@ import typing
 
 from api.controller import check_sources_by_id
 from db import insert_or_ignore, insert_or_update
-from db.models.activities import Data, Source, Tag, Type, TagSet
+from db.models.activities import Data, Source, Tag, Type, TagSet, Tagging, TagTagSet
 from flask import redirect
 from flask_modules.database import db
 from flask_security import current_user
@@ -54,7 +54,11 @@ _parsers = {
         **generic_parser(data)
     ),
     Type.crunchbase: lambda _: None,
-    Type.generic: lambda _: None,
+    Type.generic: lambda data: dict(
+        id=str(data.data['comment_id']),
+        user=dict(id=str(data.data['user']['id']), name='Anonymous'),
+        **generic_parser(data)
+    ),
 }
 
 
@@ -72,9 +76,11 @@ def source_ids_get(source_ids: list = None, count: int = None, max_id: str = Non
     data_query = db.session.query(Data)
     if random:
         data_query = data_query.filter(
-            Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{en}', source_ids)])))
+            # Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{en}', source_ids)])))
+            Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{de, en}', source_ids)])))
     else:
-        data_query = data_query.filter(Data.language.has(language='en')).order_by(Data.object_id)
+        # data_query = data_query.filter((Data.language.has(language='en')) & (Data.source_id.in_(source_ids))).order_by(Data.object_id)
+        data_query = data_query.filter(Data.source_id.in_(source_ids)).order_by(Data.object_id)
 
     if max_id:
         data_query = data_query.filter(Data.object_id < max_id)
@@ -268,6 +274,61 @@ def tags_tag_put(tag: str, commit=True) -> dict:
 def tags_tag_delete(tag: str) -> dict:
     db.session.query(Tag).filter_by(user_id=current_user.id, tag=tag).delete()
     db.session.commit()
+
+
+@defaults
+def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 10, random = False) -> dict:
+    data_query = (db.session.query(Data)
+                  .join(Source,
+                        (Data.source_id == Source.id) &
+                        (Source.id.in_(source_ids)) &
+                        (Source.id.in_(current_user.sources.with_entities(Source.id))))
+                  .join(Tagging, Data.id == Tagging.data_id)
+                  .join(Tag, (Tag.user_id == current_user.id) & (Tag.tag == tag) & (Tag.id == Tagging.tag_id)))
+
+    if random: # todo: order_by random a bit inefficient
+        data_query = data_query.from_self().order_by(func.random())
+
+    data_query = data_query.limit(count)
+    data = [parser(data) for data in data_query]
+    return dict(activities=list(data))
+
+
+@defaults
+def tags_tag_activities_get(tag: str, count: int = 10, random = False) -> dict:
+    return source_ids_tags_tag_activities_get(current_user.sources.with_entities(Source.id),
+                                              tag=tag,
+                                              count=count,
+                                              random=random)
+
+
+@defaults
+def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int, count: int = 10, random = False) -> dict:
+    tag_id_query = (db.session.query(TagTagSet.tag_id)
+                    .join(TagSet, TagSet.user_id == current_user.id)
+                    .filter(TagTagSet.tagset_id == tagset_id))
+    data_query = (db.session.query(Data)
+                  .distinct(Data.id)
+                  .join(Source,
+                        (Data.source_id == Source.id) &
+                        (Source.id.in_(source_ids)) &
+                        (Source.id.in_(current_user.sources.with_entities(Source.id))))
+                  .join(Tagging, (Data.id == Tagging.data_id) & (Tagging.tag_id.in_(tag_id_query))))
+
+    if random: # todo: order_by random a bit inefficient
+        data_query = data_query.from_self().order_by(func.random())
+
+    data_query = data_query.limit(count)
+    data = [parser(data) for data in data_query]
+    return dict(activities=list(data))
+
+
+@defaults
+def tagsets_tagset_id_activities_get(tagset_id: int, count: int = 10, random = False) -> dict:
+    return source_ids_tagsets_tagset_id_activities_get(current_user.sources.with_entities(Source.id),
+                                                       tagset_id=tagset_id,
+                                                       count=count,
+                                                       random=random)
 
 
 @defaults
