@@ -52,8 +52,8 @@
       (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
         i[r] = i[r] || function () {
-            (i[r].q = i[r].q || []).push(arguments)
-          }, i[r].l = 1 * new Date();
+          (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
         a = s.createElement(o),
           m = s.getElementsByTagName(o)[0];
         a.async = 1;
@@ -104,7 +104,13 @@
                     <a href="mailto:info@fanlens.io">Pricing</a>
                 </li>
                 <li>
-                    <a href="/v3/ui" target="_blank">Demo</a>
+                    {% block eev_widget %}
+                        <span class="skype-button rounded" data-bot-id="{{ bot_id }}" data-text="Talk To Eev"></span>
+                        <style>.skype-button > a {
+                            margin: 7.5px;
+                        }</style>
+                    {% endblock %}
+                    {#                    <a href="/v3/ui" target="_blank">Demo</a>#}
                 </li>
             </ul>
         </div>
@@ -189,8 +195,9 @@
       };
     </script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
-
+    <script src="https://latest-swc.cdn.skype.com/sdk/v1/sdk.js"></script>
 {% endblock %}
+
 </body>
 
 </html>

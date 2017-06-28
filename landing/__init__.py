@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from config.db import Config
 from flask import Flask, render_template, flash, request, redirect
 from flask_mail import Message
 from flask_modules.mail import mail
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import InputRequired, Email
+
+config = None
 
 
 def create_app():
@@ -35,6 +38,12 @@ class ContactForm(FlaskForm):
     submit = SubmitField("Send")
 
 
+@app.before_first_request
+def setup_conf():
+    global config
+    config = Config('eev')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     contact_form = ContactForm()
@@ -57,7 +66,7 @@ def index():
                       recipients=["info@fanlens.io"])
         mail.send(msg)
         flash('Thank you for contacting us!')
-    return render_template('landing/index.html', contact_form=contact_form)
+    return render_template('landing/index.html', contact_form=contact_form, bot_id=config["client_id"])
 
 
 @app.route('/pricing', methods=['GET'])
