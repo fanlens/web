@@ -3,7 +3,18 @@ swagger: "2.0"
 info:
   title: "Fanlens Activities API"
   version: "3.0.0"
-  description: "Main API to handle activities"
+  description: '
+Fanlens API to handle "activities". Predictions are performed automatically, for managing the prediction models and retrieving free form predictions please switch to the [Model API](/v3/model/ui/).
+
+## Concepts
+
+The API consists of 3 main concepts: sources, activities and tags (bundled in tagsets).
+
+* An activity is a text based action performed by a user, e.g. a Facebook Comment or a Tweet.
+
+* A source is the originator of these activities and is used for importing. Currently Facebook, Twitter, and Generic Sources are supported.
+
+* A tag is a piece of meta information that is used to build specialized speech models, e.g. "positive", or "negative". They are bundled in tagsets for convenience, e.g. "Emotion".'
 
 schemes:
   - https
@@ -26,6 +37,7 @@ paths:
   /:
     post:
       summary: Import a bulk of activities
+      description: The data field format is source dependent
       tags: [import]
       parameters:
       - name: import_activities
@@ -40,7 +52,7 @@ paths:
                 $ref: '#/definitions/Import'
       responses:
         201:
-          description: A bundle of created activities (id, source id)
+          description: A list of created activities
           schema:
             type: object
             properties:
@@ -82,7 +94,7 @@ paths:
         required: false
       responses:
         200:
-          description: A Bundle of Activitys
+          description: A list of Activitys
           schema:
             type: object
             properties:
@@ -117,6 +129,7 @@ paths:
             $ref: '#/definitions/Error'
     put:
       summary: Create or update this activity
+      description: The data field format is source dependent
       tags: [activity, import]
       parameters:
       - $ref: '#/parameters/SourceId'
@@ -216,7 +229,7 @@ paths:
       tags: [sources]
       responses:
         200:
-          description: A Bundle of sources
+          description: List of sources for current user
           schema:
             type: object
             properties:
@@ -229,7 +242,8 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      summary: Create new Source
+      summary: Create a new Source
+      description: 'Currently supported types: facebook, twitter, generic'
       tags: [sources]
       parameters:
       - name: source
@@ -290,7 +304,8 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      summary: Remove the source, WARNING! This will remove all data associated with the source!
+      summary: 'Remove the source, **WARNING!** This will remove all data associated with the source!'
+      description: '**WARNING!** This will remove all data associated with the source!'
       tags: [sources]
       parameters:
       - $ref: '#/parameters/SourceId'
@@ -431,7 +446,7 @@ paths:
         default: 10
       responses:
         200:
-          description: A Bundle of Activitys
+          description: A list of Activitys
           schema:
             type: object
             properties:
@@ -460,7 +475,7 @@ paths:
         default: 10
       responses:
         200:
-          description: A Bundle of Activitys
+          description: A list of Activitys
           schema:
             type: object
             properties:
@@ -480,7 +495,7 @@ paths:
       tags: [tagsets]
       responses:
         200:
-          description: A Bundle of TagSets
+          description: A list of TagSets
           schema:
             type: object
             properties:
@@ -582,7 +597,7 @@ paths:
         default: 10
       responses:
         200:
-          description: A Bundle of Activitys
+          description: A list of Activitys
           schema:
             type: object
             properties:
@@ -611,7 +626,7 @@ paths:
         default: 10
       responses:
         200:
-          description: A Bundle of Activitys
+          description: A list of Activitys
           schema:
             type: object
             properties:
@@ -734,7 +749,9 @@ definitions:
         maxLength: 128
       data:
         type: object
+        description: The original data, e.g. Facebook JSON comment. Format depends on source type.
       source_id:
+        description: Id of the source this import belongs to. Required only for bulk imports.
         type: integer
 
   Activity:
@@ -756,15 +773,18 @@ definitions:
       user:
         $ref: '#/definitions/User'
       language:
+        description: Inferred language of text
         type: string
         minLength: 2
         maxLength: 2
       created_time:
+        description: DateTime of creation
         type: string
         format: date-time
 
   Prediction:
     type: object
+    description: 'A dict object of the form "Tag: Predicted Score in %"'
     additionalProperties:
       type: number
       format: float
@@ -773,62 +793,79 @@ definitions:
       description: Probability of prediction
 
   User:
+    description: The user causing the activitiy
     type: object
     required: [id]
     properties:
-      id: { type: string }
-      name: { type: string }
+      id:
+        type: string
+        description: A consistent, machine readable user id
+      name:
+        type: string
+        description: A human readable user name
 
   Tag:
+    description: Tags are arbitrary strings
     type: string
     minLength: 1
     maxLength: 32
 
   Tags:
     type: array
+    description: A set of tags
     items:
       $ref: '#/definitions/Tag'
     uniqueItems: true
 
   TagSet:
     type: object
+    description: A set of tags
     properties:
       id:
         type: integer
+        description: Assigned by the system
       title:
         type: string
         format: string
+        description: Human readable title of this tag set
       tags:
         $ref: '#/definitions/Tags'
 
   TagCounts:
     type: object
+    description: 'A dict object of the form "Tag: Count"'
     additionalProperties:
       type: integer
       minimum: 0
 
   Source:
     type: object
+    description: Source representation
     properties:
       id:
         type: integer
+        description: Assigned by the system
       type:
         type: string
+        description: Source type (forces specific data format)
         enum:
         - facebook
         - twitter
-        - crunchbase
+#        - crunchbase
         - generic
       uri:
         type: string
         format: url
+        description: Canoncial URI of the source, e.g. Twitter account URI.
       slug:
         type: string
         minLength: 1
         maxLength: 128
+        description: Identifier for the URI. Required for Twitter and Facebook sources.
 
   Error:
     type: object
     properties:
       error:
         type: string
+        description: Error message
