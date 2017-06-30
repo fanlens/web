@@ -14,12 +14,12 @@ const OptionsList = ({initiallyOpen = false, helpActive, suggestionsActive, onTo
     <ListItem
       primaryText="Options"
       initiallyOpen={initiallyOpen}
-      leftIcon={<SvgIconSettings />}
+      leftIcon={<SvgIconSettings/>}
       nestedItems={[
         <ListItem
           key={0}
           primaryText="Help"
-          rightIcon={helpActive ? <SvgIconHelp /> : <SvgIconHelpOutline />}
+          rightIcon={helpActive ? <SvgIconHelp/> : <SvgIconHelpOutline/>}
           leftCheckbox={
             <Toggle
               toggled={helpActive}
@@ -29,7 +29,7 @@ const OptionsList = ({initiallyOpen = false, helpActive, suggestionsActive, onTo
         <ListItem
           key={1}
           primaryText="Suggestions"
-          rightIcon={suggestionsActive ? <SvgIconFlashOn /> : <SvgIconFlashOff />}
+          rightIcon={suggestionsActive ? <SvgIconFlashOn/> : <SvgIconFlashOff/>}
           leftCheckbox={
             <Toggle
               toggled={suggestionsActive}
@@ -43,7 +43,7 @@ const OptionsList = ({initiallyOpen = false, helpActive, suggestionsActive, onTo
 
 const mapStateToProps = (state) => ({
   helpActive: state.app.help.active,
-  suggestionsActive: state.app.suggestions.active,
+  suggestionsActive: false,
 });
 
 const mapDispatchToProps = (dispatch) => ({

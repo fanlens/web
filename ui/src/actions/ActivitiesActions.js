@@ -1,5 +1,7 @@
 import keyMirror from "keymirror";
 import _ from "lodash";
+import defaults from "lodash/fp/defaults";
+import flow from "lodash/fp/flow";
 import Swagger from "swagger-client";
 import {orNop} from "./nop";
 
@@ -83,22 +85,35 @@ export const fetchTagCounts = (filterSources = true) =>
         .catch((error) => console.log(error));
     });
 
-export const fetchRandomComments = (count, sources) =>
+const conditionalDefaults = (condition) =>
+  (value) =>
+    (key) => condition ?
+      defaults({[key]: value}) :
+      (obj) => obj;
+
+const definedDefaults = (value) => conditionalDefaults(!_.isUndefined(value) && !_.isNull(value))(value);
+
+export const fetchComments = (count, sources, since, until, tagsets = [], random = true) =>
   (dispatch) => activitiesApi.then(
-    (api) => api.activity.get_source_ids({
-      source_ids: _.chain(sources).filter('active').map('id').value(),
-      count: count,
-      random: true
-    }).then(({status, obj}) => obj)
+    (api) => api.activity.get_source_ids(
+      flow(
+        definedDefaults(since)('since'),
+        definedDefaults(until)('until'),
+        definedDefaults(_.map(tagsets, 'id').join(',') || null)('tagset_ids')
+      )({
+        source_ids: _.chain(sources).filter('active').map('id').value(),
+        count: count,
+        random: random
+      })).then(({status, obj}) => obj)
       .then(({activities}) => dispatch(receiveComments(activities)))
       .catch((error) => console.log(error)));
 
-export const fetchRandomCommentsTagSet = (count, tagSetId) =>
+export const fetchCommentsTagSet = (count, tagSetId, random = true) =>
   (dispatch) => activitiesApi.then(
     (api) => api.activity.get_tagsets_tagset_id_activities({
       tagset_id: tagSetId,
       count: count,
-      random: true
+      random: random
     }).then(({status, obj}) => obj)
       .then(({activities}) => dispatch(receiveComments(activities)))
       .catch((error) => console.log(error)));

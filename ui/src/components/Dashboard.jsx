@@ -1,13 +1,12 @@
 import React from "react";
 import {connect} from "react-redux";
 import _ from "lodash";
-import "./Eev.css";
 import {GridList, GridTile} from "material-ui/GridList";
 import Avatar from "material-ui/Avatar";
 import Chip from "material-ui/Chip";
 import SvgTag from "material-ui/svg-icons/maps/local-offer";
 import {Card, CardActions, CardHeader, CardText} from "material-ui/Card";
-import {fetchRandomCommentsTagSet, initActivities} from "../actions/ActivitiesActions";
+import {fetchCommentsTagSet, initActivities} from "../actions/ActivitiesActions";
 
 const styles = {
   root: {
@@ -112,8 +111,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   init: (force = false) => dispatch(initActivities(force)),
-  //onFetch: (count, sources) => (_.values(sources).length > 0) && dispatch(fetchRandomComments(count, sources))
-  onFetch: (count, sources) => dispatch(fetchRandomCommentsTagSet(count, 6))
+  //onFetch: (count, sources) => (_.values(sources).length > 0) && dispatch(fetchComments(count, sources))
+  onFetch: (count, sources) => dispatch(fetchCommentsTagSet(count, 6))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

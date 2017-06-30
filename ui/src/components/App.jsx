@@ -7,7 +7,7 @@ import Alerts from "./Alerts.jsx";
 
 const App = ({children}) => (
   <MuiThemeProvider>
-    <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+    <div>
       <Sidebar/>
       {children}
       <Footer/>

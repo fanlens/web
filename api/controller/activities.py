@@ -4,7 +4,7 @@ import typing
 
 from api.controller import check_sources_by_id
 from db import insert_or_ignore, insert_or_update
-from db.models.activities import Data, Source, Tag, Type, TagSet, Tagging, TagTagSet
+from db.models.activities import Data, Source, Tag, Type, TagSet, Tagging, TagTagSet, Time
 from flask import redirect
 from flask_modules.database import db
 from flask_security import current_user
@@ -67,25 +67,49 @@ def parser(data: Data) -> dict:
 
 
 @defaults
-def source_ids_get(source_ids: list = None, count: int = None, max_id: str = None, random: bool = False) -> \
-        typing.Union[dict, tuple]:
+def source_ids_get(source_ids: list = None,
+                   count: int = None,
+                   max_id: str = None,
+                   random: bool = False,
+                   since: str = None,
+                   until: str = None,
+                   tagset_ids: list = None) -> typing.Union[dict, tuple]:
     error = check_sources_by_id(set(source_ids))
     if error:
         return error
 
-    data_query = db.session.query(Data)
-    if random:
-        data_query = data_query.filter(
-            # Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{en}', source_ids)])))
-            Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{de, en}', source_ids)])))
-    else:
-        # data_query = data_query.filter((Data.language.has(language='en')) & (Data.source_id.in_(source_ids))).order_by(Data.object_id)
-        data_query = data_query.filter(Data.source_id.in_(source_ids)).order_by(Data.object_id)
+    # data_query = db.session.query(Data)
+    # if random:
+    #     data_query = data_query.filter(
+    #         Data.id.in_(db.select([func.activity.random_rows(count, 0.6, '{de, en}', source_ids)])))
+    # else:
+    #     data_query = data_query.filter(Data.source_id.in_(source_ids)).order_by(Data.object_id)
+    data_query = (db.session
+                  .query(Data)
+                  .filter(Data.source_id.in_(source_ids))
+                  .join(Time, Time.data_id == Data.id))
 
     if max_id:
         data_query = data_query.filter(Data.object_id < max_id)
 
-    data_query = data_query.limit(count).all()
+    if since or until:
+        if since:
+            data_query = data_query.filter(Time.time >= since)
+        if until:
+            data_query = data_query.filter(Time.time <= until)
+
+    if tagset_ids:
+        data_query = (data_query
+                      .join(Tagging, Tagging.data_id == Data.id)
+                      .join(TagTagSet, TagTagSet.tag_id == Tagging.tag_id)
+                      .filter(TagTagSet.tagset_id.in_(tuple(tagset_ids))))
+
+    if random:
+        data_query = data_query.order_by(db.func.random())
+    else:
+        data_query = data_query.order_by(Time.time.desc())
+
+    data_query = data_query.limit(count)
 
     data = [parser(data) for data in data_query]
     return dict(activities=list(data))
@@ -277,7 +301,7 @@ def tags_tag_delete(tag: str) -> dict:
 
 
 @defaults
-def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 10, random = False) -> dict:
+def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 10, random=False) -> dict:
     data_query = (db.session.query(Data)
                   .join(Source,
                         (Data.source_id == Source.id) &
@@ -286,7 +310,7 @@ def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 
                   .join(Tagging, Data.id == Tagging.data_id)
                   .join(Tag, (Tag.user_id == current_user.id) & (Tag.tag == tag) & (Tag.id == Tagging.tag_id)))
 
-    if random: # todo: order_by random a bit inefficient
+    if random:  # todo: order_by random a bit inefficient
         data_query = data_query.from_self().order_by(func.random())
 
     data_query = data_query.limit(count)
@@ -295,7 +319,7 @@ def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 
 
 
 @defaults
-def tags_tag_activities_get(tag: str, count: int = 10, random = False) -> dict:
+def tags_tag_activities_get(tag: str, count: int = 10, random=False) -> dict:
     return source_ids_tags_tag_activities_get(current_user.sources.with_entities(Source.id),
                                               tag=tag,
                                               count=count,
@@ -303,7 +327,8 @@ def tags_tag_activities_get(tag: str, count: int = 10, random = False) -> dict:
 
 
 @defaults
-def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int, count: int = 10, random = False) -> dict:
+def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int, count: int = 10,
+                                                random=False) -> dict:
     tag_id_query = (db.session.query(TagTagSet.tag_id)
                     .join(TagSet, TagSet.user_id == current_user.id)
                     .filter(TagTagSet.tagset_id == tagset_id))
@@ -315,7 +340,7 @@ def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int
                         (Source.id.in_(current_user.sources.with_entities(Source.id))))
                   .join(Tagging, (Data.id == Tagging.data_id) & (Tagging.tag_id.in_(tag_id_query))))
 
-    if random: # todo: order_by random a bit inefficient
+    if random:  # todo: order_by random a bit inefficient
         data_query = data_query.from_self().order_by(func.random())
 
     data_query = data_query.limit(count)
@@ -324,7 +349,7 @@ def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int
 
 
 @defaults
-def tagsets_tagset_id_activities_get(tagset_id: int, count: int = 10, random = False) -> dict:
+def tagsets_tagset_id_activities_get(tagset_id: int, count: int = 10, random=False) -> dict:
     return source_ids_tagsets_tagset_id_activities_get(current_user.sources.with_entities(Source.id),
                                                        tagset_id=tagset_id,
                                                        count=count,
