@@ -3,7 +3,14 @@ swagger: "2.0"
 info:
   title: "Fanlens Model API"
   version: "3.0.0"
-  description: "API handles the intelligence services"
+  description: '
+Fanlens API for managing the prediction models and retrieving free form predictions.
+For interacting with imported activities please switch to the [Activities API](/v3/activities/ui/).
+
+## Concepts
+
+The purpose of this API is to train "models" that can work with "[tagsets](/v3/activities/ui/#!/tagsets/get_tagsets)" and
+generate predictions based on them.'
 
 schemes:
   - https
@@ -25,7 +32,8 @@ produces:
 paths:
   '/train':
     post:
-      summary: Train a new model for a tagset based on sources (or all sources)
+      summary: Train a new model for a tagset
+      description: If now sources are specified it will be trained on all sources
       tags: [model]
       consumes: [application/json]
       parameters:
@@ -72,7 +80,7 @@ paths:
       tags: [model]
       responses:
         200:
-          description: Information about the trained model. Includes 'score' for admin roles
+          description: Information about the trained model
           schema:
             type: object
             required: [models]
@@ -95,7 +103,7 @@ paths:
       - $ref: '#/parameters/ModelId'
       responses:
         200:
-          description: Information about the trained model. Includes 'score' for admin roles
+          description: Information about the trained model
           schema:
             $ref: '#/definitions/Model'
         404:
@@ -173,7 +181,7 @@ paths:
               description: the tagset id to find, must be accessible by user
       responses:
         200:
-          description: Information about the best trained model. Includes 'score' for admin roles
+          description: Information about the best trained model
           schema:
             $ref: '#/definitions/Model'
         400:
@@ -222,47 +230,56 @@ definitions:
         description: You can get info about the currently running job or cancel it under this url
 
   Tag:
+    description: Tags are arbitrary strings
     type: string
     minLength: 1
     maxLength: 32
 
   Tags:
     type: array
+    description: A set of tags
     items:
       $ref: '#/definitions/Tag'
     uniqueItems: true
-    maxItems: 100
 
   TagSet:
     type: object
+    description: A set of tags
     properties:
       id:
         type: integer
+        description: Assigned by the system
       title:
         type: string
         format: string
+        description: Human readable title of this tag set
       tags:
         $ref: '#/definitions/Tags'
 
   Source:
     type: object
+    description: Source representation
     properties:
       id:
-        $ref: '#/definitions/SourceId'
+        type: integer
+        description: Assigned by the system
       type:
         type: string
+        description: Source type (forces specific data format)
         enum:
         - facebook
         - twitter
-        - crunchbase
+#        - crunchbase
         - generic
       uri:
         type: string
         format: url
+        description: Canoncial URI of the source, e.g. Twitter account URI.
       slug:
         type: string
         minLength: 1
         maxLength: 128
+        description: Identifier for the URI. Required for Twitter and Facebook sources.
 
   Model:
     type: object
@@ -271,7 +288,7 @@ definitions:
       id:
         type: string
         format: uuid
-        description: The id of this model
+        description: Assigned by the system
       trained_ts:
         type: string
         format: date-time
@@ -299,6 +316,7 @@ definitions:
 
   Prediction:
     type: object
+    description: 'A dict object of the form "Tag: Predicted Score in %"'
     additionalProperties:
       type: number
       format: float
