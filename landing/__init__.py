@@ -16,11 +16,13 @@ def create_app():
     from flask_modules.mail import setup_mail
     from flask_modules.security import setup_security
     from flask_modules.database import setup_db
+    from flask_modules.celery import setup_celery
 
     app = Flask(__name__)
     setup_db(app)
     setup_mail(app)
     setup_security(app)
+    setup_celery(app)
 
     from .forwards import forwards
     app.register_blueprint(forwards)
