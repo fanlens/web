@@ -1,23 +1,30 @@
 import React from "react";
 import {connect} from "react-redux";
+import {Link} from "react-router-dom";
 import map from "lodash/fp/map";
 import isEmpty from "lodash/fp/isEmpty";
 import head from "lodash/fp/head";
 import values from "lodash/fp/values";
+import defaults from "lodash/fp/defaults";
+import take from "lodash/fp/take";
+import reduce from "lodash/fp/reduce";
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
-import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
-import ActionDateRange from 'material-ui/svg-icons/action/date-range';
+import ContentInbox from 'material-ui/svg-icons/content/inbox';
+import ContentFilterList from 'material-ui/svg-icons/content/filter-list';
+import HourglassEmpty from 'material-ui/svg-icons/action/hourglass-empty';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Dialog from 'material-ui/Dialog';
 import Slider from 'material-ui/Slider';
 import Toggle from 'material-ui/Toggle';
+import ActionGavel from 'material-ui/svg-icons/action/gavel';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
 import {fetchComments} from '../../actions/ActivitiesActions';
-
+import * as tlActions from "../../actions/app/timeline";
 
 const min = 0;
 const max = 200;
@@ -25,7 +32,6 @@ const power = 4;
 
 const transform = (value) => Math.floor((Math.round((Math.exp(power * value / max) - 1) / (Math.exp(power) - 1) * max) + 1) / 2) * 2;
 const reverse = (value) => (1 / power) * Math.log(((Math.exp(power) - 1) * value / max) + 1) * max;
-
 
 const controlHeight = '3em';
 const ControlFrame = ({className, children}) => (
@@ -43,102 +49,126 @@ const ControlFrame = ({className, children}) => (
 
 const DateTimePicker = ({className, label, origDate, onChange}) => (
   <div className={className}>
-    <span style={{marginRight: '0.5em'}}>
-    {label}
-    </span>
-    <DatePicker
-      onChange={(_, date) => onChange(new Date(new Date(date.setHours(origDate.getHours())).setMinutes(origDate.getMinutes())))}
-      style={{display: 'inline-block'}}
-      textFieldStyle={{width: '6em'}}
-      hintText="1970/01/01"
-      container="inline"
-      autoOk={false}
-      mode="landscape"
-      value={origDate}
-    />
-    <TimePicker
-      onChange={(_, date) => onChange(new Date(new Date(origDate.setHours(date.getHours())).setMinutes(date.getMinutes())))}
-      format="24hr"
-      hintText="00:00"
-      style={{display: 'inline-block'}}
-      textFieldStyle={{width: '3em'}}
-      autoOk={false}
-      value={origDate}
-    />
+    <div className="row start-xs middle-xs">
+      <div className="col-xs-2 end-xs">{label}</div>
+      <div className="col-xs">
+        <DatePicker
+          onChange={(_, date) => onChange(new Date(new Date(date.setHours(origDate.getHours())).setMinutes(origDate.getMinutes())))}
+          style={{display: 'inline-block'}}
+          textFieldStyle={{width: '6em'}}
+          hintText="1970/01/01"
+          container="inline"
+          autoOk={false}
+          mode="landscape"
+          value={origDate}
+        />
+        <TimePicker
+          onChange={(_, date) => onChange(new Date(new Date(origDate.setHours(date.getHours())).setMinutes(date.getMinutes())))}
+          format="24hr"
+          hintText="00:00"
+          style={{display: 'inline-block'}}
+          textFieldStyle={{width: '3em'}}
+          autoOk={false}
+          value={origDate}
+        />
+      </div>
+    </div>
   </div>
 );
 
 class TimelineControls extends React.Component {
   state = {
-    selectedTagsetId: null,
-    datePickOpen: false,
-    fromDate: new Date(new Date().getTime() - (24 * 60 * 60 * 1000)),
-    toDate: new Date(),
-    slider: 10,
-    random: true,
+    rangePickOpen: false,
+    sliderValue: null,
   };
 
-  _closeDatePicker = () => this.setState({datePickOpen: false});
+  _closeDatePicker = () => this.setState({rangePickOpen: false});
 
   componentWillReceiveProps(nextProps) {
-    const {tagSets} = nextProps;
-    this.setState({selectedTagsetId: this.state.selectedTagsetId || (!isEmpty(tagSets) && head(values(tagSets)).id)});
+    const {allTagSets, setTagSets, allSources, setSources, count} = nextProps;
+    if (isEmpty(this.props.tagSets) && !isEmpty(allTagSets)) {
+      setTagSets(take(1, values(allTagSets)))
+    }
+    if (isEmpty(this.props.sources) && !isEmpty(allSources)) {
+      setSources(take(1, values(allSources)))
+    }
+    this.setState({sliderValue: count})
   }
 
   render() {
-    const {tagSets, sources, onRefresh} = this.props;
+    const {
+      allSources, sources, random, count, allTagSets, isFetching = false, tagSets = [],
+      onRange, onRandom, onCount, onSelectTagSet, onSelectSource, onFetch
+    } = this.props;
+    const since = new Date(this.props.since);
+    const until = new Date(this.props.until);
     return (
-      <div className="row middle-sm center-sm" style={{padding: '0.5em', overflow: 'hidden'}}>
-        <div className="col-sm-3">
-          <div style={{height: '3em'}}>
+      <div className="row middle-xs center-xs" style={{padding: '0 0.5em 0.5em 0.5em', overflow: 'hidden'}}>
+        <div className="col-sm-4 col-xs-12">
+          <div style={{height: controlHeight, marginTop: '0.5em'}}>
             <ControlFrame>
               <DropDownMenu
                 style={{height: '3em', marginTop: '-0.31em', width: '100%'}}
-                value={this.state.selectedTagsetId}
+                value={isEmpty(tagSets) ? -1 : head(tagSets).id}
                 disabled={isEmpty(tagSets)}
-                onChange={(_, __, selectedTagsetId) => this.setState({selectedTagsetId})}
+                onChange={(_, __, selectedTagSetId) => onSelectTagSet(selectedTagSetId)}
                 autoWidth={false}
+                multiple={false}
               >
-                {map(({id, title}) => (<MenuItem key={id} value={id} primaryText={title}/>))(tagSets)}
+                {map(({id, title}) => (<MenuItem key={id} value={id} primaryText={title}/>))(allTagSets)}
               </DropDownMenu>
             </ControlFrame>
           </div>
         </div>
 
-        <div className="col-sm-3">
-          <ControlFrame>
-            <div className="row middle-xs center-xs" style={{height: '100%'}}>
-              <div className="col-xs-2">
-                {this.state.slider}
-              </div>
-              <div className="col-xs middle-xs">
-                <Slider
-                  style={{marginTop: '3em', paddingRight: '0.5em'}}
-                  min={min}
-                  max={max}
-                  step={max / 100}
-                  value={reverse(this.state.slider)}
-                  onChange={(event, value) => this.setState({slider: transform(value)})}
-                />
-              </div>
-            </div>
-          </ControlFrame>
+        <div className="col-sm-4 col-xs-12">
+          <div style={{height: controlHeight, marginTop: '0.5em'}}>
+            <ControlFrame>
+              <DropDownMenu
+                style={{height: '3em', marginTop: '-0.31em', width: '100%'}}
+                value={isEmpty(sources) ? -1 : head(sources).id}
+                disabled={isEmpty(tagSets)}
+                onChange={(_, __, selectedSourceId) => onSelectSource(selectedSourceId)}
+                autoWidth={false}
+                multiple={false}
+              >
+                {map(({id, type, slug}) => (
+                  <MenuItem key={id} value={id} primaryText={`${type} > ${slug}`}/>)
+                )(allSources)}
+              </DropDownMenu>
+            </ControlFrame>
+          </div>
         </div>
 
-        <div className="col-sm-2">
+        <div className="col-sm-2 col-xs-6">
           <RaisedButton
-            icon={<ActionDateRange/>}
+            icon={<ContentFilterList/>}
             label="Range"
             buttonStyle={{height: controlHeight}}
+            style={{marginTop: '0.5em'}}
             fullWidth={true}
-            onTouchTap={() => this.setState({datePickOpen: true})}/>
+            onTouchTap={() => this.setState({rangePickOpen: true})}/>
+        </div>
+
+        <div className="col-sm-2 col-xs-6">
+          <RaisedButton
+            label="Fetch"
+            labelPosition="after"
+            fullWidth={true}
+            primary={true}
+            disabled={isEmpty(tagSets) || isFetching}
+            icon={isFetching ? <HourglassEmpty/> : <ContentInbox/>}
+            style={{marginTop: '0.5em'}}
+            buttonStyle={{height: controlHeight}}
+            onTouchTap={() => onFetch()}
+          />
         </div>
 
         <Dialog
           title={
             <h1 style={{textAlign: 'center'}}>
-              <ActionDateRange style={{marginBottom: '-0.125em'}}/>
-              Pick Date Range
+              <ContentFilterList style={{marginBottom: '-0.125em'}}/>
+              Set Comment Range
             </h1>
           }
           actions={[
@@ -150,68 +180,109 @@ class TimelineControls extends React.Component {
             />
           ]}
           modal={false}
-          open={this.state.datePickOpen}
+          open={this.state.rangePickOpen}
           onRequestClose={this._closeDatePicker}
         >
-          <div className="row center-sm middle-sm">
+          <div className="row center-xs middle-xs">
             <DateTimePicker
-              className="col-sm"
+              className="col-md col-xs-12"
               label="From"
-              origDate={this.state.fromDate}
-              onChange={(fromDate) => this.setState({
+              origDate={since}
+              onChange={(fromDate) => onRange(
                 fromDate,
-                toDate: new Date(Math.max(fromDate, this.state.toDate))
-              })}
+                new Date(Math.max(fromDate, until))
+              )}
             />
+          </div>
+          <div className="row center-xs middle-xs">
             <DateTimePicker
-              className="col-sm"
+              className="col-md col-xs-12"
               label="To"
-              origDate={this.state.toDate}
-              onChange={(toDate) => this.setState({
-                toDate,
-                fromDate: new Date(Math.min(toDate, this.state.fromDate))
-              })}
+              origDate={until}
+              onChange={(toDate) => onRange(
+                new Date(Math.min(toDate, since)),
+                toDate
+              )}
             />
-            <div className="col-sm">
+          </div>
+          <div className="row center-xs middle-xs">
+            <div className="col-md-8 col-xs-12">
+              <div className="row middle-xs center-xs" style={{height: '100%'}}>
+                <div className="col-xs-2">
+                  {this.state.sliderValue || count}
+                </div>
+                <div className="col-xs middle-xs">
+                  <Slider
+                    style={{marginTop: '3em', paddingRight: '0.5em'}}
+                    min={min}
+                    max={max}
+                    step={max / 100}
+                    value={reverse(this.state.sliderValue || count)}
+                    onChange={(_, sliderValue) => this.setState({sliderValue: transform(sliderValue)})}
+                    onDragStop={() => {
+                      onCount(this.state.sliderValue);
+                      this.setState({sliderValue: null});
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="col-md-4 col-xs-12">
               <Toggle
+                style={{width: null, margin: 'auto'}}
                 label="Random Sample"
-                toggled={this.state.random}
-                onToggle={(_, isInputChecked) => this.setState({random: isInputChecked})}
+                toggled={random}
+                onToggle={(_, isInputChecked) => onRandom(isInputChecked)}
               />
             </div>
           </div>
         </Dialog>
-        <div className="col-sm-3">
-          <RaisedButton
-            label="Fetch Comments"
-            labelPosition="after"
-            fullWidth={true}
-            primary={true}
-            disabled={this.state.selectedTagsetId === null}
-            icon={<NavigationRefresh/>}
-            buttonStyle={{height: controlHeight}}
-            onTouchTap={() => onRefresh(
-              this.state.slider,
-              sources,
-              this.state.fromDate.toISOString(),
-              this.state.toDate.toISOString(),
-              [tagSets[this.state.selectedTagsetId]],
-              this.state.random)}
-          />
-        </div>
+
+        <Link to="/v3/ui/evaluator" style={{
+          float: 'right',
+          position: 'fixed',
+          right: '0.5em',
+          bottom: '1.75em',
+          zIndex: 10000
+        }}>
+          <FloatingActionButton>
+            <ActionGavel/>
+          </FloatingActionButton>
+        </Link>
       </div>
     );
   }
 }
 
-const mapStateToProps = (state) => ({
-  tagSets: state.activities.tagSets,
-  sources: state.activities.sources,
-});
+const mapStateToProps = (state) => defaults({
+  allTagSets: state.activities.tagSets,
+  allSources: state.activities.sources,
+})(state.app.timeline);
 
-const mapDispatchToProps = (dispatch) => ({
-  onRefresh: (count, sources, since, until, tagSets, random) =>
-    dispatch(fetchComments(count, sources, since, until, tagSets, random)),
-});
+const mapDispatchToProps = (dispatch, props) => ({
+    onRange: (since, until) => dispatch(tlActions.setRange(since, until)),
+    onRandom: (random) => dispatch(tlActions.setRandom(random)),
+    onCount: (count) => dispatch(tlActions.setCount(count)),
+    setTagSets: (tagSets) => dispatch(tlActions.setTagSets(tagSets)),
+    setSources: (sources) => dispatch(tlActions.setSources(sources)),
+    fetchComments: (args) => dispatch(tlActions.setIsFetching(true))
+      .then(() => dispatch(fetchComments(defaults(args)({
+        since: new Date(args.since).toISOString(),
+        until: new Date(args.until).toISOString()
+      }))))
+      .then(() => dispatch(tlActions.setIsFetching(false))),
+  }
+);
 
-export default connect(mapStateToProps, mapDispatchToProps)(TimelineControls);
+const mergeProps = (stateProps, dispatchProps, ownProps) => reduce(defaults, {})([
+  ownProps,
+  stateProps,
+  dispatchProps,
+  {
+    onSelectTagSet: (id) => dispatchProps.setTagSets([stateProps.allTagSets[id]]),
+    onSelectSource: (id) => dispatchProps.setSources([stateProps.allSources[id]]),
+    onFetch: (args = {}) => dispatchProps.fetchComments(defaults(stateProps)(args)),
+  }
+]);
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(TimelineControls);

@@ -1,6 +1,5 @@
 import React from "react";
 import {connect} from "react-redux";
-import {setInputActive} from "../../actions/AppActions";
 import "./Splash.css";
 
 const Splash = ({onActivate}) => (
@@ -20,7 +19,7 @@ const Splash = ({onActivate}) => (
 
 const mapDispatchToProps = (dispatch) => ({
   onActivate: () => {
-    dispatch(setInputActive(true));
+    // dispatch(setInputActive(true));
     document.getElementById('guiframeworkssucksometimes').focus();
   }
 });

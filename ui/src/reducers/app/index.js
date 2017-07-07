@@ -1,12 +1,15 @@
 import {combineReducers} from "redux";
 import _ from "lodash";
 import md5 from "md5";
-import {AppActionType} from "../actions/AppActions";
+import {ActionType as UserActionType} from "../../actions/app/user";
+import {ActionType as DrawerActionType} from "../../actions/app/drawer";
 
+import timeline from "./timeline";
+import evaluator from "./evaluator";
 
 const user = (state = {}, action) => {
   switch (action.type) {
-    case AppActionType.RECEIVE_USER:
+    case UserActionType.RECEIVE_USER:
       return _.defaults(_.defaults({email_md5: md5(action.user.email)}, action.user), state);
     default:
       return state;
@@ -17,28 +20,16 @@ const drawer = (state = {
   open: false
 }, action) => {
   switch (action.type) {
-    case AppActionType.RECEIVE_DRAWER_STATE:
+    case DrawerActionType.RECEIVE_DRAWER_STATE:
       return _.defaults({open: action.open}, state);
     default:
       return state;
   }
 };
 
-const help = (state = {
-  active: true
-}, action) => {
-  switch (action.type) {
-    case AppActionType.RECEIVE_HELP_STATE:
-      return _.defaults({active: action.active}, state);
-    default:
-      return state;
-  }
-};
-
-const app = combineReducers({
+export default combineReducers({
   user,
   drawer,
-  help,
+  timeline,
+  evaluator
 });
-
-export default app;

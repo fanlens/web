@@ -1,24 +1,39 @@
 import React from "react";
-import {Router, Route, IndexRoute, browserHistory, DefaultRoute} from "react-router";
-import App from "./App.jsx";
+import {BrowserRouter, Route, Switch} from "react-router-dom";
 import NotFound from "./NotFound.jsx";
-import Eev from "./Eev.jsx";
+import EvaluatorFrame from "./evaluator/EvaluatorFrame.jsx";
+import TimelineFrame from "./timeline/TimelineFrame.jsx";
 import Team from "./Team.jsx";
 import Legal from "./Legal.jsx";
-import Dashboard from "./Dashboard.jsx";
 import Enterprise from "./enterprise/Enterprise.jsx";
+import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+import Footer from "./Footer.jsx";
+import Sidebar from "./sidebar/Sidebar.jsx";
+import Alerts from "./Alerts.jsx";
+
+const App = () => (
+  <MuiThemeProvider>
+    <div>
+      <Sidebar/>
+      <Switch>
+        <Route exact path='/v3/ui/' component={TimelineFrame}/>
+        <Route path='/v3/ui/timeline' component={TimelineFrame}/>
+        <Route path='/v3/ui/evaluator' component={EvaluatorFrame}/>
+        <Route path='/v3/ui/team' component={Team}/>
+        <Route path='/v3/ui/legal' component={Legal}/>
+        <Route path='/v3/ui/enterprise' component={Enterprise}/>
+        <Route path='/v3/ui/' component={NotFound}/>
+      </Switch>
+      <Footer/>
+      <Alerts/>
+    </div>
+  </MuiThemeProvider>
+);
 
 const AppRouter = () => (
-  <Router history={browserHistory}>
-    <Route path='/v3/ui/' component={App}>
-      <IndexRoute component={Eev}/>
-      <Route path='team' component={Team}/>
-      <Route path='legal' component={Legal}/>
-      <Route path='dashboard' component={Dashboard}/>
-      <Route path='enterprise' component={Enterprise}/>
-      <Route path='*' component={NotFound}/>
-    </Route>
-  </Router>
+  <BrowserRouter>
+    <App/>
+  </BrowserRouter>
 );
 
 export default AppRouter;

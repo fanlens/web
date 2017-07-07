@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from flask import render_template, Blueprint, g, send_file
-from flask_security import current_user
+from flask_security import current_user, login_required
 
 catchall = Blueprint('catchall', __name__, url_prefix='/v3/ui')
 
@@ -13,6 +13,7 @@ def appjs():
 
 @catchall.route('/', defaults={'path': ''})
 @catchall.route('/<path:path>')
+@login_required
 def root(path):
     return render_template('ui.html',
                            api_key=(

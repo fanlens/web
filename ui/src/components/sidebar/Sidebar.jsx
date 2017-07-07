@@ -5,7 +5,7 @@ import AppBar from "material-ui/AppBar";
 import Divider from "material-ui/Divider";
 import IconButton from "material-ui/IconButton";
 import NavigationClose from "material-ui/svg-icons/navigation/close";
-import {setDrawerState} from "../../actions/AppActions";
+import {setDrawerState} from "../../actions/app/drawer";
 import SourcesList from "./SourcesList.jsx";
 import OptionsList from "./OptionsList.jsx";
 

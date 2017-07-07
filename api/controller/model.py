@@ -91,6 +91,14 @@ def model_id_prediction_post(model_id, body: dict) -> dict:
     if not model:
         return dict(error='model not associated with user'), 404
     text = body['text']
-    prediction = Brain.predict_text(model_id, text).get()
+    prediction = Brain.predict_text(str(model_id), text).get()
     prediction = dict((model.tags.filter_by(id=k).one().tag, v) for k, v in prediction)
     return dict(text=text, prediction=prediction)
+
+
+@defaults
+def prediction_post(body: dict) -> dict:
+    best_model = search_post(body, internal=True)
+    if not best_model:
+        return dict(error='no model found'), 404
+    return model_id_prediction_post(best_model['id'], body)

@@ -1,14 +1,14 @@
 import React from "react";
 import {connect} from "react-redux";
 
-import TimelineControls from "./TimelineControls.jsx";
-import Timeline from "./Timeline.jsx";
+import EvaluatorControls from "./EvaluatorControls.jsx";
+import Evaluator from "./Evaluator.jsx";
 
 import {initActivities} from "../../actions/ActivitiesActions";
 
 const separatorBorder = '2px #409db1 solid';
 
-class TimelineFrame extends React.Component {
+class EvaluatorFrame extends React.Component {
   componentDidMount() {
     this.props.init();
   }
@@ -16,9 +16,9 @@ class TimelineFrame extends React.Component {
   render() {
     return (
       <div>
-        <TimelineControls/>
+        <EvaluatorControls/>
         <div style={{borderBottom: separatorBorder}}/>
-        <Timeline/>
+        <Evaluator/>
       </div>
     );
   }
@@ -30,4 +30,4 @@ const mapDispatchToProps = (dispatch) => ({
   init: (force = false) => dispatch(initActivities(force))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(TimelineFrame);
+export default connect(mapStateToProps, mapDispatchToProps)(EvaluatorFrame);
