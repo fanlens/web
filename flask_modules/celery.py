@@ -39,3 +39,9 @@ class Brain(object):
     @staticmethod
     def predict_text(*args, **kwargs) -> Celery.AsyncResult:
         return celery.send_task('worker.brain.' + Brain.predict_text.__name__, args=args, kwargs=kwargs)
+
+
+class Scrape(object):
+    @staticmethod
+    def scrape_meta_for_url(*args, **kwargs) -> Celery.AsyncResult:
+        return celery.send_task('worker.scrape.' + Scrape.scrape_meta_for_url.__name__, args=args, kwargs=kwargs)
