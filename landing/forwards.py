@@ -16,21 +16,21 @@ forwards.add_url_rule('/jobs/cgo', 'cgo', lambda: redirect('/cdn/img/jobs/cgo.pd
 @forwards.route('/@<url_hash>', methods=['GET'])
 def shortener(url_hash):
     shortened_id = decode(url_hash)
-    data = db.session.query(Shortener).get(shortened_id)
-    if data is None:
-        return jsonify(error='url not found', reason=str(url_hash)), 404
+    tags = db.session.query(Shortener).get(shortened_id)
+    if tags is None:
+        return jsonify(error='/@%s not found' % str(url_hash)), 404
 
-    data = dict(data.__dict__)
-    data.pop('_sa_instance_state', None)
+    tags = dict(tags.__dict__)
+    tags.pop('_sa_instance_state', None)
 
     if request.headers['Accept'] == 'application/json':
-        return jsonify(**data)
+        return jsonify(hash=url_hash, short_url='https://fanlens.io/@%s' % url_hash, tags=tags)
     else:
         user_agent = request.headers.get('User-Agent', '').lower()
         if user_agent.startswith('twitterbot') or user_agent.startswith('facebo') or user_agent.startswith('LinkedIn'):
-            return render_template('shortener.html', **data)
+            return render_template('shortener.html', **tags)
         else:
-            return redirect(data['url'], code=302)
+            return redirect(tags['url'], code=302)
 
 
 @forwards.route('/@', methods=['POST'])
@@ -46,7 +46,8 @@ def create():
         return jsonify(error='bad request'), 400
     result = Scrape.scrape_meta_for_url(url)
     inserted_id, tags = result.get()
-    return jsonify(hash=encode(inserted_id), tags=tags)
+    hash = encode(inserted_id)
+    return jsonify(hash=hash, short_url='https://fanlens.io/@%s' % hash, tags=tags)
 
 
 @forwards.route('/@', methods=['GET'])
