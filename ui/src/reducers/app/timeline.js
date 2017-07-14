@@ -23,7 +23,7 @@ const modifier = (action) => {
 };
 
 const timeline = (state = {
-  since: +new Date(new Date().getTime() - (24 * 60 * 60 * 1000)),
+  since: +new Date(new Date().getTime() - (365 * 60 * 60 * 1000)),
   until: +new Date(),
   radnom: true,
   count: 10,
