@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import requests
 from config.db import Config
-from flask import session
+from flask import session, redirect, request
 from flask_security import current_user
 from flask_security.decorators import roles_accepted, auth_token_required, login_required
 
@@ -79,4 +79,4 @@ def _set_session_data(channel_id, user_id, auth_token, name) -> bool:
 def login_channel_id_user_id_get(channel_id: str, user_id: str) -> tuple:
     token = current_user.get_auth_token() if current_user.has_role('tagger') else g.demo_user.get_auth_token()
     success = _set_session_data(channel_id, user_id, token, current_user.email)
-    return ('ok', 200) if success else ('failed', 403)
+    return redirect(request.referrer) if success else ('failed', 403)
