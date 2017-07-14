@@ -141,15 +141,11 @@ def source_id_activity_id_tags_patch(source_id: int, activity_id: str, body: dic
     elif isinstance(data, tuple):  # error
         return data
 
-    for add_tag in add.union(remove):  # make sure all tags are in DB
-        tags_tag_put(add_tag, commit=False)
-    db.session.commit()
-
     add and data.tags.update(db.session.query(Tag).filter(Tag.tag.in_(add)).filter_by(user_id=current_user.id))
     remove and data.tags.difference_update(
         db.session.query(Tag).filter(Tag.tag.in_(remove)).filter_by(user_id=current_user.id))
     db.session.commit()
-    return source_id_activity_id_field_id_get(source_id, activity_id, 'tags')
+    return {'id': str(data.object_id), 'tags': [tag.tag for tag in data.tags]}
 
 
 @defaults

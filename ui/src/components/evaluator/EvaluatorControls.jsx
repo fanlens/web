@@ -43,7 +43,7 @@ class EvaluatorControls extends React.Component {
     const {allTagSets, tagSets, allSources, sources, onSelectTagSet, onSelectSource} = this.props;
     return (
       <div className="row center-xs middle-xs" style={{padding: '0 0.5em 0.5em 0.5em', overflow: 'hidden'}}>
-        <div className="col-lg-4 col-sm-5 col-xs-12">
+        <div className="col-lg-4 col-sm-6 col-xs-12">
           <div style={{height: '3em', marginTop: '0.5em'}}>
             <ControlFrame>
               <DropDownMenu
@@ -61,7 +61,7 @@ class EvaluatorControls extends React.Component {
             </ControlFrame>
           </div>
         </div>
-        <div className="col-lg-4 col-sm-5 col-xs-12">
+        <div className="col-lg-4 col-sm-6 col-xs-12">
           <div style={{height: '3em', marginTop: '0.5em'}}>
             <ControlFrame>
               <DropDownMenu
@@ -79,11 +79,12 @@ class EvaluatorControls extends React.Component {
             </ControlFrame>
           </div>
         </div>
+
         <Link to="/v3/ui/timeline" style={{
           float: 'right',
           position: 'fixed',
-          right: '0.5em',
-          bottom: '1.75em',
+          right: '8px',
+          bottom: '28px',
           zIndex: 10000
         }}>
           <FloatingActionButton>

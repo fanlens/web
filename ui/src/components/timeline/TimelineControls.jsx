@@ -241,8 +241,8 @@ class TimelineControls extends React.Component {
         <Link to="/v3/ui/evaluator" style={{
           float: 'right',
           position: 'fixed',
-          right: '0.5em',
-          bottom: '1.75em',
+          right: '8px',
+          bottom: '28px',
           zIndex: 10000
         }}>
           <FloatingActionButton>

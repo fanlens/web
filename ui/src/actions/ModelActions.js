@@ -36,8 +36,8 @@ export const fetchSuggestionForText = ({text, sources, tagSets}) =>
       }
     }).then(({status, obj}) => dispatch(receiveSuggestion(obj)))
       .then(() => dispatch(setIsFetching(false)))
-      .catch((error, reason) => {
-      console.log(error, reason)
-        dispatch(warning(error.detail));
+      .catch(({response: {obj: {detail, status, title}}}) => {
+        console.log(status, title, detail);
+        dispatch(warning(detail));
         dispatch(setIsFetching(false));
       }));

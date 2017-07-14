@@ -41,8 +41,8 @@ class Evaluator extends React.Component {
                   rowsMax={10}
                   multiLine={true}
                   autoFocus={true}
-                  hintText="Example: Hey folks how's it going?!"
-                  floatingLabelText="Enter A New Post"
+                  hintText="Example: Hey folks how's it going?! (min. 24 characters)"
+                  floatingLabelText={`Enter A New Post${this.state.text.length > 0 && this.state.text.length < 24 ? ` ${24-this.state.text.length} more` : ''}`}
                   onChange={(_, text) => this.setState({text})}
                   value={this.state.text}
                 />
@@ -53,7 +53,7 @@ class Evaluator extends React.Component {
                 <RaisedButton
                   label="Evaluate"
                   icon={isFetching ? <ActionHourglassEmpty/> : <ActionGavel/>}
-                  disabled={isFetching}
+                  disabled={isFetching || this.state.text.length < 24}
                   primary={true}
                   fullWidth={true}
                   onTouchTap={() => onEvaluate({text: this.state.text})}

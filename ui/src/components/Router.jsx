@@ -10,6 +10,7 @@ import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import Footer from "./Footer.jsx";
 import Sidebar from "./sidebar/Sidebar.jsx";
 import Alerts from "./Alerts.jsx";
+import Skype from "./skype/Skype.jsx";
 
 const App = () => (
   <MuiThemeProvider>
@@ -24,6 +25,7 @@ const App = () => (
         <Route path='/v3/ui/enterprise' component={Enterprise}/>
         <Route path='/v3/ui/' component={NotFound}/>
       </Switch>
+      <Skype/>
       <Footer/>
       <Alerts/>
     </div>

@@ -86,10 +86,11 @@
 #}
 
 {% block scripts %}
-    <!-- CSRF -->
+    <!-- Keys -->
     <script>
       var CSRFToken = "{{ csrf_token() }}";
       var apiKey = "{{ api_key }}";
+      var botId = "{{ bot_id }}"
     </script>
 
     <!-- Cookie Consent -->
@@ -106,6 +107,9 @@
 
     <!-- App -->
     <script src="/v3/ui/static/app.js"></script>
+
+    <!-- Skype Bot -->
+    <script src="https://latest-swc.cdn.skype.com/sdk/v1/sdk.js"></script>
 
 {% endblock %}
 </body>

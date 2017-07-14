@@ -16,7 +16,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Avatar from "material-ui/Avatar";
 import ActionBookmark from 'material-ui/svg-icons/action/bookmark';
 import NavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
-import {fetchComments} from '../../actions/ActivitiesActions';
+import {fetchComments, toggleCommentTag} from '../../actions/ActivitiesActions';
 import {strToCol} from "../stringUtils";
 
 const mapIdx = map.convert({cap: false});
@@ -104,7 +104,7 @@ class Timeline extends React.Component {
   };
 
   render() {
-    const {comments, tagSets, onMore} = this.props;
+    const {comments, tagSets, onMore, onToggleTag} = this.props;
     const numRows = Math.floor((Object.keys(comments).length + 1) / 2);
     return (
       <div>
@@ -169,11 +169,12 @@ class Timeline extends React.Component {
                         />
                         <CardActions expandable={true} style={{textAlign: 'center', padding: 0}}>
                           {flatMap((tagSet) => tagSet.tags.map((tag, idx) => {
-                            const primary = includes(tag)(comment.tags);
+                            const isTagged = includes(tag)(comment.tags);
                             return (
                               <FlatButton
                                 key={idx}
-                                primary={primary}
+                                primary={isTagged}
+                                onTouchTap={() => onToggleTag(comment, tag)}
                                 icon={
                                   <ActionBookmark
                                     role="img"
@@ -217,6 +218,7 @@ const mapStateToProps = (state) => defaults({
 })(state.app.timeline);
 
 const mapDispatchToProps = (dispatch) => ({
+  onToggleTag: (comment, tag) => dispatch(toggleCommentTag(comment, tag)),
   fetchComments: (args) => dispatch(fetchComments(defaults(args)({
     since: new Date(args.since).toISOString(),
     until: new Date(args.until).toISOString()

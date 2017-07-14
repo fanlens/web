@@ -84,8 +84,8 @@ export const fetchComments = ({count, sources, since, until, tagSets = [], rando
     (client) => client.apis.activity.get__source_ids__(
       flow(
         definedDefaults(since)('since'),
-        definedDefaults(until)('until'),
-        definedDefaults(_.map(tagSets, 'id').join(',') || null)('tagset_ids')
+        definedDefaults(until)('until')
+        // definedDefaults(_.chain(tagSets).reject({'id':'all'}).map('id').value().join(',') || null)('tagset_ids')
       )({
         source_ids: _.chain(sources).map('id').value(),
         count: count,
@@ -107,7 +107,7 @@ export const fetchCommentsTagSet = (count, tagSetId, random = true) =>
 
 const manipulateTags = (comment, add, remove) =>
   (dispatch) => activitiesApi.then(
-    (client) => client.apis.activity.patch__source_id__activity_id__tags({
+    (client) => client.apis.activity.patch__source_id___activity_id__tags({
       source_id: comment.source.id,
       activity_id: comment.id,
       body: {
