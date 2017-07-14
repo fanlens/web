@@ -103,7 +103,7 @@ class TimelineControls extends React.Component {
     const since = new Date(this.props.since);
     const until = new Date(this.props.until);
     return (
-      <div className="row middle-xs center-xs" style={{padding: '0 0.5em 0.5em 0.5em', overflow: 'hidden'}}>
+      <div className="row middle-xs center-xs" style={{padding: '0 0 0.5em 0', margin: 0, overflow: 'hidden'}}>
         <div className="col-sm-4 col-xs-12">
           <div style={{height: controlHeight, marginTop: '0.5em'}}>
             <ControlFrame>
