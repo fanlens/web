@@ -58,7 +58,7 @@ def search_post(body: dict, internal=False) -> dict:
 
 
 @defaults
-@roles_required('admin')
+# @roles_required('admin') # rate limited atm
 def train_post(body: dict, fast=True) -> tuple:
     tagset_id = body['tagset_id']
     tagset = current_user.tagsets.filter_by(id=tagset_id).one_or_none()
