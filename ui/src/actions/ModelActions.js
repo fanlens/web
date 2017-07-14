@@ -1,36 +1,43 @@
 import keyMirror from "keymirror";
 import Swagger from "swagger-client";
+import map from "lodash/fp/map";
 import {warning} from "./AlertActions";
+import resolveToSelf from "./resolveToSelf";
 
 const modelApi = new Swagger({
-  url: '/v3/model/swagger.json',
-  usePromise: true,
+  url: resolveToSelf('/v3/model/swagger.json'),
   authorizations: {
-    headerAuth: new Swagger.ApiKeyAuthorization('Authorization-Token', apiKey, 'header')
+    api_key: apiKey
   }
 });
 
 export const ModelActionType = keyMirror({
   MODEL_RECEIVE_SUGGESTION: null,
-  MODEL_ENTER_SUGGESTION: null,
+  MODEL_RECEIVE_ISFETCHING: null,
 });
 
 
 const receiveSuggestion = (suggestion) => ({type: ModelActionType.MODEL_RECEIVE_SUGGESTION, suggestion});
+const receiveIsFetching = (isFetching) => ({type: ModelActionType.MODEL_RECEIVE_ISFETCHING, isFetching});
 
-const enterSuggestion = () => ({type: ModelActionType.MODEL_ENTER_SUGGESTION});
+export const setIsFetching = (isFetching) =>
+  (dispatch) => Promise.resolve(dispatch(receiveIsFetching(isFetching)));
 
-export function fetchSuggestionForText(text) {
-  return (dispatch) => {
-    dispatch(enterSuggestion())
-      .then(modelApi.then(
-        (api) => api.suggestion.post_suggestion({body: {text}})
-          .then(({status, obj}) => obj)
-          .then(({suggestion}) => dispatch(receiveSuggestion(suggestion)))
-          .catch((error) => {
-            console.log(error);
-            dispatch(warning("There was a problem with the provided text! Is it in english?"))
-              .then(dispatch(receiveSuggestion([])));
-          })));
-  };
-}
+export const clearSuggestion = () =>
+  (dispatch) => Promise.resolve(dispatch(receiveSuggestion({})));
+
+export const fetchSuggestionForText = ({text, sources, tagSets}) =>
+  (dispatch) => modelApi.then(
+    (client) => client.apis.prediction.post_prediction({
+      body: {
+        text,
+        source_ids: map('id')(sources),
+        tagset_ids: map('id')(tagSets)
+      }
+    }).then(({status, obj}) => dispatch(receiveSuggestion(obj)))
+      .then(() => dispatch(setIsFetching(false)))
+      .catch(({response: {obj: {detail, status, title}}}) => {
+        console.log(status, title, detail);
+        dispatch(warning(detail));
+        dispatch(setIsFetching(false));
+      }));

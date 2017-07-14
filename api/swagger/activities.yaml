@@ -71,7 +71,7 @@ paths:
 
   /{source_ids}/:
     get:
-      summary: Get a list of random activities
+      summary: Get a list of activities
       tags: [activity]
       parameters:
       - $ref: '#/parameters/SourceIds'
@@ -83,7 +83,7 @@ paths:
         format: int32
         default: 8
         minimum: 0
-        maximum: 30
+        maximum: 500
       - $ref: '#/parameters/Random'
       - name: max_id
         in: query
@@ -92,6 +92,20 @@ paths:
         minLength: 1
         maxLength: 128
         required: false
+      - name: since
+        in: query
+        description: DateTime of oldest entry
+        type: string
+        format: date-time
+        required: false
+      - name: until
+        in: query
+        description: DateTime of newest entry
+        type: string
+        format: date-time
+        required: false
+      - $ref: '#/parameters/TagsetIds'
+#      - $ref: '#/parameters/Tags'
       responses:
         200:
           description: A list of Activitys
@@ -715,6 +729,18 @@ parameters:
     uniqueItems: true
     collectionFormat: csv
     maxItems: 10
+
+  TagsetIds:
+    name: tagset_ids
+    in: query
+    required: false
+    type: array
+    items:
+      type: integer
+    uniqueItems: true
+    collectionFormat: csv
+    maxItems: 10
+
 
   FieldId:
     name: field_id

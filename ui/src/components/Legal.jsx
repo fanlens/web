@@ -1,6 +1,5 @@
 import React from "react";
 import Paper from "material-ui/Paper";
-import "./Eev.css";
 
 const Container = ({children}) => (
   <Paper style={{textAlign: 'justify', padding: '2em'}}>

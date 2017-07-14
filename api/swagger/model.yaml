@@ -131,9 +131,61 @@ paths:
           properties:
             text:
               type: string
-              minLength: 64
+              minLength: 24
               maxLength: 7000
               description: The text to fetch prediction for. English only atm.
+      responses:
+        200:
+          description: A prediction Bundle
+          schema:
+            type: object
+            required: [prediction]
+            properties:
+              text:
+                type: string
+              prediction:
+                $ref: '#/definitions/Prediction'
+        404:
+          description: Model not associated to user
+          schema:
+            $ref: '#/definitions/Error'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /prediction:
+    post:
+      summary: Get prediction for a provided text based on the best model for source/tagset
+      tags: [prediction]
+      consumes: [application/json]
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required: [text]
+          properties:
+            text:
+              type: string
+              minLength: 24
+              maxLength: 7000
+              description: The text to fetch prediction for. English only atm.
+            source_ids:
+              type: array
+              items:
+                $ref: '#/definitions/SourceId'
+              uniqueItems: true
+              description: list of sources to use, empty list means all
+            tagset_id:
+              type: number
+              format: int32
+              description: the tagset id to find, must be accessible by user
       responses:
         200:
           description: A prediction Bundle

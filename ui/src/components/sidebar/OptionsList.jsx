@@ -7,19 +7,18 @@ import SvgIconHelp from "material-ui/svg-icons/action/help";
 import SvgIconHelpOutline from "material-ui/svg-icons/action/help-outline";
 import SvgIconFlashOn from "material-ui/svg-icons/image/flash-on";
 import SvgIconFlashOff from "material-ui/svg-icons/image/flash-off";
-import {toggleHelp, toggleSuggestions} from "../../actions/AppActions";
 
 const OptionsList = ({initiallyOpen = false, helpActive, suggestionsActive, onToggleHelp, onToggleSuggestions}) => (
   <List>
     <ListItem
       primaryText="Options"
       initiallyOpen={initiallyOpen}
-      leftIcon={<SvgIconSettings />}
+      leftIcon={<SvgIconSettings/>}
       nestedItems={[
         <ListItem
           key={0}
           primaryText="Help"
-          rightIcon={helpActive ? <SvgIconHelp /> : <SvgIconHelpOutline />}
+          rightIcon={helpActive ? <SvgIconHelp/> : <SvgIconHelpOutline/>}
           leftCheckbox={
             <Toggle
               toggled={helpActive}
@@ -29,7 +28,7 @@ const OptionsList = ({initiallyOpen = false, helpActive, suggestionsActive, onTo
         <ListItem
           key={1}
           primaryText="Suggestions"
-          rightIcon={suggestionsActive ? <SvgIconFlashOn /> : <SvgIconFlashOff />}
+          rightIcon={suggestionsActive ? <SvgIconFlashOn/> : <SvgIconFlashOff/>}
           leftCheckbox={
             <Toggle
               toggled={suggestionsActive}
@@ -42,13 +41,14 @@ const OptionsList = ({initiallyOpen = false, helpActive, suggestionsActive, onTo
 );
 
 const mapStateToProps = (state) => ({
-  helpActive: state.app.help.active,
-  suggestionsActive: state.app.suggestions.active,
+  // helpActive: state.app.help.active,
+  helpActive: false,
+  suggestionsActive: false,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onToggleHelp: () => dispatch(toggleHelp()),
-  onToggleSuggestions: () => dispatch(toggleSuggestions()),
+  // onToggleHelp: () => dispatch(toggleHelp()),
+  // onToggleSuggestions: () => dispatch(toggleSuggestions()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OptionsList)

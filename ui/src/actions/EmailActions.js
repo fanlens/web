@@ -1,13 +1,12 @@
 import keyMirror from "keymirror";
 import Swagger from "swagger-client";
 import {info, error} from "./AlertActions";
+import resolveToSelf from "./resolveToSelf";
 
 const uiApi = new Swagger({
-  url: '/v3/ui/swagger.json',
-  usePromise: true,
+  url: resolveToSelf('/v3/ui/swagger.json'),
   authorizations: {
-    headerAuth: new Swagger.ApiKeyAuthorization('Authorization-Token', apiKey, 'header'),
-    headerCsrf: new Swagger.ApiKeyAuthorization('X-CSRFToken', CSRFToken, 'header')
+    api_key: apiKey
   }
 });
 
@@ -25,7 +24,7 @@ const receiveEnquirySuccess = (success = true) => {
 
 export const sendEnquiry = (tag, email) =>
   (dispatch) => uiApi.then(
-    (api) => api.enquiries.put_enquiries_tag_email({
+    (client) => client.apis.enquiries.put_enquiries__tag___email_({
       tag,
       email,
     }).then(({status}) => dispatch(receiveEnquirySuccess(status === 200)))

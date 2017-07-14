@@ -106,7 +106,7 @@ class Enterprise extends React.Component {
           <div id="offers" className="col-lg-6 col-sm-7 col-xs-10">
             <OffersList
               initialIndex={offerIndex}
-              onChangeIndex={(idx) => this.props.router.replace({
+              onChangeIndex={(idx) => this.props.history.replace({
                 pathname: this.props.location.pathname,
                 hash: '#' + offers[idx].head
               })}/>

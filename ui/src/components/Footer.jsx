@@ -1,21 +1,21 @@
 import React from "react";
-import {IndexLink, Link} from "react-router";
+import {NavLink} from "react-router-dom";
 import Paper from "material-ui/Paper";
 import "./Footer.css";
 
 const Footer = () => (
   <footer>
-    <Paper className="row" zDepth={1} style={{width: '100%', margin: 0, padding: '0.25em'}} rounded={false}>
+    <Paper className="row" zDepth={1} style={{height: '100%', width: '100%', margin: 0, padding: '0.25em'}} rounded={false}>
       <div className="col-xs-4 start-xs">
         <ul id="footer-nav">
           <li>
-            <Link to="/v3/ui/">Home</Link>
+            <NavLink to="/v3/ui/">Home</NavLink>
           </li>
           <li>
-            <Link to="/v3/ui/team">Team</Link>
+            <NavLink to="/v3/ui/team">Team</NavLink>
           </li>
           <li>
-            <Link to="/v3/ui/legal">Legal</Link>
+            <NavLink to="/v3/ui/legal">Legal</NavLink>
           </li>
         </ul>
       </div>

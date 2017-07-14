@@ -1,13 +1,16 @@
 import keyMirror from "keymirror";
 import _ from "lodash";
+import defaults from "lodash/fp/defaults";
+import flow from "lodash/fp/flow";
 import Swagger from "swagger-client";
 import {orNop} from "./nop";
 
+import resolveToSelf from "./resolveToSelf";
+
 const activitiesApi = new Swagger({
-  url: '/v3/activities/swagger.json',
-  usePromise: true,
+  url: resolveToSelf('/v3/activities/swagger.json'),
   authorizations: {
-    headerAuth: new Swagger.ApiKeyAuthorization('Authorization-Token', apiKey, 'header')
+    api_key: apiKey
   }
 });
 
@@ -17,10 +20,6 @@ export const ActivitiesActionType = keyMirror({
   ACTIVITIES_RECEIVE_COMMENTS: null,
   ACTIVITIES_RECEIVE_SOURCES: null,
   ACTIVITIES_RECEIVE_TAGCOUNTS: null,
-  ACTIVITIES_RECEIVE_SUGGESTION: null,
-  ACTIVITIES_ENTER_SUGGESTION: null,
-  ACTIVITIES_TOGGLE_SOURCE: null,
-  ACTIVITIES_TOGGLE_TAGSET: null
 });
 
 const receiveTags = (comment, tags) => ({type: ActivitiesActionType.ACTIVITIES_RECEIVE_TAGS, comment, tags});
@@ -33,8 +32,6 @@ const receiveSources = (sources) => ({type: ActivitiesActionType.ACTIVITIES_RECE
 
 const receiveTagCounts = (counts) => ({type: ActivitiesActionType.ACTIVITIES_RECEIVE_TAGCOUNTS, counts});
 
-const receiveToggleSource = (source) => ({type: ActivitiesActionType.ACTIVITIES_TOGGLE_SOURCE, source});
-
 
 let initialized = false; // ugly but no better idea atm
 
@@ -42,70 +39,75 @@ export const initActivities = (force = false) => orNop(!initialized || force)(
   (dispatch) => {
     initialized = true;
     return Promise.all([
-      dispatch(fetchTagCounts(false)),
+      dispatch(fetchTagCounts()),
       dispatch(fetchTagSets()),
       dispatch(fetchSources())])
-      .catch(() => initialized = false);
+      .catch(() => {
+        initialized = false;
+      });
   }
 );
 
 export const fetchTagSets = () =>
   (dispatch) => activitiesApi.then(
-    (api) => api.tagsets.get_tagsets()
+    (client) => client.apis.tagsets.get_tagsets_()
       .then(({status, obj}) => obj)
       .then(({tagSets}) => dispatch(receiveTagSets(tagSets)))
       .catch((error) => console.log(error)));
 
-export const toggleTagSet = (id) => ({type: ActivitiesActionType.ACTIVITIES_TOGGLE_TAGSET, id});
 
 export const fetchSources = () =>
   (dispatch) => activitiesApi.then(
-    (api) => api.sources.get_sources()
+    (client) => client.apis.sources.get_sources_()
       .then(({status, obj}) => obj)
       .then(({sources}) => dispatch(receiveSources(sources)))
       .catch((error) => console.log(error)));
 
-export const toggleSource = (source) =>
-  (dispatch) => Promise.resolve(dispatch(receiveToggleSource(source)))
-    .then(dispatch(fetchTagCounts()));
-
-export const fetchTagCounts = (filterSources = true) =>
+export const fetchTagCounts = () =>
   (dispatch, getState) => activitiesApi.then(
-    (api) => {
-      const counts = filterSources ?
-        api.tags.get_source_ids_tags({
-          source_ids: _.chain(getState().tagger.sources).filter('active').map('id').value(),
-          with_count: true
-        }) :
-        api.tags.get_tags({with_count: true});
-      counts.then(({status, obj}) => obj)
-        .then(({counts}) => dispatch(receiveTagCounts(counts)))
-        .catch((error) => console.log(error));
-    });
+    (client) => client.apis.tags.get_tags_({with_count: true})
+      .then(({status, obj}) => obj)
+      .then(({counts}) => dispatch(receiveTagCounts(counts)))
+      .catch((error) => console.log(error))
+  );
 
-export const fetchRandomComments = (count, sources) =>
+const conditionalDefaults = (condition) =>
+  (value) =>
+    (key) => condition ?
+      defaults({[key]: value}) :
+      (obj) => obj;
+
+const definedDefaults = (value) => conditionalDefaults(!_.isUndefined(value) && !_.isNull(value))(value);
+
+export const fetchComments = ({count, sources, since, until, tagSets = [], random = false}) =>
   (dispatch) => activitiesApi.then(
-    (api) => api.activity.get_source_ids({
-      source_ids: _.chain(sources).filter('active').map('id').value(),
-      count: count,
-      random: true
-    }).then(({status, obj}) => obj)
+    (client) => client.apis.activity.get__source_ids__(
+      flow(
+        definedDefaults(since)('since'),
+        definedDefaults(until)('until')
+        // definedDefaults(_.chain(tagSets).reject({'id':'all'}).map('id').value().join(',') || null)('tagset_ids')
+      )({
+        source_ids: _.chain(sources).map('id').value(),
+        count: count,
+        random: random
+      })).then(({status, obj}) => obj)
       .then(({activities}) => dispatch(receiveComments(activities)))
-      .catch((error) => console.log(error)));
+      .catch((error) => console.log(error))
+  );
 
-export const fetchRandomCommentsTagSet = (count, tagSetId) =>
+export const fetchCommentsTagSet = (count, tagSetId, random = true) =>
   (dispatch) => activitiesApi.then(
-    (api) => api.activity.get_tagsets_tagset_id_activities({
+    (client) => client.apis.activity.get_tagsets__tagset_id__activities_({
       tagset_id: tagSetId,
       count: count,
-      random: true
+      random: random
     }).then(({status, obj}) => obj)
       .then(({activities}) => dispatch(receiveComments(activities)))
       .catch((error) => console.log(error)));
 
 const manipulateTags = (comment, add, remove) =>
   (dispatch) => activitiesApi.then(
-    (api) => api.activity.patch_source_id_activity_id_tags({
+    (client) => client.apis.activity.patch__source_id___activity_id__tags({
       source_id: comment.source.id,
       activity_id: comment.id,
       body: {

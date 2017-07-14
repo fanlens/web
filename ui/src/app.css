@@ -20,16 +20,16 @@
 }
 
 body, html, div#app {
-    height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
 }
 
 body {
-    background-color: rgb(108, 188, 237);
-    background-image: linear-gradient(rgba(108, 188, 237, 0.7), rgba(108, 188, 237, 0.7)), url(/cdn/img/pattern.png);
+    background-color: #fff7e7;
     background-size: 4px;
     font-family: 'Roboto', sans-serif;
 }
 
+button {
+    white-space: nowrap !important;
+}
