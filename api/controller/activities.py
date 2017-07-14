@@ -219,10 +219,11 @@ def sources_post(source: dict) -> typing.Union[dict, tuple]:
 @defaults
 def sources_source_id_get(source_id: int) -> typing.Union[dict, tuple]:
     source = current_user.sources.filter_by(id=source_id).one_or_none()
-    return dict(id=source.id,
-                type=source.type.value,
-                uri=source.uri,
-                slug=source.slug) if source else dict(error="source does not exist"), 404
+    return (dict(id=source.id,
+                 type=source.type.value,
+                 uri=source.uri,
+                 slug=source.slug), 200) if source else \
+        (dict(error="source does not exist"), 404)
 
 
 @defaults
