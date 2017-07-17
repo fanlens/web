@@ -58,14 +58,13 @@ const Notice = () => (
     <h1>Legal Notice</h1>
     <h2>Responsible for Content, Design and Layout:</h2>
     <dl>
-      <dt>"Fanlens"</dt>
-      <dt>Christian Junker</dt>
+      <dt>Fanlens OG</dt>
       <dt>Dorfstraße 17</dt>
       <dt>6121 Baumkirchen</dt>
       <dt>Austria</dt>
     </dl>
     <p>
-      E: info@fanlens.io
+      E: info {at} fanlens.io
     </p>
     <h2>Disclaimer Google Analytics:</h2>
     <p>
