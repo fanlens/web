@@ -64,7 +64,7 @@ const Notice = () => (
       <dt>Austria</dt>
     </dl>
     <p>
-      E: info {at} fanlens.io
+      E: info -at- fanlens.io
     </p>
     <h2>Disclaimer Google Analytics:</h2>
     <p>

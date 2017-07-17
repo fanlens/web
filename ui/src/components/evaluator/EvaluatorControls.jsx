@@ -84,7 +84,7 @@ class EvaluatorControls extends React.Component {
           float: 'right',
           position: 'fixed',
           right: '8px',
-          bottom: '28px',
+          bottom: '92px',
           zIndex: 10000
         }}>
           <FloatingActionButton>
