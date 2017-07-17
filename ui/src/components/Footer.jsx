@@ -1,5 +1,5 @@
 import React from "react";
-import {NavLink} from "react-router-dom";
+import {Link} from "react-router-dom";
 import Paper from "material-ui/Paper";
 import "./Footer.css";
 
@@ -9,13 +9,16 @@ const Footer = () => (
       <div className="col-xs-4 start-xs">
         <ul id="footer-nav">
           <li>
-            <NavLink to="/v3/ui/">Home</NavLink>
+            <a href="/">Home</a>
           </li>
           <li>
-            <NavLink to="/v3/ui/team">Team</NavLink>
+            <a href="/v4/ui">App</a>
           </li>
           <li>
-            <NavLink to="/v3/ui/legal">Legal</NavLink>
+            <Link to="/team">Team</Link>
+          </li>
+          <li>
+            <Link to="/legal">Legal</Link>
           </li>
         </ul>
       </div>

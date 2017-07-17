@@ -1,36 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from config.db import Config
-from flask import Flask, render_template, flash, request, redirect
+from flask import Blueprint, flash, redirect, render_template, request
 from flask_mail import Message
 from flask_modules.mail import mail
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField
-from wtforms.validators import InputRequired, Email
+from wtforms import StringField, SubmitField, TextAreaField
+from wtforms.validators import Email, InputRequired
 
 config = None
 
-
-def create_app():
-    from flask_modules.mail import setup_mail
-    from flask_modules.security import setup_security
-    from flask_modules.database import setup_db
-    from flask_modules.celery import setup_celery
-
-    app = Flask(__name__)
-    setup_db(app)
-    setup_mail(app)
-    setup_security(app)
-    setup_celery(app)
-
-    from .forwards import forwards
-    app.register_blueprint(forwards)
-
-    return app
-
-
-app = create_app()
+landing = Blueprint('landing', __name__)
 
 
 class ContactForm(FlaskForm):
@@ -40,14 +20,21 @@ class ContactForm(FlaskForm):
     submit = SubmitField("Send")
 
 
-@app.before_first_request
+@landing.before_app_first_request
 def setup_conf():
     global config
     config = Config('eev')
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+@landing.route('/pricing', methods=['GET'])
+def pricing():
+    contact_form = ContactForm()
+    return render_template('landing/pricing.html', contact_form=contact_form)
+
+
+@landing.route('/', defaults={'path': ''}, methods=['GET', 'POST'])
+@landing.route('/<path:path>')
+def index(path):
     contact_form = ContactForm()
     if request.method == 'POST':
         #        if session.get('already_sent', False):
@@ -69,14 +56,3 @@ def index():
         mail.send(msg)
         flash('Thank you for contacting us!')
     return render_template('landing/index.html', contact_form=contact_form, bot_id=config["client_id"])
-
-
-@app.route('/pricing', methods=['GET'])
-def pricing():
-    contact_form = ContactForm()
-    return render_template('landing/pricing.html', contact_form=contact_form)
-
-
-@app.route('/<path:path>')
-def root(path):
-    return redirect('/v3/ui/' + path)

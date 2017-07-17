@@ -1,50 +1,50 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from collections import defaultdict
+from flask import render_template, Blueprint, g, send_file, request, redirect
+from flask_security import current_user, login_required
+from config.db import Config
 
-from db.models.users import Enquiry
-from flask import current_app
-from flask_mail import Message
-from flask_modules import annotation_composer
-from flask_modules.database import db
-from flask_modules.mail import mail
-from flask_modules.security import csrf
-from flask_security import auth_token_required, roles_required
-from sqlalchemy.exc import IntegrityError
+ui = Blueprint('ui', __name__, url_prefix='/v4/ui')
+ui_nonauth = Blueprint('ui_nonauth', __name__)
 
-default = annotation_composer(csrf.exempt)
-
-strict = annotation_composer(
-    auth_token_required,
-    roles_required('admin'),
-    csrf.exempt)
+config = None
 
 
-@default
-def enquiries_tag_email_put(tag: str, email: str) -> str:
-    try:
-        db.session.add(Enquiry(email=email, tag=tag.strip().lower()))
-        db.session.commit()
-    except IntegrityError:
-        current_app.logger.warning('duplicate email %s entered in category %s' % (email, tag))
+@ui.before_app_first_request
+def setup_conf():
+    global config
+    config = Config('eev')
 
 
-@strict
-def enquiries_get(filter_done: bool = False):
-    enquiries_by_tag = defaultdict(list)
-    for enquiry in db.session.query(Enquiry):
-        enquiries_by_tag[enquiry.tag].append(
-            dict(email=enquiry.email,
-                 timestamp=enquiry.timestamp))
-    return enquiries_by_tag
+@ui.route('/static/app.js')
+def appjs():
+    return send_file('static/app.js')
 
 
-@default
-def email_post(email: dict):
-    msg = Message(subject=email.get('subject', 'Message From: %s' % email['from']),
-                  body="%(sender)s\n%(message)s" % dict(
-                      sender=email['from'], message=email['message']),
-                  sender=email['from'],
-                  recipients=['info@fanlens.io'])
-    mail.send(msg)
-    return 'sent', 202
+def hand_off_to_app(path):
+    return render_template('ui.html',
+                           bot_id=config["client_id"],
+                           api_key=(
+                               current_user.get_auth_token()
+                               if current_user.has_role('tagger')
+                               else g.demo_user.get_auth_token()),
+                           path=path)
+
+
+@ui_nonauth.route('/legal')
+@ui_nonauth.route('/team')
+@ui_nonauth.route('/enterprise')
+def nonauth():
+    return hand_off_to_app(request.path)
+
+
+@ui_nonauth.route('/v3/<path:path>')
+def redir_old_new(path):
+    return redirect('/v4/' + path)
+
+
+@ui.route('/', defaults={'path': ''})
+@ui.route('/<path:path>')
+@login_required
+def root(path):
+    return hand_off_to_app(path)

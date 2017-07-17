@@ -80,7 +80,7 @@ class EvaluatorControls extends React.Component {
           </div>
         </div>
 
-        <Link to="/v3/ui/timeline" style={{
+        <Link to="/v4/ui/timeline" style={{
           float: 'right',
           position: 'fixed',
           right: '8px',

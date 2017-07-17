@@ -98,7 +98,7 @@
                     <a href="/#contact">Contact</a>
                 </li>
                 <li>
-                    <a href="/v3/ui/team" target="_blank">Team</a>
+                    <a href="/team" target="_blank">Team</a>
                 </li>
                 <li>
                     <a href="mailto:info@fanlens.io">Pricing</a>
@@ -110,7 +110,7 @@
                             margin: 7.5px;
                         }</style>
                     {% endblock %}
-                    {#                    <a href="/v3/ui" target="_blank">Demo</a>#}
+                    {#                    <a href="/v4/ui" target="_blank">Demo</a>#}
                 </li>
             </ul>
         </div>
@@ -124,17 +124,17 @@
     {% endblock %}
 </main>
 
-<!-- #alerts -->
-<div class="container-fluid" id="alerts">
-    {% block alerts %}
-        {% for message in get_flashed_messages() %}
-            <div class="alert fade in alert-success alert-dismissable"><strong>Info!</strong>
-                {{ message }}<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            </div>
-        {% endfor %}
-    {% endblock %}
-</div>
-<!-- /#alerts -->
+{#<!-- #alerts -->#}
+{#<div class="container-fluid" id="alerts">#}
+{#    {% block alerts %}#}
+{#        {% for message in get_flashed_messages() %}#}
+{#            <div class="alert fade in alert-success alert-dismissable"><strong>Info!</strong>#}
+{#                {{ message }}<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>#}
+{#            </div>#}
+{#        {% endfor %}#}
+{#    {% endblock %}#}
+{#</div>#}
+{#<!-- /#alerts -->#}
 
 <!-- Footer -->
 <footer>
@@ -163,11 +163,11 @@
                     </li>
                     <li class="footer-menu-divider">&sdot;</li>
                     <li>
-                        <a href="/v3/ui" target="_blank">Demo</a>
+                        <a href="/v4/ui/" target="_blank">Demo</a>
                     </li>
                     <li class="footer-menu-divider">&sdot;</li>
                     <li>
-                        <a href="/v3/ui/legal" target="_blank">Terms &amp; Legal Notice</a>
+                        <a href="/legal" target="_blank">Terms &amp; Legal Notice</a>
                     </li>
                 </ul>
                 <p class="copyright text-muted small">Copyright &copy; Fanlens 2016. All Rights Reserved.</p>
