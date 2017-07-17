@@ -17,13 +17,16 @@ const App = () => (
     <div>
       <Sidebar/>
       <Switch>
-        <Route exact path='/v3/ui/' component={TimelineFrame}/>
-        <Route path='/v3/ui/timeline' component={TimelineFrame}/>
-        <Route path='/v3/ui/evaluator' component={EvaluatorFrame}/>
-        <Route path='/v3/ui/team' component={Team}/>
-        <Route path='/v3/ui/legal' component={Legal}/>
-        <Route path='/v3/ui/enterprise' component={Enterprise}/>
-        <Route path='/v3/ui/' component={NotFound}/>
+        <Route exact path='/:version/ui/' component={TimelineFrame}/>
+        <Route path='/:version/ui/timeline' component={TimelineFrame}/>
+        <Route path='/:version/ui/evaluator' component={EvaluatorFrame}/>
+        <Route path='/:version/ui/team' component={Team}/>
+        <Route path='/:version/ui/legal' component={Legal}/>
+        <Route path='/:version/ui/enterprise' component={Enterprise}/>
+        <Route path='/team' component={Team}/>
+        <Route path='/legal' component={Legal}/>
+        <Route path='/enterprise' component={Enterprise}/>
+        <Route path='/:version/ui/' component={NotFound}/>
       </Switch>
       <Skype/>
       <Footer/>

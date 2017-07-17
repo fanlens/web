@@ -18,12 +18,17 @@ def create_app():
     setup_security(app.app)
 
     from flask_modules import SimpleResolver
-    from .controller.catchall import catchall
-    from .controller import ui
+    from .controller.ui import ui, ui_nonauth
+    from .controller.landing import landing
+    from .controller.forwards import forwards
+    from .controller import ui_api
 
-    app.app.register_blueprint(catchall)
-    app.add_api('ui.yaml', validate_responses=True, resolver=SimpleResolver(ui))
-    app.add_url_rule('/', 'health', lambda: 'ok')
+    app.app.register_blueprint(ui_nonauth)
+    app.app.register_blueprint(ui)
+    app.app.register_blueprint(forwards)
+    app.app.register_blueprint(landing)
+    app.add_api('ui.yaml', validate_responses=True, resolver=SimpleResolver(ui_api))
+    app.add_url_rule('/', 'health', lambda: 'ok', methods=['HEAD'])
     return app
 
 

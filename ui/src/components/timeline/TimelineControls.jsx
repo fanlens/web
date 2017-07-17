@@ -238,7 +238,7 @@ class TimelineControls extends React.Component {
           </div>
         </Dialog>
 
-        <Link to="/v3/ui/evaluator" style={{
+        <Link to="/v4/ui/evaluator" style={{
           float: 'right',
           position: 'fixed',
           right: '8px',

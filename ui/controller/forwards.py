@@ -7,7 +7,7 @@ from flask_modules.celery import Scrape
 from flask_modules.database import db
 
 from db.models.scrape import Shortener
-from .base62 import encode, decode
+from ..base62 import encode, decode
 
 forwards = Blueprint('forwards', __name__)
 forwards.add_url_rule('/jobs/cgo', 'cgo', lambda: redirect('/cdn/img/jobs/cgo.pdf'))
