@@ -20,6 +20,7 @@ setup(
         'Flask-Redis',
         'connexion',
         'celery[redis]',
-        'msgpack-python'
+        'msgpack-python',
+        'requests'
     ],
 )

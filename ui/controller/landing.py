@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import requests
 from config.db import Config
 from flask import Blueprint, flash, redirect, render_template, request
 from flask_mail import Message
 from flask_modules.mail import mail
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField
+from wtforms import StringField, SubmitField, TextAreaField, HiddenField
 from wtforms.validators import Email, InputRequired
 
 config = None
@@ -17,13 +18,13 @@ class ContactForm(FlaskForm):
     email = StringField("Email", [InputRequired("Please enter your email address."),
                                   Email("A valid email address is required.")])
     message = TextAreaField("Message", [InputRequired("Please add a message.")])
-    submit = SubmitField("Send")
+    g_recaptcha_response = HiddenField("g-recaptcha-response", id="g-recaptcha-response")
 
 
 @landing.before_app_first_request
 def setup_conf():
     global config
-    config = Config('eev')
+    config = Config()
 
 
 @landing.route('/pricing', methods=['GET'])
@@ -37,22 +38,21 @@ def pricing():
 def index(path):
     contact_form = ContactForm()
     if request.method == 'POST':
-        #        if session.get('already_sent', False):
-        #            flash('Already got your message, thanks!')
-        #        elif contact_form.validate():
-        #            flash('Thank you for contacting us!')
-        #            msg = Message(subject='Message From: %s' % contact_form.email.data,
-        #                          body="%(sender)s\n%(message)s" % dict(
-        #                              sender=contact_form.email.data, message=contact_form.message.data),
-        #                          sender=contact_form.email.data,
-        #                          recipients=["info@fanlens.io"])
-        #            mail.send(msg)
-        #            session['already_sent'] = True
-        msg = Message(subject='Message From: %s' % contact_form.email.data,
-                      body="%(sender)s\n%(message)s" % dict(
-                          sender=contact_form.email.data, message=contact_form.message.data),
-                      sender=contact_form.email.data,
-                      recipients=["info@fanlens.io"])
-        mail.send(msg)
-        flash('Thank you for contacting us!')
-    return render_template('landing/index.html', contact_form=contact_form, bot_id=config["client_id"])
+        response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=dict(
+            secret=config["recaptcha"]["secret_key"],
+            response=contact_form.g_recaptcha_response.data
+        ))
+        recaptcha = response.json()
+        if recaptcha.get('success', False):
+            msg = Message(subject='Message From: %s' % contact_form.email.data,
+                          body="%(sender)s\n%(message)s" % dict(
+                              sender=contact_form.email.data, message=contact_form.message.data),
+                          sender=contact_form.email.data,
+                          recipients=["info@fanlens.io"])
+            mail.send(msg)
+            flash('Thank you for contacting us!')
+        flash('Spotted invalid traffic')
+    return render_template('landing/index.html',
+                           contact_form=contact_form,
+                           recaptcha_site_key=config["recaptcha"]["site_key"],
+                           bot_id=config["eev"]["client_id"])
