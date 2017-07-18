@@ -4,11 +4,12 @@ import typing
 
 from api.controller import check_sources_by_id
 from db import insert_or_ignore, insert_or_update
-from db.models.activities import Data, Source, Tag, Type, TagSet, Tagging, TagTagSet, Time
+from db.models.activities import Data, Source, Tag, Type, TagSet, Tagging, TagTagSet, TagUser, TagSetUser, Time
 from flask import redirect
 from flask_modules.database import db
 from flask_security import current_user
 from sqlalchemy.sql import func
+from sqlalchemy.exc import IntegrityError
 
 from . import defaults
 
@@ -38,8 +39,10 @@ def generic_parser(data: Data) -> dict:
         tags=[tag.tag for tag in data.tags],
         created_time=data.time.time.isoformat() if data.time else '1970-01-01T00:00:00+00:00',
         language=data.language.language.name if data.language else 'un',
-        prediction=dict((data.prediction.model.tags.filter_by(id=k).one().tag, v) for k, v in
-                        data.prediction.prediction) if data.prediction else dict())
+        prediction=dict(
+            (prediction.model.tags.filter_by(id=k).one().tag, v)
+            for prediction in data.predictions for k, v in prediction.prediction)
+        if data.predictions else dict())
 
 
 _parsers = {
@@ -141,9 +144,8 @@ def source_id_activity_id_tags_patch(source_id: int, activity_id: str, body: dic
     elif isinstance(data, tuple):  # error
         return data
 
-    add and data.tags.update(db.session.query(Tag).filter(Tag.tag.in_(add)).filter_by(user_id=current_user.id))
-    remove and data.tags.difference_update(
-        db.session.query(Tag).filter(Tag.tag.in_(remove)).filter_by(user_id=current_user.id))
+    add and data.tags.append(db.session.query(Tag).filter(Tag.tag.in_(add) & Tag.user.any(id=current_user.id)))
+    remove and data.tags.filter_by(db.session.query(Tag).filter(Tag.tag.in_(remove) & Tag.user.any(id=current_user.id)))
     db.session.commit()
     return {'id': str(data.object_id), 'tags': [tag.tag for tag in data.tags]}
 
@@ -275,7 +277,7 @@ def source_ids_tags_get(source_ids: list, with_count: bool = True) -> typing.Uni
 
 @defaults
 def tags_tag_get(tag: str, with_count: bool = False) -> typing.Union[dict, tuple]:
-    the_tag = db.session.query(Tag).filter_by(user_id=current_user.id, tag=tag).one_or_none()
+    the_tag = current_user.tags.filter_by(tag=tag).one_or_none()
     if the_tag is None:
         return dict(error="Tag not found"), 404
 
@@ -287,13 +289,20 @@ def tags_tag_get(tag: str, with_count: bool = False) -> typing.Union[dict, tuple
 
 @defaults
 def tags_tag_put(tag: str, commit=True) -> dict:
-    insert_or_ignore(db.session, Tag(user_id=current_user.id, tag=tag), flush=True)
-    commit and db.session.commit()
+    tag = Tag(tag=tag, created_by_user_id=current_user.id)
+    try:
+        tag.user.append(current_user)
+        db.session.add(tag)
+        commit and db.session.commit()
+    except IntegrityError as err:
+        pass
+    return dict(tag=tag.tag), 201
 
 
 @defaults
 def tags_tag_delete(tag: str) -> dict:
-    db.session.query(Tag).filter_by(user_id=current_user.id, tag=tag).delete()
+    # current_user.tags.filter_by(tag=tag).delete() << not working
+    current_user.created_tags.filter_by(tag=tag).delete()
     db.session.commit()
 
 
@@ -305,7 +314,7 @@ def source_ids_tags_tag_activities_get(source_ids: list, tag: str, count: int = 
                         (Source.id.in_(source_ids)) &
                         (Source.id.in_(current_user.sources.with_entities(Source.id))))
                   .join(Tagging, Data.id == Tagging.data_id)
-                  .join(Tag, (Tag.user_id == current_user.id) & (Tag.tag == tag) & (Tag.id == Tagging.tag_id)))
+                  .join(Tag, Tag.user.any(id=current_user.id) & (Tag.tag == tag) & (Tag.id == Tagging.tag_id)))
 
     if random:  # todo: order_by random a bit inefficient
         data_query = data_query.from_self().order_by(func.random())
@@ -327,7 +336,8 @@ def tags_tag_activities_get(tag: str, count: int = 10, random=False) -> dict:
 def source_ids_tagsets_tagset_id_activities_get(source_ids: list, tagset_id: int, count: int = 10,
                                                 random=False) -> dict:
     tag_id_query = (db.session.query(TagTagSet.tag_id)
-                    .join(TagSet, TagSet.user_id == current_user.id)
+                    .join(TagSetUser, (TagSetUser.user_id == current_user.id) &
+                          (TagSetUser.tagset_id == TagTagSet.tagset_id))
                     .filter(TagTagSet.tagset_id == tagset_id))
     data_query = (db.session.query(Data)
                   .distinct(Data.id)
@@ -364,8 +374,8 @@ def tagsets_post(tagset: dict):
     tags = set(tagset['tags'])
     for tag in tags:  # make sure all tags are in DB
         tags_tag_put(tag, commit=False)
-    tagset = TagSet(title=tagset['title'], user_id=current_user.id)
-    tagset.tags.update(db.session.query(Tag).filter_by(user_id=current_user.id).filter(Tag.tag.in_(tags)))
+    tagset = TagSet(title=tagset['title'])
+    tagset.tags.update(db.session.query(Tag).filter(Tag.user.any(id=current_user.id) & Tag.tag.in_(tags)))
     current_user.tagsets.append(tagset)
     db.session.commit()
     return redirect('/tagset/%d' % tagset.id, code=201)
@@ -392,8 +402,15 @@ def tagsets_tagset_id_patch(tagset_id: int, tagset: dict) -> typing.Union[dict, 
         tags = set(tagset['tags'])
         for tag in tags:  # make sure all tags are in DB
             tags_tag_put(tag, commit=False)
-        user_tagset.tags.update(db.session.query(Tag).filter_by(user_id=current_user.id).filter(Tag.tag.in_(tags)))
+        user_tagset.tags.update(
+            db.session.query(Tag).filter(Tag.user.any(id=current_user.id)).filter(Tag.tag.in_(tags)))
     db.session.commit()
+    if user_tagset:
+        return dict(id=user_tagset.id,
+                    title=user_tagset.title,
+                    tags=[tag.tag for tag in user_tagset.tags]), 200
+    else:
+        return dict(error="tagset does not exist"), 404
 
 
 @defaults
@@ -407,7 +424,7 @@ def tagsets_tagset_id_tag_delete(tagset_id: int, tag: str) -> typing.Union[dict,
     tagset = current_user.tagsets.filter_by(id=tagset_id).one_or_none()
     if tagset is None:
         return dict(error="tagset does not exist"), 404
-    tagset.tags.discard(db.session.query(Tag).filter_by(user_id=current_user.id, tag=tag).one_or_none())
+    tagset.tags.discard(db.session.query(Tag).filter(Tag.user.any(id=current_user.id) & (Tag.tag == tag)).one_or_none())
     db.session.commit()
 
 
@@ -417,5 +434,5 @@ def tagsets_tagset_id_tag_put(tagset_id: int, tag: str) -> typing.Union[dict, tu
     if tagset is None:
         return dict(error="tagset does not exist"), 404
     tags_tag_put(tag, commit=False)
-    tagset.tags.update(db.session.query(Tag).filter_by(user_id=current_user.id, tag=tag))
+    tagset.tags.update(db.session.query(Tag).filter(Tag.user.any(id=current_user.id) & (Tag.tag == tag)))
     db.session.commit()

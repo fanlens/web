@@ -425,8 +425,14 @@ paths:
       parameters:
       - $ref: '#/parameters/Tag'
       responses:
-        200:
+        201:
           description: Tag added
+          schema:
+            type: object
+            required: [tag]
+            properties:
+              tag:
+                $ref: '#/definitions/Tag'
         default:
           description: Unexpected error
           schema:
@@ -571,6 +577,8 @@ paths:
       responses:
         200:
           description: TagSet updated
+          schema:
+            $ref: '#/definitions/TagSet'
         403:
           description: Updating immutable field
           schema:
