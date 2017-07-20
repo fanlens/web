@@ -2,13 +2,13 @@ swagger: "2.0"
 
 info:
   title: "Fanlens EEV API"
-  version: "3.0.0"
+  version: "4.0.0"
   description: "API related to eev activity"
 
 schemes:
   - https
 
-basePath: /v3/eev
+basePath: /v4/eev
 
 securityDefinitions:
   api_key:
