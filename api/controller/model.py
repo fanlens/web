@@ -79,9 +79,9 @@ def train_post(body: dict, fast=True) -> tuple:
     job = Brain.train_model(tagset_id, tuple(source_ids), n_estimators=10, _params=params, _score=score)
     best_model_id = best_model.get(id)
     if fast and best_model_id is not None:
-        redir_url = '/v3/model/' + best_model_id
+        redir_url = '/v4/model/' + best_model_id
     else:
-        redir_url = '/v3/search'
+        redir_url = '/v4/search'
     return dict(job=job.id, url=redir_url), 202
 
 

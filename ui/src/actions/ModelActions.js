@@ -5,7 +5,7 @@ import {warning} from "./AlertActions";
 import resolveToSelf from "./resolveToSelf";
 
 const modelApi = new Swagger({
-  url: resolveToSelf('/v3/model/swagger.json'),
+  url: resolveToSelf('/v4/model/swagger.json'),
   authorizations: {
     api_key: apiKey
   }

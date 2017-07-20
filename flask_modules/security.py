@@ -26,7 +26,7 @@ def setup_security(app):
     app.config['SECRET_KEY'] = web_config['secret_key']
     app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
     app.config['SECURITY_PASSWORD_SALT'] = web_config['salt']  # unnecessary but required
-    app.config['SECURITY_URL_PREFIX'] = '/v3/user'
+    app.config['SECURITY_URL_PREFIX'] = '/v4/user'
     app.config['SECURITY_CONFIRMABLE'] = True
     app.config['SECURITY_REGISTERABLE'] = True
     app.config['SECURITY_RECOVERABLE'] = False
@@ -39,11 +39,11 @@ def setup_security(app):
     user_datastore = SQLAlchemyUserDatastore(db, WebUser, WebRole)
     security.init_app(app, user_datastore)
 
-    @app.route('/v3/user/swagger.json', methods=['GET'])
+    @app.route('/v4/user/swagger.json', methods=['GET'])
     def get_definition():
         return jsonify({"swagger": "2.0", "info": {"title": "Fanlens User API", "version": "3.0.0",
                                                    "description": "API related to users"}, "schemes": ["https"],
-                        "basePath": "/v3", "securityDefinitions": {
+                        "basePath": "/v4", "securityDefinitions": {
                 "api_key": {"type": "apiKey", "name": "Authorization-Token", "in": "header"}},
                         "security": [{"api_key": []}], "produces": ["application/json"], "paths": {"/user": {
                 "get": {"summary": "get user data", "tags": ["user"], "responses": {
@@ -57,7 +57,7 @@ def setup_security(app):
                     "403": {"description": "not logged in", "schema": {"$ref": "#/definitions/Error"}}}}}},
                         "definitions": {"Error": {"type": "object", "properties": {"error": {"type": "string"}}}}})
 
-    @app.route('/v3/user', methods=['GET'])
+    @app.route('/v4/user', methods=['GET'])
     @auth_required('token', 'session')
     def get_user():
         user = (current_user
