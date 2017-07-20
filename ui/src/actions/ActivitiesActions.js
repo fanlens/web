@@ -39,7 +39,7 @@ export const initActivities = (force = false) => orNop(!initialized || force)(
   (dispatch) => {
     initialized = true;
     return Promise.all([
-      dispatch(fetchTagCounts()),
+      // dispatch(fetchTagCounts()),
       dispatch(fetchTagSets()),
       dispatch(fetchSources())])
       .catch(() => {
