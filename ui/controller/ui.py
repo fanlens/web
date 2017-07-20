@@ -38,6 +38,8 @@ def nonauth():
     return hand_off_to_app(request.path)
 
 
+@ui_nonauth.route('/v1/<path:path>')
+@ui_nonauth.route('/v2/<path:path>')
 @ui_nonauth.route('/v3/<path:path>')
 def redir_old_new(path):
     return redirect('/v4/' + path)
