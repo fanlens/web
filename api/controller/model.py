@@ -76,7 +76,7 @@ def train_post(body: dict, fast=True) -> tuple:
         best_model = search_post(dict(tagset_id=tagset_id, source_ids=source_ids), internal=True) or dict()
         params = best_model.get('params')
         score = best_model.get('score')
-    job = Brain.train_model(tagset_id, tuple(source_ids), n_estimators=10, _params=params, _score=score)
+    job = Brain.train_model(current_user.id, tagset_id, tuple(source_ids), n_estimators=10, _params=params, _score=score)
     best_model_id = best_model.get(id)
     if fast and best_model_id is not None:
         redir_url = '/v4/model/' + best_model_id

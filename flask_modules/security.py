@@ -41,7 +41,7 @@ def setup_security(app):
 
     @app.route('/v4/user/swagger.json', methods=['GET'])
     def get_definition():
-        return jsonify({"swagger": "2.0", "info": {"title": "Fanlens User API", "version": "3.0.0",
+        return jsonify({"swagger": "2.0", "info": {"title": "Fanlens User API", "version": "4.0.0",
                                                    "description": "API related to users"}, "schemes": ["https"],
                         "basePath": "/v4", "securityDefinitions": {
                 "api_key": {"type": "apiKey", "name": "Authorization-Token", "in": "header"}},

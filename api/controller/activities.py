@@ -5,13 +5,26 @@ import typing
 from api.controller import check_sources_by_id
 from db import insert_or_ignore, insert_or_update
 from db.models.activities import Data, Source, Tag, Type, TagSet, Tagging, TagTagSet, TagUser, TagSetUser, Time
+from db.models.brain import Prediction
 from flask import redirect
 from flask_modules.database import db
 from flask_security import current_user
-from sqlalchemy.sql import func
+from sqlalchemy import text, func
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import IntegrityError
 
 from . import defaults
+
+_best_models_for_user_sql = text('''
+SELECT id FROM (
+SELECT DISTINCT ON (tagset_id, sources)
+    model.id, model.score, model.trained_ts, model.tagset_id, jsonb_agg(DISTINCT src_mdl.source_id ORDER BY src_mdl.source_id) AS sources
+FROM activity.model AS model
+JOIN activity.source_model AS src_mdl ON src_mdl.model_id = model.id
+JOIN activity.model_user AS model_user ON model_user.model_id = model.id
+WHERE model_user.user_id = :user_id 
+GROUP BY model.tagset_id, model.id, model.score, model.trained_ts
+ORDER BY model.tagset_id, sources, score DESC) as best_models''')
 
 
 def source_to_json(source: Source):
@@ -30,6 +43,7 @@ def tagset_to_json(tagset: TagSet):
 
 
 def generic_parser(data: Data) -> dict:
+    # todo for large amount of rows this is very inefficient
     return dict(
         text=data.text.text if data.text else "",
         source=dict(id=data.source.id,
@@ -41,7 +55,9 @@ def generic_parser(data: Data) -> dict:
         language=data.language.language.name if data.language else 'un',
         prediction=dict(
             (prediction.model.tags.filter_by(id=k).one().tag, v)
-            for prediction in data.predictions for k, v in prediction.prediction)
+            for prediction in data.predictions.filter(
+                Prediction.model_id.in_(_best_models_for_user_sql.bindparams(user_id=current_user.id)))
+            for k, v in prediction.prediction)
         if data.predictions else dict())
 
 
