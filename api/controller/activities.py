@@ -3,14 +3,13 @@
 import typing
 
 from api.controller import check_sources_by_id
-from db import insert_or_ignore, insert_or_update
-from db.models.activities import Data, Source, Tag, Type, TagSet, Tagging, TagTagSet, TagUser, TagSetUser, Time
+from db import insert_or_ignore
+from db.models.activities import Data, Source, Tag, TagSet, TagSetUser, TagTagSet, Tagging, Time, Type
 from db.models.brain import Prediction
 from flask import redirect
 from flask_modules.database import db
 from flask_security import current_user
-from sqlalchemy import text, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
 from . import defaults
@@ -24,7 +23,7 @@ JOIN activity.source_model AS src_mdl ON src_mdl.model_id = model.id
 JOIN activity.model_user AS model_user ON model_user.model_id = model.id
 WHERE model_user.user_id = :user_id 
 GROUP BY model.tagset_id, model.id, model.score, model.trained_ts
-ORDER BY model.tagset_id, sources, score DESC) as best_models''')
+ORDER BY model.tagset_id, sources, score DESC, model.trained_ts DESC) AS best_models''')
 
 
 def source_to_json(source: Source):
@@ -160,8 +159,13 @@ def source_id_activity_id_tags_patch(source_id: int, activity_id: str, body: dic
     elif isinstance(data, tuple):  # error
         return data
 
-    add and data.tags.append(db.session.query(Tag).filter(Tag.tag.in_(add) & Tag.user.any(id=current_user.id)))
-    remove and data.tags.filter_by(db.session.query(Tag).filter(Tag.tag.in_(remove) & Tag.user.any(id=current_user.id)))
+    if add:
+        for add_tag in db.session.query(Tag).filter(Tag.tag.in_(add) & Tag.user.any(id=current_user.id)):
+            insert_or_ignore(db.session, Tagging(tag_id=add_tag.id, data_id=data.id))
+    db.session.commit()
+    remove and (db.session.query(Tagging)
+                .filter(Tagging.tag.has(Tag.tag.in_(remove) & Tag.user.any(id=current_user.id)))
+                .delete(synchronize_session=False))
     db.session.commit()
     return {'id': str(data.object_id), 'tags': [tag.tag for tag in data.tags]}
 
@@ -181,11 +185,15 @@ def source_id_activity_id_put(source_id: int,
         db.session.rollback()
         return err
 
-    insert_or_update(db.session,
+    insert_or_ignore(db.session,
                      Data(source_id=source_id,
                           object_id=activity_id,
-                          data=activity_import['data']),
-                     'source_id, object_id')
+                          data=activity_import['data']))
+    # insert_or_update(db.session,
+    #                  Data(source_id=source_id,
+    #                       object_id=activity_id,
+    #                       data=activity_import['data']),
+    #                  'source_id, object_id')
     commit and db.session.commit()
 
 
