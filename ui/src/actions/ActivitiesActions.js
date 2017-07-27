@@ -116,7 +116,6 @@ const manipulateTags = (comment, add, remove) =>
       }
     }).then(({status, obj}) => obj)
       .then(({tags}) => dispatch(receiveTags(comment, tags)))
-      .then(() => dispatch(fetchTagCounts()))
       .catch((error) => console.log(error)));
 
 export const toggleCommentTag = (comment, tag) =>
