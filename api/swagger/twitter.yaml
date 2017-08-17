@@ -1,0 +1,58 @@
+swagger: "2.0"
+
+info:
+  title: "Fanlens Twitter Proxy"
+  version: "4.0.0"
+  description: "API related to twitter activity"
+
+schemes:
+  - https
+
+basePath: /v4/twitter
+
+produces:
+  - application/json
+
+paths:
+  /signin:
+    get:
+      summary: get the authorization url
+      tags: [twitter]
+      parameters:
+      - name: next
+        in: query
+        required: false
+        default: "/"
+        type: string
+      responses:
+        302:
+          description: the url the user has to sign in to
+  /test:
+    get:
+      tags: [twitter]
+      responses:
+        200:
+          description: direct messages
+        302:
+          description: signin
+  /callback:
+    get:
+      parameters:
+      - name: next
+        in: query
+        required: false
+        default: "/"
+        type: string
+      - name: oauth_token
+        in: query
+        required: true
+        type: string
+      - name: oauth_verifier
+        in: query
+        required: true
+        type: string
+      summary: callback of log in process
+      tags: [twitter]
+      responses:
+        302:
+          description: original page
