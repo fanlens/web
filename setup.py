@@ -6,13 +6,13 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="web",
+    name="fanlens-web",
     version="4.0.0",
     long_description=__doc__,
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'common',  # fanlens
+        'fanlens-common',
 
         'Flask',
         'flask-security',
