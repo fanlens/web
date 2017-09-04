@@ -29,7 +29,7 @@ ORDER BY model.tagset_id, sources, score DESC, model.trained_ts DESC) AS best_mo
 def source_to_json(source: Source):
     return dict(
         id=source.id,
-        type=source.type.value,
+        type=source.type,
         uri=source.uri,
         slug=source.slug)
 
@@ -46,7 +46,7 @@ def generic_parser(data: Data) -> dict:
     return dict(
         text=data.text.text if data.text else "",
         source=dict(id=data.source.id,
-                    type=data.source.type.value,
+                    type=data.source.type,
                     uri=data.source.uri,
                     slug=data.source.slug),
         tags=[tag.tag for tag in data.tags],
@@ -71,17 +71,22 @@ _parsers = {
         user=dict(id=data.data['user']['screen_name'], name=data.data['user']['name']),
         **generic_parser(data)
     ),
+    Type.twitter_dm: lambda data: dict(
+        id=data.data['id'],
+        user=dict(id=data.data['message_create']['sender_id'], name=data.data['message_create']['sender_id']),
+        **generic_parser(data)
+    ),
     Type.crunchbase: lambda _: None,
     Type.generic: lambda data: dict(
         id=str(data.data['comment_id']),
-        user=dict(id=str(data.data['user']['id']), name='Anonymous'),
+        user=dict(id=str(data.data['user']['id']), name=data.data['user']['id']),
         **generic_parser(data)
     ),
 }
 
 
 def parser(data: Data) -> dict:
-    return _parsers[data.source.type](data)
+    return _parsers[Type(data.source.type)](data)
 
 
 @defaults
@@ -246,7 +251,7 @@ def sources_post(source: dict) -> typing.Union[dict, tuple]:
 def sources_source_id_get(source_id: int) -> typing.Union[dict, tuple]:
     source = current_user.sources.filter_by(id=source_id).one_or_none()
     return (dict(id=source.id,
-                 type=source.type.value,
+                 type=source.type,
                  uri=source.uri,
                  slug=source.slug), 200) if source else \
         (dict(error="source does not exist"), 404)

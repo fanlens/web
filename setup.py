@@ -22,6 +22,7 @@ setup(
         'connexion',
         'celery[redis]',
         'msgpack-python',
-        'requests'
+        'requests',
+        'Tweepy',
     ],
 )
