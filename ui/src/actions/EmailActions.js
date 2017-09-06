@@ -4,7 +4,7 @@ import {info, error} from "./AlertActions";
 import resolveToSelf from "./resolveToSelf";
 
 const uiApi = new Swagger({
-  url: resolveToSelf('/v4/ui/swagger.json', 'ui'),
+  url: resolveToSelf('/v4/ui/swagger.json'),
   authorizations: {
     api_key: apiKey
   }

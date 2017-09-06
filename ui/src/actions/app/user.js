@@ -5,7 +5,7 @@ import isEmpty from "lodash/fp/isEmpty";
 import resolveToSelf from "../resolveToSelf";
 
 const userApi = new Swagger({
-  url: resolveToSelf('/v4/user/swagger.json', 'ui'),
+  url: resolveToSelf('/v4/user/swagger.json'),
   authorizations: {
     api_key: apiKey
   }
