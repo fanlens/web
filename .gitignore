@@ -1,12 +1,5 @@
 requirements.txt
-gce/key.json
 localhost.pem
-brain/brain/nltk_data
-manage.py
-manage_elephant.py
-manage_prod.py
-eev/emu
-./cdn
 __pycache__
 *.pyc
 *.swp
@@ -15,9 +8,6 @@ venv*
 **egg-info**
 config/*.env
 config/*.ini
-docker/config/*.env
-docker/config/*.ini
-docker/haproxy/*.cfg
 **/node_modules
 data
 docker/backup
@@ -25,5 +15,4 @@ docker/backup
 /celerybeat-schedule.dat
 /celerybeat-schedule.bak
 /celerybeat-schedule.dir
-web/ui/static/app.js
 
