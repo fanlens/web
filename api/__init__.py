@@ -10,6 +10,7 @@ def create_app():
     from flask_modules.redis import setup_redis
     from flask_modules.mail import setup_mail
     from flask_modules.security import setup_security
+    from flask_modules.cors import setup_cors
     from flask_modules.logging import setup_logging
     from flask_modules.twitter import setup_twitter
 
@@ -19,7 +20,8 @@ def create_app():
     setup_db(app.app)
     setup_redis(app.app)
     setup_mail(app.app)
-    setup_security(app.app)
+    setup_security(app.app, allow_login=False)
+    setup_cors(app.app)
     setup_celery(app.app)
     setup_twitter(app.app)
 

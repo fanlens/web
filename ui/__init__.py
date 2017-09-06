@@ -16,7 +16,7 @@ def create_app():
     setup_logging(app.app)
     setup_db(app.app)
     setup_mail(app.app)
-    setup_security(app.app)
+    setup_security(app.app, allow_login=True)
     setup_celery(app.app)
 
     from flask_modules import SimpleResolver
