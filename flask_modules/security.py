@@ -42,12 +42,11 @@ def setup_security(app: Flask, allow_login=False):
 
     security.init_app(app, user_datastore, register_blueprint=allow_login)
 
-    if allow_login:
-        @app.route('%s/swagger.json' % prefix, methods=['GET'])
-        def get_definition():
+    @app.route('%s/swagger.json' % prefix, methods=['GET'])
+    def get_definition():
             return jsonify({"swagger": "2.0", "info": {"title": "Fanlens User API", "version": "4.0.0",
                                                        "description": "API related to users"}, "schemes": ["https"],
-                            "basePath": "/v4", "securityDefinitions": {
+                            "basePath": "https://ui.fanlens.io/v4", "securityDefinitions": {
                     "api_key": {"type": "apiKey", "name": "Authorization-Token", "in": "header"}},
                             "security": [{"api_key": []}], "produces": ["application/json"], "paths": {"/user": {
                     "get": {"summary": "get user data", "tags": ["user"], "responses": {
@@ -61,15 +60,15 @@ def setup_security(app: Flask, allow_login=False):
                         "403": {"description": "not logged in", "schema": {"$ref": "#/definitions/Error"}}}}}},
                             "definitions": {"Error": {"type": "object", "properties": {"error": {"type": "string"}}}}})
 
-        @app.route(prefix, methods=['GET'])
-        @auth_required('token', 'session')
-        def get_user():
-            user = (current_user
-                    if current_user.has_role('tagger')
-                    else g.demo_user)
-            return jsonify(email=user.email, active=user.active, confirmed_at=user.confirmed_at,
-                           api_key=user.get_auth_token(),
-                           roles=[role.name for role in user.roles])
+    @app.route(prefix, methods=['GET'])
+    @auth_required('token', 'session')
+    def get_user():
+        user = (current_user
+                if current_user.has_role('tagger')
+                else g.demo_user)
+        return jsonify(email=user.email, active=user.active, confirmed_at=user.confirmed_at,
+                       api_key=user.get_auth_token(),
+                       roles=[role.name for role in user.roles])
 
     @app.before_first_request
     def fetch_demo_user():
