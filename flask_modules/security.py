@@ -46,7 +46,7 @@ def setup_security(app: Flask, allow_login=False):
     def get_definition():
             return jsonify({"swagger": "2.0", "info": {"title": "Fanlens User API", "version": "4.0.0",
                                                        "description": "API related to users"}, "schemes": ["https"],
-                            "basePath": "https://ui.fanlens.io/v4", "securityDefinitions": {
+                            "basePath": "/v4", "securityDefinitions": {
                     "api_key": {"type": "apiKey", "name": "Authorization-Token", "in": "header"}},
                             "security": [{"api_key": []}], "produces": ["application/json"], "paths": {"/user": {
                     "get": {"summary": "get user data", "tags": ["user"], "responses": {
