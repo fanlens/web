@@ -1,6 +1,6 @@
 {
   "name": "fanlens",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "",
   "dependencies": {
     "babel-polyfill": "^6.23.0",

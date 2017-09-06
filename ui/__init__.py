@@ -7,6 +7,7 @@ def create_app():
 
     from flask_modules.mail import setup_mail
     from flask_modules.security import setup_security
+    from flask_modules.cors import setup_cors
     from flask_modules.database import setup_db
     from flask_modules.logging import setup_logging
     from flask_modules.celery import setup_celery
@@ -17,6 +18,7 @@ def create_app():
     setup_db(app.app)
     setup_mail(app.app)
     setup_security(app.app, allow_login=True)
+    setup_cors(app.app, resources={"/static/fonts/*": {"origins": "*"}})
     setup_celery(app.app)
 
     from flask_modules import SimpleResolver
