@@ -3,8 +3,8 @@
 {% block styles %}
     {{ super() }}
 
-    <link href="/cdn/css/landing-page.css" rel="stylesheet">
-    <link href="/cdn/css/browser.css" rel="stylesheet">
+    <link href="{{ cdn }}/css/landing-page.css" rel="stylesheet">
+    <link href="{{ cdn }}/css/browser.css" rel="stylesheet">
 {% endblock %}
 
 {% block alerts %}
@@ -26,7 +26,7 @@
                     <div class="intro-message">
                         <div>
                             <h1>
-                                <img src="/cdn/img/logo.png"><em>f</em>anlens</h1>
+                                <img src="{{ cdn }}/img/logo.png"><em>f</em>anlens</h1>
                             <h3>Artificial Intelligence<br>
                                 Social Media Management</h3>
                         </div>
@@ -93,7 +93,7 @@
                 <div class="col-lg-6 col-sm-pull-6 col-sm-6">
                     <div>
                         <img class="img-responsive" style="margin: -4em 0"
-                             src="/cdn/img/screenshot_proactive_framed-768.png"/>
+                             src="{{ cdn }}/img/screenshot_proactive_framed-768.png"/>
                     </div>
                 </div>
             </div>
@@ -127,7 +127,7 @@
                 <div class="col-lg-6 col-lg-offset-1 col-sm-6">
                     <div class="browser-mockup with-url tagger-greeting">
                         {#                        {% include 'landing/demo.html' %}#}
-                        <img class="img-responsive" src="/cdn/img/tagger-orig.png"/>
+                        <img class="img-responsive" src="{{ cdn }}/img/tagger-orig.png"/>
                     </div>
 {#                    <p class="small text-center" style="margin-top:0.5em;">(Link to external source! We take no#}
 {#                        responsibility for the shown content.)</p>#}
@@ -160,7 +160,7 @@
                 </div>
                 <div class="col-lg-6 col-sm-pull-6 col-sm-6">
                     <div class="browser-mockup with-url evaluator-greeting">
-                        <img class="img-responsive" src="/cdn/img/evaluator-768.png"/>
+                        <img class="img-responsive" src="{{ cdn }}/img/evaluator-768.png"/>
                     </div>
                 </div>
             </div>
@@ -189,7 +189,7 @@
                     </p>
                 </div>
                 <div class="col-lg-6 col-lg-offset-1 col-sm-6">
-                    <img class="img-responsive" src="/cdn/img/contract.png" />
+                    <img class="img-responsive" src="{{ cdn }}/img/contract.png" />
                 </div>
             </div>
 

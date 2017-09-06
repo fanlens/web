@@ -39,9 +39,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-app-dev": "node_modules/browserify/bin/cmd.js -t browserify-css -t babelify src/app.jsx -o ./static/app.js --debug",
-    "build-app-watch": "node_modules/watchify/bin/cmd.js -t browserify-css -t babelify src/app.jsx -o ./static/app.js --debug",
-    "build-app": "NODE_ENV=production node_modules/browserify/bin/cmd.js -t browserify-css -t babelify -t uglifyify src/app.jsx -o ./static/app.js"
+    "build-app-dev": "node_modules/browserify/bin/cmd.js -t browserify-css -t babelify src/app.jsx -o ./static/js/app.js --debug",
+    "build-app-watch": "node_modules/watchify/bin/cmd.js -t browserify-css -t babelify src/app.jsx -o ./static/js/app.js --debug",
+    "build-app": "NODE_ENV=production node_modules/browserify/bin/cmd.js -t browserify-css -t babelify -t uglifyify src/app.jsx -o ./static/js/app.js"
   },
   "author": "Christian Junker"
 }

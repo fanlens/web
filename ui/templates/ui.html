@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% set cdn = "//cdn.fanlens.io/static" %}
+
 <head>
     {% block metas %}
         {% set description = "With a few clicks you can generate personalized models that encapsulate the behaviour of your fans and followers. It's your own little pet robot that reacts in the same ways as your fans!" %}
         {% set title = "Fanlens: Machine Learning + Social Media" %}
-        {% set logo = "https://fanlens.io/cdn/img/logo.png" %}
+        {% set logo = "{{ cdn }}/img/logo.png" %}
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -29,13 +31,13 @@
     <title>{% block title %}Fanlens{% endblock %}</title>
 
     {% block styles %}
-        <link rel="stylesheet" href="/cdn/css/flexboxgrid.min.css"/>
-        <link rel="stylesheet" href="/cdn/css/font-awesome.min.css"/>
+        <link rel="stylesheet" href="{{ cdn }}/css/flexboxgrid.min.css"/>
+        <link rel="stylesheet" href="{{ cdn }}/css/font-awesome.min.css"/>
     {% endblock %}
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="/cdn/favicon.ico"/>
-    <link rel="apple-touch-icon" href="/cdn/apple-touch-icon-precomposed.png"/>
+    <link rel="shortcut icon" href="{{ cdn }}/favicon.ico"/>
+    <link rel="apple-touch-icon" href="{{ cdn }}/apple-touch-icon-precomposed.png"/>
 
     {% block fonts %}
         <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet"/>
@@ -106,7 +108,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
 
     <!-- App -->
-    <script src="/v4/ui/static/app.js"></script>
+    <script src="/v4/ui/static/js/app.js"></script>
 
     <!-- Skype Bot -->
     <script src="https://latest-swc.cdn.skype.com/sdk/v1/sdk.js"></script>

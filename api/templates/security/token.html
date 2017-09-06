@@ -15,7 +15,7 @@
 {% block scripts %}
     {{ super() }}
 
-    <script src="/cdn/js/clipboard.min.js"></script>
+    <script src="{{ cdn }}/js/clipboard.min.js"></script>
     <script>
         var clipboard = new Clipboard('#copy');
         clipboard.on('success', function (e) {

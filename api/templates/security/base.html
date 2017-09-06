@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% set cdn = "//cdn.fanlens.io/static" %}
+
 <head>
     {% block metas %}
         {% set description = "With a few clicks you can generate personalized models that encapsulate the behaviour of your fans and followers. It's your own little pet robot that reacts in the same ways as your fans!" %}
         {% set title = "Fanlens: Machine Learning + Social Media" %}
-        {% set logo = "https://fanlens.io/cdn/img/logo.png" %}
+        {% set logo = "{{ cdn }}/img/logo.png" %}
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,17 +30,17 @@
     <title>{% block title %}Fanlens{% endblock %}</title>
 
     {% block styles %}
-        <link href="/cdn/css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ cdn }}/css/bootstrap.min.css" rel="stylesheet">
     {% endblock %}
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="/cdn/favicon.ico">
-    <link rel="apple-touch-icon" href="/cdn/apple-touch-icon-precomposed.png">
+    <link rel="shortcut icon" href="{{ cdn }}/favicon.ico">
+    <link rel="apple-touch-icon" href="{{ cdn }}/apple-touch-icon-precomposed.png">
 
     {% block fonts %}
         <!-- Custom Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Lato|Crimson+Text" rel="stylesheet">
-        <link href="/cdn/css/font-awesome.min.css" rel="stylesheet">
+        <link href="{{ cdn }}/css/font-awesome.min.css" rel="stylesheet">
     {% endblock %}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -65,7 +67,7 @@
       ga('send', 'pageview');
     </script>
     <!-- jQuery -->
-    <script src="/cdn/js/jquery.js"></script>
+    <script src="{{ cdn }}/js/jquery.js"></script>
 </head>
 
 <body>
@@ -104,7 +106,7 @@
     </script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="/cdn/js/bootstrap.min.js"></script>
+    <script src="{{ cdn }}/js/bootstrap.min.js"></script>
 
     <!-- Cookie Consent -->
     <script type="text/javascript">
