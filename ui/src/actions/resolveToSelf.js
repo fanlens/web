@@ -1,1 +1,1 @@
-export default (path) => `${window.location.protocol}//${window.location.host}:${window.location.port}${path}`;
+export default (path) => `${window.location.protocol}//${window.location.host == 'localhost' ? 'localhost' : 'api.fanlens.io'}:${window.location.port}${path}`;
