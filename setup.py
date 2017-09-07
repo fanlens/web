@@ -20,6 +20,8 @@ setup(
         'flask-sqlalchemy',
         'psycopg2',
         'Flask-Redis',
+        'redis',
+        'Flask-Cache',
         'connexion',
         'celery[redis]',
         'msgpack-python',

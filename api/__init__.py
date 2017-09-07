@@ -7,7 +7,6 @@ def create_app():
 
     from flask_modules.celery import setup_celery
     from flask_modules.database import setup_db
-    from flask_modules.redis import setup_redis
     from flask_modules.mail import setup_mail
     from flask_modules.security import setup_security
     from flask_modules.cors import setup_cors
@@ -18,7 +17,6 @@ def create_app():
 
     setup_logging(app.app)
     setup_db(app.app)
-    setup_redis(app.app)
     setup_mail(app.app)
     setup_security(app.app, allow_login=False)
     setup_cors(app.app)
