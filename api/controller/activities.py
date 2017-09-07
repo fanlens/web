@@ -170,7 +170,7 @@ def source_id_activity_id_tags_patch(source_id: int, activity_id: str, body: dic
             FROM %(tag_table)s as tag
             INNER JOIN %(data_table)s as data ON data.object_id = :object_id   -- correct data id
             INNER JOIN %(source_user_table)s as source_user ON data.source_id = source_user.source_id AND source_user.user_id = :user_id  -- data belongs to user
-            INNER JOIN %(tag_user_table)s as tag_user ON tag.id = tag_user.id AND tag_user.user_id = :user_id  -- tag belongs to user
+            INNER JOIN %(tag_user_table)s as tag_user ON tag.id = tag_user.tag_id AND tag_user.user_id = :user_id  -- tag belongs to user
             WHERE tag.tag in :add
             ON CONFLICT DO NOTHING;
             
