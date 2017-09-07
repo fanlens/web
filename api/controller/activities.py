@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 import typing
 
-from api.controller import check_sources_by_id
-from db import insert_or_ignore
-from db.models.activities import Data, Source, Tag, TagSet, TagSetUser, TagTagSet, Tagging, Time, Type
-from db.models.brain import Prediction
 from flask import redirect
-from flask_modules.database import db
 from flask_security import current_user
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
+from api.controller import check_sources_by_id
+from db import insert_or_ignore
+from db.models.activities import Data, Source, SourceUser, Tag, TagUser, TagSet, TagSetUser, TagTagSet, Tagging, Time, Type
+from db.models.brain import Prediction
+from flask_modules.database import db
 from . import defaults
 
 _best_models_for_user_sql = text('''
@@ -143,7 +143,9 @@ def source_id_activity_id_get(source_id: int, activity_id: str, _internal=False)
     data = current_user.data.filter_by(source_id=source_id, object_id=activity_id).one_or_none()
     if not data:
         return dict(error='No activity found for user and %d -> %s' % (source_id, activity_id)), 404
-    return parser(data) if not _internal else data
+    if _internal:
+        return data
+    return parser(data)
 
 
 @defaults
@@ -156,23 +158,50 @@ def source_id_activity_id_field_id_get(source_id: int, activity_id: str, field_i
 
 @defaults
 def source_id_activity_id_tags_patch(source_id: int, activity_id: str, body: dict) -> typing.Union[dict, tuple]:
-    remove = set(body.get('remove', []))
-    add = set(body.get('add', []))
-    data = source_id_activity_id_get(source_id, activity_id, _internal=True)
-    if data is None:
-        return dict(error='No activity for this id found'), 404
-    elif isinstance(data, tuple):  # error
-        return data
+    remove = tuple(set(body.get('remove', [])))
+    add = tuple(set(body.get('add', [])))
 
-    if add:
-        for add_tag in db.session.query(Tag).filter(Tag.tag.in_(add) & Tag.user.any(id=current_user.id)):
-            insert_or_ignore(db.session, Tagging(tag_id=add_tag.id, data_id=data.id))
-    db.session.commit()
-    remove and (db.session.query(Tagging)
-                .filter(Tagging.tag.has(Tag.tag.in_(remove) & Tag.user.any(id=current_user.id)))
-                .delete(synchronize_session=False))
-    db.session.commit()
-    return {'id': str(data.object_id), 'tags': [tag.tag for tag in data.tags]}
+    if add or remove:
+        sql = text("""
+            BEGIN;
+            
+            INSERT INTO %(tagging_table)s (tag_id, data_id, tagging_ts)
+            SELECT tag.id as tag_id, data.id as data_id, now() as tagging_ts
+            FROM %(tag_table)s as tag
+            INNER JOIN %(data_table)s as data ON data.object_id = :object_id   -- correct data id
+            INNER JOIN %(source_user_table)s as source_user ON data.source_id = source_user.source_id AND source_user.user_id = :user_id  -- data belongs to user
+            INNER JOIN %(tag_user_table)s as tag_user ON tag.id = tag_user.id AND tag_user.user_id = :user_id  -- tag belongs to user
+            WHERE tag.tag in :add
+            ON CONFLICT DO NOTHING;
+            
+            DELETE FROM %(tagging_table)s as tagging
+            USING %(tag_user_table)s as tag_user,
+                  %(tag_table)s as tag, 
+                  %(data_table)s as data,  
+                  %(source_user_table)s as source_user
+            WHERE tag.tag in :remove AND
+                  tag.id = tag_user.tag_id AND tag_user.user_id = :user_id AND  -- tag belongs to user
+                  data.object_id = :object_id AND  -- correct data id
+                  data.source_id = source_user.source_id AND source_user.user_id = :user_id AND  -- data belongs to user
+                  tagging.tag_id = tag.id AND 
+                  tagging.data_id = data.id;
+            
+            COMMIT;
+            """ % dict(tagging_table=Tagging.__table__.fullname,
+                       tag_table=Tag.__table__.fullname,
+                       tag_user_table=TagUser.__table__.fullname,
+                       data_table=Data.__table__.fullname,
+                       source_user_table=SourceUser.__table__.fullname))
+        db.engine.execute(sql,
+                          object_id=activity_id,
+                          user_id=current_user.id,
+                          add=add or tuple([None]),
+                          remove=remove or tuple([None]))
+
+    data = source_id_activity_id_get(source_id, activity_id, _internal=True)  # type: Data
+    if isinstance(data, tuple):  # error
+        return data
+    return {'id': activity_id, 'tags': [tag.tag for tag in data.tags]}
 
 
 @defaults
