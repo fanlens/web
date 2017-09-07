@@ -810,7 +810,7 @@ definitions:
         description: Inferred language of text
         type: string
         minLength: 2
-        maxLength: 2
+        maxLength: 12
       created_time:
         description: DateTime of creation
         type: string
