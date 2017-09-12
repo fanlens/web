@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from flask import redirect, request
 from flask_modules.database import db
-from flask_security import login_required, current_user
 from db import insert_or_ignore
 from db.models.users import TwitterAuth, UserTwitterAuth, User
 from flask_modules.twitter import twitter_auth, ExtendedTweepyApi
+from flask_security import login_required, current_user
 
 
 def user_twitter_auth(user: User):

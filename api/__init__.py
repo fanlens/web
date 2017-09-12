@@ -8,27 +8,23 @@ def create_app():
     from flask_modules.celery import setup_celery
     from flask_modules.database import setup_db
     from flask_modules.mail import setup_mail
-    from flask_modules.security import setup_security
+    from flask_modules.jwt import setup_jwt
     from flask_modules.cors import setup_cors
     from flask_modules.logging import setup_logging
-    from flask_modules.twitter import setup_twitter
 
     app = connexion.App(__name__, specification_dir='swagger')
 
     setup_logging(app.app)
     setup_db(app.app)
     setup_mail(app.app)
-    setup_security(app.app, allow_login=False)
+    setup_jwt(app.app)
     setup_cors(app.app)
     setup_celery(app.app)
-    setup_twitter(app.app)
 
     from flask_modules import SimpleResolver
-    from .controller import activities, model, eev, twitter
+    from .controller import activities, model
     app.add_api('activities.yaml', validate_responses=True, resolver=SimpleResolver(activities))
-    app.add_api('eev.yaml', validate_responses=True, resolver=SimpleResolver(eev))
     app.add_api('model.yaml', validate_responses=True, resolver=SimpleResolver(model))
-    app.add_api('twitter.yaml', validate_responses=True, resolver=SimpleResolver(twitter))
     app.add_url_rule('/', 'health', lambda: 'ok')
 
     return app

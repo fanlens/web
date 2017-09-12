@@ -22,13 +22,13 @@ schemes:
 basePath: /v4/activities
 
 securityDefinitions:
-  api_key:
+  jwt:
     type: apiKey
-    name: Authorization-Token
+    name: Authorization
     in: header
 
 security:
-  - api_key: []
+  - jwt: []
 
 produces:
   - application/json
@@ -68,13 +68,10 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
-  /{source_ids}/:
     get:
       summary: Get a list of activities
       tags: [activity]
       parameters:
-      - $ref: '#/parameters/SourceIds'
       - name: count
         in: query
         description: number of activities to fetch
@@ -84,7 +81,6 @@ paths:
         default: 8
         minimum: 0
         maximum: 500
-      - $ref: '#/parameters/Random'
       - name: max_id
         in: query
         description: used for cursoring
@@ -104,8 +100,11 @@ paths:
         type: string
         format: date-time
         required: false
+      - $ref: '#/parameters/SourceIds'
       - $ref: '#/parameters/TagsetIds'
-#      - $ref: '#/parameters/Tags'
+      - $ref: '#/parameters/Tags'
+      - $ref: '#/parameters/Languages'
+      - $ref: '#/parameters/Random'
       responses:
         200:
           description: A list of Activitys
@@ -120,6 +119,9 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
+
+
 
   /{source_id}/{activity_id}:
     get:
@@ -173,29 +175,6 @@ paths:
       responses:
         200:
           description: Success
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
-  /{source_id}/{activity_id}/{field_id}:
-    get:
-      summary: Get specific field of activity
-      tags: [activity]
-      consumes: [application/json]
-      parameters:
-      - $ref: '#/parameters/SourceId'
-      - $ref: '#/parameters/ActivityId'
-      - $ref: '#/parameters/FieldId'
-      responses:
-        200:
-          description: A skeleton of the activity with the requested field
-          schema:
-           $ref: '#/definitions/Activity'
-        404:
-          description: No activity with provided ID
-          schema:
-            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -358,34 +337,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /{source_ids}/tags/:
-    get:
-      summary: Get tags of source_ids
-      tags: [tags]
-      parameters:
-      - $ref: '#/parameters/SourceIds'
-      - name: with_count
-        in: query
-        description: should the tag counts be included
-        type: boolean
-        required: false
-        default: true
-      responses:
-        200:
-          description: All tags requested sources
-          schema:
-            type: object
-            required: [tags]
-            properties:
-              tags:
-                $ref: '#/definitions/Tags'
-              count:
-                $ref: '#/definitions/TagCounts'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
   /tags/{tag}:
     get:
       summary: Get this tag
@@ -449,65 +400,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
-  /tags/{tag}/activities/:
-    get:
-      summary: Get activities tagged with this tag
-      tags: [tags, activity]
-      parameters:
-      - $ref: '#/parameters/Tag'
-      - $ref: '#/parameters/Random'
-      - name: count
-        in: query
-        type: integer
-        format: int32
-        minimum: 1
-        required: true
-        default: 10
-      responses:
-        200:
-          description: A list of Activitys
-          schema:
-            type: object
-            properties:
-              activities:
-                type: array
-                items:
-                  $ref: '#/definitions/Activity'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /{source_ids}/tags/{tag}/activities/:
-    get:
-      summary: Get activities tagged with this tag for source_id
-      tags: [tags, activity]
-      parameters:
-      - $ref: '#/parameters/SourceIds'
-      - $ref: '#/parameters/Tag'
-      - $ref: '#/parameters/Random'
-      - name: count
-        in: query
-        type: integer
-        format: int32
-        minimum: 1
-        required: true
-        default: 10
-      responses:
-        200:
-          description: A list of Activitys
-          schema:
-            type: object
-            properties:
-              activities:
-                type: array
-                items:
-                  $ref: '#/definitions/Activity'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
 
   /tagsets/:
     get:
@@ -603,63 +495,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /tagsets/{tagset_id}/activities/:
-    get:
-      summary: Get activities tagged with this tagset
-      tags: [tagsets, activity]
-      parameters:
-      - $ref: '#/parameters/TagsetId'
-      - $ref: '#/parameters/Random'
-      - name: count
-        in: query
-        type: integer
-        format: int32
-        minimum: 1
-        required: true
-        default: 10
-      responses:
-        200:
-          description: A list of Activitys
-          schema:
-            type: object
-            properties:
-              activities:
-                type: array
-                items:
-                  $ref: '#/definitions/Activity'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /{source_ids}/tagsets/{tagset_id}/activities/:
-    get:
-      summary: Get activities tagged with this tagset
-      tags: [tagsets, activity]
-      parameters:
-      - $ref: '#/parameters/TagsetId'
-      - $ref: '#/parameters/SourceIds'
-      - $ref: '#/parameters/Random'
-      - name: count
-        in: query
-        type: integer
-        format: int32
-        minimum: 1
-        required: true
-        default: 10
-      responses:
-        200:
-          description: A list of Activitys
-          schema:
-            type: object
-            properties:
-              activities:
-                type: array
-                items:
-                  $ref: '#/definitions/Activity'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
 
   /tagsets/{tagset_id}/{tag}:
     put:
@@ -729,8 +564,8 @@ parameters:
 
   SourceIds:
     name: source_ids
-    in: path
-    required: true
+    in: query
+    required: false
     type: array
     items:
       type: integer
@@ -748,22 +583,32 @@ parameters:
     uniqueItems: true
     collectionFormat: csv
     maxItems: 10
-
-
-  FieldId:
-    name: field_id
-    in: path
-    type: string
-    enum:
-      - tags
-      - prediction
-      - text
-      - user
-      - created_time
-      - source
-      - language
-    required: true
-
+  Tags:
+    name: tags
+    in: query
+    required: false
+    type: array
+    items:
+      type: string
+      minLength: 1
+      maxLength: 32
+    uniqueItems: true
+    collectionFormat: csv
+    maxItems: 30
+  Languages:
+    name: languages
+    in: query
+    description: Inferred language of text
+    required: false
+    default: 'en'
+    type: array
+    items:
+      type: string
+      minLength: 2
+      maxLength: 12
+    uniqueItems: true
+    collectionFormat: csv
+    maxItems: 30
   Random:
     name: random
     in: query
