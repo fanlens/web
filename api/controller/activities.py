@@ -71,7 +71,7 @@ def generic_parser(data: Data) -> dict:
 _parsers = {
     Type.facebook: lambda data: dict(
         id=data.data['id'],
-        user=data.data.get('from', data.data['id'].split('_')[0]),
+        user=data.data.get('from', dict(id=data.data['id'].split('_')[0])),
         **generic_parser(data)
     ),
     Type.twitter: lambda data: dict(
