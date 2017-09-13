@@ -1,7 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 import Snackbar from "material-ui/Snackbar";
-import {dismiss} from "../actions/AlertActions";
+import {dismiss} from "../actions/alert";
 
 const Alerts = ({alert, open, onDismiss}) => (
   <Snackbar

@@ -23,7 +23,7 @@ import Slider from 'material-ui/Slider';
 import Toggle from 'material-ui/Toggle';
 import ActionGavel from 'material-ui/svg-icons/action/gavel';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
-import {fetchComments} from '../../actions/ActivitiesActions';
+import {fetchComments} from '../../actions/activities';
 import * as tlActions from "../../actions/app/timeline";
 
 const min = 0;

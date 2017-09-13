@@ -1,12 +1,12 @@
 import keyMirror from "keymirror";
 import Swagger from "swagger-client";
-import {info, error} from "./AlertActions";
-import resolveToSelf from "./resolveToSelf";
+import {info, error} from "../alert";
+import resolveToSelf from "../resolveToSelf";
 
 const uiApi = new Swagger({
   url: resolveToSelf('/v4/ui/swagger.json'),
   authorizations: {
-    api_key: apiKey
+    auth_token: authToken
   }
 });
 

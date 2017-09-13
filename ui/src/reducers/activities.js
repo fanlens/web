@@ -1,6 +1,6 @@
 import {combineReducers} from "redux";
 import _ from "lodash";
-import {ActivitiesActionType} from "../actions/ActivitiesActions";
+import {ActivitiesActionType} from "../actions/activities";
 
 const comments = (state = {}, action) => {
   switch (action.type) {

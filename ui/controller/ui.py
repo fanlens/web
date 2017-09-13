@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, Blueprint, g, send_file, request, redirect
 from flask_security import current_user, login_required
+from flask_modules.jwt import create_jwt_for_user
 from config.db import Config
 
 ui = Blueprint('ui', __name__, url_prefix='/v4/ui')
@@ -24,7 +25,10 @@ def appjs():
 def hand_off_to_app(path):
     return render_template('ui.html',
                            bot_id=config["client_id"],
-                           api_key=(
+                           jwt=create_jwt_for_user(current_user
+                               if current_user.has_role('tagger')
+                               else g.demo_user),
+                           auth_token=(
                                current_user.get_auth_token()
                                if current_user.has_role('tagger')
                                else g.demo_user.get_auth_token()),

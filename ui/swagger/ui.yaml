@@ -11,13 +11,13 @@ schemes:
 basePath: /v4/ui
 
 securityDefinitions:
-  api_key:
+  auth_token:
     type: apiKey
-    name: Authorization-Token
+    name: Authorization
     in: header
 
 security:
-  - api_key: []
+  - auth_token: []
 
 produces:
   - application/json
