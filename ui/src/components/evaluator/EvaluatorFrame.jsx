@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import EvaluatorControls from "./EvaluatorControls.jsx";
 import Evaluator from "./Evaluator.jsx";
 
-import {initActivities} from "../../actions/ActivitiesActions";
+import {initActivities} from "../../actions/activities";
 
 const separatorBorder = '2px #409db1 solid';
 

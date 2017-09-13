@@ -1,13 +1,13 @@
 import keyMirror from "keymirror";
 import Swagger from "swagger-client";
 import map from "lodash/fp/map";
-import {warning} from "./AlertActions";
+import {warning} from "./alert";
 import resolveToSelf from "./resolveToSelf";
 
-const modelApi = new Swagger({
+export const modelApi = new Swagger({
   url: resolveToSelf('/v4/model/swagger.json', 'api'),
   authorizations: {
-    api_key: apiKey
+    jwt: JWT
   }
 });
 

@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import TimelineControls from "./TimelineControls.jsx";
 import Timeline from "./Timeline.jsx";
 
-import {initActivities} from "../../actions/ActivitiesActions";
+import {initActivities} from "../../actions/activities";
 
 const separatorBorder = '2px #409db1 solid';
 

@@ -16,7 +16,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Avatar from "material-ui/Avatar";
 import ActionBookmark from 'material-ui/svg-icons/action/bookmark';
 import NavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
-import {fetchComments, toggleCommentTag} from '../../actions/ActivitiesActions';
+import {fetchComments, toggleCommentTag} from '../../actions/activities';
 import {strToCol} from "../stringUtils";
 
 const mapIdx = map.convert({cap: false});

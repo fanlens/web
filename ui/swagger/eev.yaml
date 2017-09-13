@@ -11,13 +11,13 @@ schemes:
 basePath: /v4/eev
 
 securityDefinitions:
-  jwt:
+  auth_token:
     type: apiKey
     name: Authorization
     in: header
 
 security:
-  - jwt: []
+  - auth_token: []
 
 produces:
   - application/json

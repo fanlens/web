@@ -13,7 +13,7 @@ import ActionGavel from 'material-ui/svg-icons/action/gavel';
 import ActionWatchLater from 'material-ui/svg-icons/action/watch-later';
 import ActionHourglassEmpty from 'material-ui/svg-icons/action/hourglass-empty';
 import ActionBookmark from 'material-ui/svg-icons/action/bookmark';
-import {fetchSuggestionForText, clearSuggestion, setIsFetching} from "../../actions/ModelActions";
+import {fetchSuggestionForText, clearSuggestion, setIsFetching} from "../../actions/model";
 import {strToCol} from "../stringUtils";
 
 class Evaluator extends React.Component {
