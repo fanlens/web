@@ -7,10 +7,10 @@ import {orNop} from "./nop";
 
 import resolveToSelf from "./resolveToSelf";
 
-const activitiesApi = new Swagger({
+export const activitiesApi = new Swagger({
   url: resolveToSelf('/v4/activities/swagger.json', 'api'),
   authorizations: {
-    api_key: apiKey
+    jwt: JWT
   }
 });
 
@@ -81,7 +81,7 @@ const definedDefaults = (value) => conditionalDefaults(!_.isUndefined(value) && 
 
 export const fetchComments = ({count, sources, since, until, tagSets = [], random = false}) =>
   (dispatch) => activitiesApi.then(
-    (client) => client.apis.activity.get__source_ids__(
+    (client) => client.apis.activity.get_(
       flow(
         definedDefaults(since)('since'),
         definedDefaults(until)('until')
@@ -97,8 +97,8 @@ export const fetchComments = ({count, sources, since, until, tagSets = [], rando
 
 export const fetchCommentsTagSet = (count, tagSetId, random = true) =>
   (dispatch) => activitiesApi.then(
-    (client) => client.apis.activity.get_tagsets__tagset_id__activities_({
-      tagset_id: tagSetId,
+    (client) => client.apis.activity.get_({
+      tagset_ids: tagSetId,
       count: count,
       random: random
     }).then(({status, obj}) => obj)

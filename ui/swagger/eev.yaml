@@ -11,37 +11,18 @@ schemes:
 basePath: /v4/eev
 
 securityDefinitions:
-  api_key:
+  auth_token:
     type: apiKey
-    name: Authorization-Token
+    name: Authorization
     in: header
 
 security:
-  - api_key: []
+  - auth_token: []
 
 produces:
   - application/json
 
 paths:
-  /token:
-    post:
-      summary: get a conversation token for eev
-      tags: [eev]
-      responses:
-        200:
-          description: A token and associated conversationId
-          schema:
-            type: object
-            required: [token, conversationId]
-            properties:
-              token:
-                type: string
-              conversationId:
-                type: string
-        500:
-          description: could not renew or generate token
-          schema:
-            $ref: '#/definitions/Error'
   /login/{channel_id}/{user_id}:
     get:
       summary: login to chat service

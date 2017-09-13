@@ -18,15 +18,17 @@ schemes:
 basePath: /v4/model
 
 securityDefinitions:
-  api_key:
+  jwt:
     type: apiKey
-    name: Authorization-Token
+    name: Authorization
     in: header
 
 security:
-  - api_key: []
+  - jwt: []
 
 produces:
+  - application/json
+consumes:
   - application/json
 
 paths:
@@ -35,7 +37,6 @@ paths:
       summary: Train a new model for a tagset
       description: If now sources are specified it will be trained on all sources
       tags: [model]
-      consumes: [application/json]
       parameters:
       - name: body
         in: body
@@ -115,55 +116,13 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /{model_id}/prediction:
-    post:
-      summary: Get prediction for a provided text based on a model
-      tags: [prediction]
-      consumes: [application/json]
-      parameters:
-      - $ref: '#/parameters/ModelId'
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          required: [text]
-          properties:
-            text:
-              type: string
-              minLength: 24
-              maxLength: 7000
-              description: The text to fetch prediction for. English only atm.
-      responses:
-        200:
-          description: A prediction Bundle
-          schema:
-            type: object
-            required: [prediction]
-            properties:
-              text:
-                type: string
-              prediction:
-                $ref: '#/definitions/Prediction'
-        404:
-          description: Model not associated to user
-          schema:
-            $ref: '#/definitions/Error'
-        400:
-          description: Bad request
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
   /prediction:
     post:
       summary: Get prediction for a provided text based on the best model for source/tagset
       tags: [prediction]
       consumes: [application/json]
       parameters:
+      - $ref: '#/parameters/ModelIdQuery'
       - name: body
         in: body
         required: true
@@ -250,6 +209,14 @@ paths:
             $ref: '#/definitions/Error'
 
 parameters:
+  ModelIdQuery:
+    name: model_id
+    in: query
+    type: string
+    format: uuid
+    required: false
+    description: The id of this model
+
   ModelId:
     name: model_id
     in: path

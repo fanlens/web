@@ -1,5 +1,5 @@
 import defaults from "lodash/fp/defaults";
-import {ModelActionType} from "../../actions/ModelActions";
+import {ModelActionType} from "../../actions/model";
 
 const evaluator = (state = {suggestion: {}, isFetching: false}, action) => {
   switch (action.type) {

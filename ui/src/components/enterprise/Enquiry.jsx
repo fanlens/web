@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import Paper from "material-ui/Paper";
 import TextField from "material-ui/TextField";
 import RaisedButton from "material-ui/RaisedButton";
-import {sendEnquiry} from "../../actions/EmailActions";
+import {sendEnquiry} from "../../actions/app/email";
 
 const emailPattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const emailValidator = (email) => emailPattern.test(email); // not curryable

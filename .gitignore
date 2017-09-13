@@ -16,4 +16,3 @@ docker/backup
 /celerybeat-schedule.bak
 /celerybeat-schedule.dir
 ui/static/js/app.js
-

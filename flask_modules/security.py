@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from config.db import Config
-from db.models.users import Role, User
 from flask import g, jsonify, Flask
-from flask_modules.database import db
 from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin, auth_required, current_user
 from flask_wtf.csrf import CSRFProtect
+
+from config.db import Config
+from db.models.users import Role, User
+
+from .database import db
+from .jwt import create_jwt_for_user
+
 
 csrf = CSRFProtect()
 security = Security()
@@ -31,8 +35,8 @@ def setup_security(app: Flask, allow_login=False):
     app.config['SECURITY_REGISTERABLE'] = False
     app.config['SECURITY_RECOVERABLE'] = False
     app.config['SECURITY_CHANGEABLE'] = False
-    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authorization-Token'
-    app.config['SECURITY_TOKEN_AUTHENTICATION_KEY'] = 'api_key'
+    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authorization'
+    app.config['SECURITY_TOKEN_AUTHENTICATION_KEY'] = 'auth_token'
 
     app.config['SECURITY_URL_PREFIX'] = prefix
 
@@ -66,8 +70,11 @@ def setup_security(app: Flask, allow_login=False):
         user = (current_user
                 if current_user.has_role('tagger')
                 else g.demo_user)
-        return jsonify(email=user.email, active=user.active, confirmed_at=user.confirmed_at,
-                       api_key=user.get_auth_token(),
+        return jsonify(email=user.email,
+                       active=user.active,
+                       confirmed_at=user.confirmed_at,
+                       auth_token=current_user.get_auth_token(),
+                       jwt=create_jwt_for_user(current_user),
                        roles=[role.name for role in user.roles])
 
     @app.before_first_request

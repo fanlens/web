@@ -1,4 +1,4 @@
-import {AlertActionType} from '../actions/AlertActions';
+import {AlertActionType} from '../actions/alert';
 import reject from 'lodash/fp/reject';
 
 const alerts = (state = [], action) => {
