@@ -71,7 +71,7 @@ def generic_parser(data: Data) -> dict:
 _parsers = {
     Type.facebook: lambda data: dict(
         id=data.data['id'],
-        user=data.data.get('from'),
+        user=data.data.get('from', data.data['id'].split('_')[0]),
         **generic_parser(data)
     ),
     Type.twitter: lambda data: dict(
@@ -119,11 +119,10 @@ def root_get(count: int = None,
     if max_id:
         data_query = data_query.filter(Data.object_id < max_id)
 
-    if since or until:
-        if since:
-            data_query = data_query.filter(Time.time >= since)
-        if until:
-            data_query = data_query.filter(Time.time <= until)
+    if since:
+        data_query = data_query.filter(Time.time >= since)
+    if until:
+        data_query = data_query.filter(Time.time <= until)
 
     if tagset_ids:
         data_query = (data_query
@@ -142,11 +141,11 @@ def root_get(count: int = None,
                             (TagUser.user_id == current_user_dao.id))
                       .filter(Tag.tag.in_(tags)))
 
-        if random:
-            data_query = data_query.order_by(
-                db.func.random())  # inefficient but ok for now, see also random_rows stored procedure
-        else:
-            data_query = data_query.order_by(Time.time.desc())
+    if random:
+        data_query = data_query.order_by(
+            db.func.random())  # inefficient but ok for now, see also random_rows stored procedure
+    else:
+        data_query = data_query.order_by(Time.time.desc())
 
     if languages:
         data_query = (data_query
