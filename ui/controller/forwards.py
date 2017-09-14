@@ -54,7 +54,7 @@ def create():
 @roles_required('admin')
 def create_gui():
     return '''
-    <form action="/@?api_key=%(access_token)s" method="post">
+    <form action="/@?auth_token=%(access_token)s" method="post">
         <input name="url"></input>
     </form>
     ''' % dict(access_token=current_user.get_auth_token())
