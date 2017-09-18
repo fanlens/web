@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-from logging import Logger
 
-logger = object  # type: Logger
+logger = object
 
 
 def setup_logging(app):
