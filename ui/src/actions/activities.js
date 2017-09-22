@@ -8,7 +8,7 @@ import {orNop} from "./nop";
 import resolveToSelf from "./resolveToSelf";
 
 export const activitiesApi = new Swagger({
-  url: resolveToSelf('/v4/activities/swagger.json', 'api'),
+  url: resolveToSelf('/activities/swagger.json', 'api'),
   authorizations: {
     jwt: JWT
   }

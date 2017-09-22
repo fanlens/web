@@ -32,16 +32,6 @@ class SimpleResolver(Resolver):
         return Resolution(func, func_name)
 
 
-def function_resolver(module):
-    """why is this not standard???"""
-
-    def fetch_function(name):
-        print(name)
-        getattr(module, name)
-
-    return fetch_function
-
-
 def annotation_composer(*decs):
     def deco(f):
         for dec in reversed(decs):

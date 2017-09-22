@@ -3,6 +3,7 @@
 import typing
 from sqlalchemy import text
 
+from config import get_config
 from db.models.activities import Source, TagSetUser, SourceUser
 from db.models.brain import Model
 from flask_modules.database import db
@@ -12,6 +13,8 @@ from . import defaults, CurrentUserDao, table_names
 from .activities import source_to_json, tagset_to_json
 
 current_user_dao = CurrentUserDao()
+
+_config = get_config()
 
 
 def _model_to_result(model: Model):
@@ -110,7 +113,7 @@ def train_post(body: dict, fast=True) -> tuple:
     job = Brain.train_model(current_user_dao.id, tagset_id, tuple(source_ids), n_estimators=10, _params=params,
                             _score=score)
     if fast and model_id is not None:
-        redir_url = '/v4/model/' + model_id
+        redir_url = '/%s/model/%s' % (_config.get('DEFAULT', 'version'), str(model_id))
     else:
-        redir_url = '/v4/search'
+        redir_url = '/%s/search' % _config.get('DEFAULT', 'version')
     return dict(job=job.id, url=redir_url), 202

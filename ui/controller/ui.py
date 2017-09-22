@@ -2,19 +2,14 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, Blueprint, g, send_file, request, redirect
 from flask_security import current_user, login_required
+
+from config import get_config
 from flask_modules.jwt import create_jwt_for_user
-from config.db import Config
 
-ui = Blueprint('ui', __name__, url_prefix='/v4/ui')
+_config = get_config()
+
+ui = Blueprint('ui', __name__, url_prefix='/%s/ui' % _config.get('DEFAULT', 'version'))
 ui_nonauth = Blueprint('ui_nonauth', __name__)
-
-config = None
-
-
-@ui.before_app_first_request
-def setup_conf():
-    global config
-    config = Config('eev')
 
 
 @ui.route('/static/app.js')
@@ -24,15 +19,16 @@ def appjs():
 
 def hand_off_to_app(path):
     return render_template('ui.html',
-                           bot_id=config["client_id"],
+                           bot_id=_config.get("BOT", "client_id"),
                            jwt=create_jwt_for_user(current_user
-                               if current_user.has_role('tagger')
-                               else g.demo_user),
+                                                   if current_user.has_role('tagger')
+                                                   else g.demo_user),
                            auth_token=(
                                current_user.get_auth_token()
                                if current_user.has_role('tagger')
                                else g.demo_user.get_auth_token()),
-                           path=path)
+                           path=path,
+                           version=_config.get('DEFAULT', 'version'))
 
 
 @ui_nonauth.route('/legal')
@@ -46,7 +42,7 @@ def nonauth():
 @ui_nonauth.route('/v2/<path:path>')
 @ui_nonauth.route('/v3/<path:path>')
 def redir_old_new(path):
-    return redirect('/v4/' + path)
+    return redirect('/%s/%s' % (_config.get('DEFAULT', 'version'), path))
 
 
 @ui.route('/', defaults={'path': ''})

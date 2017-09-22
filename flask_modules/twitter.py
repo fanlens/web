@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from config.db import Config
+from config import get_config
 from tweepy import OAuthHandler, API, binder
 
+_config = get_config()
 _consumer_key = str
 _consumer_secret = str
+
+
+def setup_twitter(app):
+    global _consumer_key
+    global _consumer_secret
+    _consumer_key = _config.get('TWITTER', 'consumer_key')
+    _consumer_secret = _config.get('TWITTER', 'consumer_secret')
 
 
 def twitter_auth(next: str = "/"):
@@ -14,18 +22,13 @@ def twitter_auth(next: str = "/"):
     auth = OAuthHandler(
         _consumer_key,
         _consumer_secret,
-        callback='https://localhost/v4/twitter/callback?next=' + next
-    );
+        callback='%s/%s/twitter/callback?next=%s' % (
+            _config.get('WEB', 'host'),
+            _config.get('DEFAULT', 'version'),
+            next)
+    )
     auth.secure = True
     return auth
-
-
-def setup_twitter(app):
-    global _consumer_key
-    global _consumer_secret
-    twitter_config = Config('twitter')
-    _consumer_key = twitter_config['consumer_key']
-    _consumer_secret = twitter_config['consumer_secret']
 
 
 class ExtendedTweepyApi(API):
