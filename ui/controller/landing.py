@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import requests
-from config.db import Config
+from config import get_config
 from flask import Blueprint, flash, redirect, render_template, request
 from flask_mail import Message
 from flask_modules.mail import mail
@@ -9,7 +9,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, HiddenField
 from wtforms.validators import Email, InputRequired
 
-config = None
+config = get_config()
 
 landing = Blueprint('landing', __name__)
 
@@ -19,12 +19,6 @@ class ContactForm(FlaskForm):
                                   Email("A valid email address is required.")])
     message = TextAreaField("Message", [InputRequired("Please add a message.")])
     g_recaptcha_response = HiddenField("g-recaptcha-response", id="g-recaptcha-response")
-
-
-@landing.before_app_first_request
-def setup_conf():
-    global config
-    config = Config()
 
 
 @landing.route('/pricing', methods=['GET'])
@@ -39,7 +33,7 @@ def index(path):
     contact_form = ContactForm()
     if request.method == 'POST':
         response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=dict(
-            secret=config["recaptcha"]["secret_key"],
+            secret=config.get("RECAPTCHA", "secret_key"),
             response=contact_form.g_recaptcha_response.data
         ))
         recaptcha = response.json()
@@ -54,5 +48,5 @@ def index(path):
         flash('Spotted invalid traffic')
     return render_template('landing/index.html',
                            contact_form=contact_form,
-                           recaptcha_site_key=config["recaptcha"]["site_key"],
-                           bot_id=config["eev"]["client_id"])
+                           recaptcha_site_key=config.get("RECAPTCHA", "site_key"),
+                           bot_id=config.get("BOT", "client_id"))

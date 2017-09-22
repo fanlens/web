@@ -3,16 +3,16 @@
 
 from flask_sqlalchemy import SQLAlchemy
 
-from config.env import Environment
+from config import get_config
+
 from db import Base
 
 db = SQLAlchemy(metadata=Base.metadata)
 
 
 def setup_db(app):
-    env = Environment()
+    config = get_config()
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(username)s:%(password)s@%(host)s:%(port)s/%(database)s' % \
-                                            env['DB']
+                                            dict(config.items('DB'))
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
-

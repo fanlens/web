@@ -12,7 +12,7 @@ const Footer = () => (
             <a href="/">Home</a>
           </li>
           <li>
-            <a href="/v4/ui">App</a>
+            <a href={`/${fanlensVersion}/ui`}>App</a>
           </li>
           <li>
             <Link to="/team">Team</Link>

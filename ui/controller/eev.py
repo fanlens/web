@@ -2,28 +2,22 @@
 # -*- coding: utf-8 -*-
 import requests
 from flask_security import login_required, roles_accepted, current_user
-from config.db import Config
+from config import get_config
 from flask_modules.jwt import create_jwt_for_user
 
-eev_config = None
+config = get_config()
+
 TOKEN_API = "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"
-GRANT_TYPE = "grant_type=client_credentials&client_id=%(client_id)s&client_secret=%(client_secret)s&scope=https%%3A%%2F%%2Fapi.botframework.com%%2F.default"
+GRANT_TYPE = (
+    "grant_type=client_credentials&client_id=%(client_id)s&client_secret=%(client_secret)s&scope=https%%3A%%2F%%2Fapi.botframework.com%%2F.default"
+    % dict(client_id=config.get('BOT', 'client_id'),
+           client_secret=config.get('BOT', 'client_secret')))
 STATE_BASE_PATH = "https://state.botframework.com/v3"
 
 
-def _get_eev_config():
-    global eev_config
-    if not eev_config:
-        eev_config = Config('eev')
-    return eev_config
-
-
 def _set_session_data(channel_id, user_id, jwt, name) -> bool:
-    eev_config = _get_eev_config()
     data_obj = {"data": {"jwt": jwt, "name": name}, "etag": "*"}
-    token_req = requests.post(TOKEN_API,
-                              data=GRANT_TYPE % dict(client_id=eev_config['client_id'],
-                                                     client_secret=eev_config['client_secret']))
+    token_req = requests.post(TOKEN_API, data=GRANT_TYPE)
 
     access_token = token_req.json().get('access_token', '')
 

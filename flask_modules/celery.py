@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from celery import Celery
-from config.db import Config
+from config import get_config
 
 celery = object  # type: Celery
 
 
 def setup_celery(app):
-    worker_config = Config('worker')
     app.config['CELERY_ALWAYS_EAGER'] = False  # important so it doesn't get executed locally!
     app.config['CELERY_TASK_SERIALIZER'] = 'msgpack'
     app.config['CELERY_RESULT_SERIALIZER'] = 'msgpack'
@@ -17,7 +16,10 @@ def setup_celery(app):
     app.config['CELERY_TRACK_STARTED'] = True,
 
     global celery
-    celery = Celery(app.import_name, backend=worker_config['backend'], broker=worker_config['broker'])
+    config = get_config()
+    celery = Celery(app.import_name,
+                    backend=config.get('CELERY', 'backend'),
+                    broker=config.get('CELERY', 'broker'))
     celery.conf.update(app.config)
     TaskBase = celery.Task
 

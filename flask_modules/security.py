@@ -6,7 +6,7 @@ from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMix
 from flask_security.utils import verify_and_update_password, hash_password
 from flask_wtf.csrf import CSRFProtect
 
-from config.db import Config
+from config import get_config
 from db.models.users import Role, User
 
 from .database import db
@@ -26,11 +26,11 @@ class WebUser(db.Model, UserMixin, User):
 
 
 def setup_security(app: Flask, allow_login=False):
-    web_config = Config('web')
-    prefix = '/v4/user'
-    app.config['SECRET_KEY'] = web_config['secret_key']
+    config = get_config()
+    prefix = '/%s/user' % config.get('DEFAULT', 'version')
+    app.config['SECRET_KEY'] = config.get('WEB', 'secret_key')
     app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
-    app.config['SECURITY_PASSWORD_SALT'] = web_config['salt']  # unnecessary but required
+    app.config['SECURITY_PASSWORD_SALT'] = config.get('WEB', 'salt')  # unnecessary but required
     app.config['SECURITY_CONFIRMABLE'] = True
     app.config['SECURITY_REGISTERABLE'] = False
     app.config['SECURITY_RECOVERABLE'] = False
@@ -50,7 +50,7 @@ def setup_security(app: Flask, allow_login=False):
     def get_definition():
         return jsonify(
             {
-                "basePath": "/v4",
+                "basePath": "/" + config.get('DEFAULT', 'version'),
                 "definitions": {
                     "Error": {
                         "properties": {
