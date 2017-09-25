@@ -5,7 +5,7 @@ import {warning} from "./alert";
 import resolveToSelf from "./resolveToSelf";
 
 export const modelApi = new Swagger({
-  url: resolveToSelf('/v4/model/swagger.json', 'api'),
+  url: resolveToSelf('/model/swagger.json', 'api'),
   authorizations: {
     jwt: JWT
   }

@@ -26,6 +26,7 @@
         <meta name="twitter:image" content="{{ logo }}"/>
         <meta name="csrf-token" content="{{ csrf_token() }}"/>
         <meta name="api-key" content="{{ api_key }}"/>
+        <meta name="fanlens-version" content="{{ version }}"
         <meta name="jwt" content="{{ jwt }}"/>
     {% endblock %}
 
@@ -95,6 +96,7 @@
       var authToken = "{{ auth_token }}";
       var JWT = "{{ jwt }}";
       var botId = "{{ bot_id }}"
+      var fanlensVersion = "{{ version }}"
     </script>
 
     <!-- Cookie Consent -->

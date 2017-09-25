@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from flask import redirect, request
-from flask_modules.database import db
+from flask import redirect
+from flask_security import login_required, current_user
+
+from config import get_config
 from db import insert_or_ignore
 from db.models.users import TwitterAuth, UserTwitterAuth, User
+from flask_modules.database import db
 from flask_modules.twitter import twitter_auth, ExtendedTweepyApi
-from flask_security import login_required, current_user
+
+_config = get_config()
 
 
 def user_twitter_auth(user: User):
@@ -46,7 +50,7 @@ def callback_get(next: str, oauth_token: str, oauth_verifier: str):
 
 
 from tweepy.error import TweepError
-import logging
+from flask_modules.logging import logger
 
 
 @login_required
@@ -56,5 +60,5 @@ def test_get():
         twitter = ExtendedTweepyApi(auth_handler=auth)
         return twitter.direct_messages_events_list(count=50)
     except (TweepError, Exception) as err:
-        logging.exception(err)
-        return redirect('/v4/twitter/signin?next=/v4/twitter/test')
+        logger.exception(err)
+        return redirect('/%s/twitter/signin?next=/%s/twitter/test' % _config.get('DEFAULT', 'version'))

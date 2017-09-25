@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
+from config import get_config
 
 logger = object
 
 
 def setup_logging(app):
-    app.config['PROPAGATE_EXCEPTIONS'] = None if os.environ.get('FL_WEB_LOGEXCEPTION') != 'True' else True
+    config = get_config()
+    app.config['PROPAGATE_EXCEPTIONS'] = config.getboolean('WEB', 'logexception', fallback=False)
     global logger
     logger = app.logger

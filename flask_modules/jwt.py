@@ -1,7 +1,7 @@
 import typing
 from flask import Flask, jsonify
 from flask_jwt_simple import JWTManager, get_jwt_identity, create_jwt
-from config.db import Config
+from config import get_config
 
 from db.models.users import User
 
@@ -9,11 +9,11 @@ jwt = JWTManager()
 
 
 def setup_jwt(app: Flask):
-    config = Config('web')
+    config = get_config()
     app.config['JWT_HEADER_NAME'] = 'Authorization'
     app.config['JWT_HEADER_TYPE'] = 'Bearer'
     app.config['JWT_ALGORITHM'] = 'HS256'
-    app.config['JWT_SECRET_KEY'] = config['jwt_secret_key']
+    app.config['JWT_SECRET_KEY'] = config.get('WEB', 'jwt_secret_key')
     jwt.init_app(app)
 
     @jwt.expired_token_loader
