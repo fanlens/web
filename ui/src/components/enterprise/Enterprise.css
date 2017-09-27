@@ -8,11 +8,11 @@ div#team {
 }
 
 div#team-bg {
-    background-image: url(/cdn/img/enterprise-bg-pattern-1080.jpg)
+    background-image: url(/static/img/enterprise-bg-pattern-1080.jpg)
 }
 
 div#team {
-    background-image: url(/cdn/img/enterprise-bg-1080.jpg);
+    background-image: url(/static/img/enterprise-bg-1080.jpg);
     background-repeat: no-repeat;
 }
 

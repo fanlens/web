@@ -9,7 +9,7 @@ const Splash = ({onActivate}) => (
       onClick={onActivate}>
       <div className="title">
         <h1>
-          <img src="/cdn/img/logo.png"/><em>f</em>anlens</h1>
+          <img src="/static/img/logo.png"/><em>f</em>anlens</h1>
         <h3>Artificial Intelligence<br/>
           Social Media Management</h3>
       </div>

@@ -15,12 +15,12 @@ export const TeamMember = ({name, tagline, role, roleDescription, img, bio, soci
       title={`${role} - ${name}`}
       titleStyle={{marginTop: 'calc(72px / 6)'}}
       subtitle={tagline}
-      avatar={<Avatar src={`/cdn/img/${img}-128.jpg`} size={72}/>}
+      avatar={<Avatar src={`/static/img/${img}-128.jpg`} size={72}/>}
       actAsExpander={true}
       showExpandableButton={true}
     />
     <CardMedia expandable={true} mediaStyle={{textAlign: 'center'}}>
-      <img src={`/cdn/img/${img}-512.jpg`} style={{minWidth: '75%', width: '75%'}}/>
+      <img src={`/static/img/${img}-512.jpg`} style={{minWidth: '75%', width: '75%'}}/>
     </CardMedia>
     <CardTitle expandable={true} title={roleDescription} style={{padding: '8px 16px 0px 16px'}}/>
     <CardText expandable={true} style={{padding: '0 16px'}}>
@@ -95,7 +95,7 @@ const Customer = ({name, context, href, comment, img, imgType = 'jpg'}) => (
       title={name}
       titleStyle={{marginTop: 'calc(72px / 6)'}}
       subtitle={<a href={href} target="_blank">{context}</a>}
-      avatar={<Avatar src={`/cdn/img/${img}-128.jpg`} size={72}/>}
+      avatar={<Avatar src={`/static/img/${img}-128.jpg`} size={72}/>}
     />
     <CardText style={{paddingTop: 0}}>
       "{comment}"
@@ -141,7 +141,7 @@ const Sponsor = ({name, context, href, comment, img, imgType = 'jpg'}) => (
     />
     <CardMedia mediaStyle={{textAlign: 'center', paddingBottom: '1em'}}>
       <a href={href} target="_blank">
-        <img src={`/cdn/img/${img}-256.${imgType}`} style={{minWidth: '256px', width: '256px'}}/>
+        <img src={`/static/img/${img}-256.${imgType}`} style={{minWidth: '256px', width: '256px'}}/>
       </a>
     </CardMedia>
   </Card>
