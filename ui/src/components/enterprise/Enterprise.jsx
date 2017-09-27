@@ -15,7 +15,7 @@ const Offer = ({head, tagline, features, theme, description, banner}) => (
       {description}
     </CardText>
     <CardMedia>
-      <div className="offer-banner" style={{backgroundImage: `url(/cdn/img/${banner}-512.jpg)`}}/>
+      <div className="offer-banner" style={{backgroundImage: `url(/static/img/${banner}-512.jpg)`}}/>
     </CardMedia>
     <CardHeader
       titleStyle={{color: 'white', textShadow: 'black 0px 0px 2px'}}

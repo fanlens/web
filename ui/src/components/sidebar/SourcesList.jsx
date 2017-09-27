@@ -26,7 +26,7 @@ function avatarFromType(type, slug) {
     case 'facebook':
       return `https://graph.facebook.com/${slug}/picture`
     default:
-      return '/cdn/img/logo.png';
+      return '/static/img/logo.png';
   }
 }
 
