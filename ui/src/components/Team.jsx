@@ -188,9 +188,10 @@ const TeamPage = () => (
   <main id="team"
         style={{display: 'flex', flexDirection: 'column', flex: '1 1 auto'}}>
     <div style={{overflowY: 'scroll', padding: '16px'}}>
-      <h1 style={{textAlign: 'center'}}>
+        {/*      <h1 style={{textAlign: 'center'}}>
         <a style={{color: 'white', fontWeight: 'bold'}} className="awesome" href="/jobs/cgo" target="_blank">!!! WE ARE HIRING A CGO !!!</a>
       </h1>
+      */}
       <Team/>
       <Customers/>
       <Sponsors/>
