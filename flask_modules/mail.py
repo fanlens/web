@@ -9,7 +9,7 @@ mail = Mail()
 
 def setup_mail(app):
     config = get_config()
-    app.config['MAIL_SERVER'] = config.get('MAIL', 'host')
+    app.config['MAIL_SERVER'] = config.get('MAIL', 'server')
     app.config['MAIL_PORT'] = config.get('MAIL', 'port')
     app.config['MAIL_USERNAME'] = config.get('MAIL', 'username')
     app.config['MAIL_PASSWORD'] = config.get('MAIL', 'password')
