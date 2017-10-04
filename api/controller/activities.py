@@ -8,7 +8,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
 from db import insert_or_ignore
-from db.models.activities import (Data, Source, SourceUser, Language, Tag, TagUser, TagSet, TagSetUser, TagTagSet,
+from db.models.activities import (Data, Source, SourceUser, Language, Lang, Tag, TagUser, TagSet, TagSetUser, TagTagSet,
                                   Tagging, Time, Type)
 from db.models.brain import Prediction
 from flask_modules.database import db
@@ -59,7 +59,7 @@ def generic_parser(data: Data) -> dict:
                     slug=data.source.slug),
         tags=[tag.tag for tag in data.tags],
         created_time=data.time.time.isoformat() if data.time else '1970-01-01T00:00:00+00:00',
-        language=data.language.language.name if data.language else 'un',
+        language=data.language.language.name if data.language else Lang.un.name,
         prediction=dict(
             (prediction.model.tags.filter_by(id=k).one().tag, v)
             for prediction in data.predictions.filter(
