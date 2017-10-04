@@ -36,14 +36,14 @@ def setup_celery(app):
 class Brain(object):
     @staticmethod
     def train_model(*args, **kwargs) -> Celery.AsyncResult:
-        return celery.send_task('worker.brain.' + Brain.train_model.__name__, args=args, kwargs=kwargs)
+        return celery.send_task('worker.brain_tasks.' + Brain.train_model.__name__, args=args, kwargs=kwargs)
 
     @staticmethod
     def predict_text(*args, **kwargs) -> Celery.AsyncResult:
-        return celery.send_task('worker.brain.' + Brain.predict_text.__name__, args=args, kwargs=kwargs)
+        return celery.send_task('worker.brain_tasks.' + Brain.predict_text.__name__, args=args, kwargs=kwargs)
 
 
 class Scrape(object):
     @staticmethod
     def scrape_meta_for_url(*args, **kwargs) -> Celery.AsyncResult:
-        return celery.send_task('worker.scrape.' + Scrape.scrape_meta_for_url.__name__, args=args, kwargs=kwargs)
+        return celery.send_task('worker.scrape_tasks.' + Scrape.scrape_meta_for_url.__name__, args=args, kwargs=kwargs)
