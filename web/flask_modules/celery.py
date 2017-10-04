@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from celery import Celery
-from config import get_config
+from common.config import get_config
 
-celery = object  # type: Celery
+celery: Celery = object()
 
 
 def setup_celery(app):

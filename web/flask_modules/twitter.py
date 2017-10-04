@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from config import get_config
 from tweepy import OAuthHandler, API, binder
+
+from common.config import get_config
 
 _config = get_config()
 _consumer_key = str

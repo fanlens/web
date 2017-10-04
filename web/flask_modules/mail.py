@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from config import get_config
 from flask_mail import Mail
+
+from common.config import get_config
 
 mail = Mail()
 

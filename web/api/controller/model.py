@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import typing
+
 from sqlalchemy import text
 
-from config import get_config
-from db.models.activities import Source, TagSetUser, SourceUser
-from db.models.brain import Model
-from flask_modules.database import db
-from flask_modules.celery import Brain
-from flask_modules.jwt import is_admin, roles_all, current_user_id
+from common.config import get_config
+from common.db.models.activities import Source, TagSetUser, SourceUser
+from common.db.models.brain import Model
 from . import defaults, CurrentUserDao, table_names
 from .activities import source_to_json, tagset_to_json
+from ...flask_modules.celery import Brain
+from ...flask_modules.database import db
+from ...flask_modules.jwt import is_admin, roles_all, current_user_id
 
 current_user_dao = CurrentUserDao()
 

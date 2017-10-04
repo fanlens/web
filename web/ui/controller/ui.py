@@ -3,8 +3,8 @@
 from flask import render_template, Blueprint, g, send_file, request, redirect
 from flask_security import current_user, login_required
 
-from config import get_config
-from flask_modules.jwt import create_jwt_for_user
+from common.config import get_config
+from ...flask_modules.jwt import create_jwt_for_user
 
 _config = get_config()
 

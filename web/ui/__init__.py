@@ -5,14 +5,14 @@
 def create_app():
     import connexion
 
-    from flask_modules.mail import setup_mail
-    from flask_modules.jwt import setup_jwt
-    from flask_modules.security import setup_security
-    from flask_modules.cors import setup_cors
-    from flask_modules.database import setup_db
-    from flask_modules.logging import setup_logging
-    from flask_modules.celery import setup_celery
-    from flask_modules.twitter import setup_twitter
+    from ..flask_modules.mail import setup_mail
+    from ..flask_modules.jwt import setup_jwt
+    from ..flask_modules.security import setup_security
+    from ..flask_modules.cors import setup_cors
+    from ..flask_modules.database import setup_db
+    from ..flask_modules.logging import setup_logging
+    from ..flask_modules.celery import setup_celery
+    from ..flask_modules.twitter import setup_twitter
 
     app = connexion.App(__name__, specification_dir='swagger')
 
@@ -25,7 +25,7 @@ def create_app():
     setup_celery(app.app)
     setup_twitter(app.app)
 
-    from flask_modules import SimpleResolver
+    from ..flask_modules import SimpleResolver
     from .controller.ui import ui, ui_nonauth
     from .controller.landing import landing
     from .controller.forwards import forwards

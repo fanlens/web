@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 
-from db.models.users import Enquiry
 from flask import current_app
 from flask_mail import Message
-from flask_modules import annotation_composer
-from flask_modules.database import db
-from flask_modules.mail import mail
-from flask_modules.security import csrf
 from flask_security import auth_token_required, roles_required
 from sqlalchemy.exc import IntegrityError
+
+from common.db.models.users import Enquiry
+from ...flask_modules import annotation_composer
+from ...flask_modules.database import db
+from ...flask_modules.mail import mail
+from ...flask_modules.security import csrf
 
 default = annotation_composer(csrf.exempt)
 

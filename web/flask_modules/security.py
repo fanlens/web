@@ -3,12 +3,11 @@
 
 from flask import g, jsonify, Flask, request
 from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, UserMixin, auth_required, current_user
-from flask_security.utils import verify_and_update_password, hash_password
+from flask_security.utils import verify_and_update_password
 from flask_wtf.csrf import CSRFProtect
 
-from config import get_config
-from db.models.users import Role, User
-
+from common.config import get_config
+from common.db.models.users import Role, User
 from .database import db
 from .jwt import create_jwt_for_user
 

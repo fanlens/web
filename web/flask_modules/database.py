@@ -3,9 +3,8 @@
 
 from flask_sqlalchemy import SQLAlchemy
 
-from config import get_config
-
-from db import Base
+from common.config import get_config
+from common.db import Base
 
 db = SQLAlchemy(metadata=Base.metadata)
 
