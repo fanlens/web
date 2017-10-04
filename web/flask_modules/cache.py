@@ -4,7 +4,7 @@
 from flask import Flask
 from flask_cache import Cache
 
-from config import get_config
+from common.config import get_config
 
 cache = Cache()
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from config import get_config
+from common.config import get_config
 
-logger = object
+logger = object()
 
 
 def setup_logging(app):

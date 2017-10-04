@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from .base62 import encode, decode
-from db.models.scrape import Shortener
 from flask import Blueprint, redirect, jsonify, request, render_template
-from flask_modules.celery import Scrape
-from flask_modules.database import db
-from flask_modules.security import csrf
 from flask_security import roles_required, auth_token_required, login_required, current_user
+
+from common.db.models.scrape import Shortener
+from .base62 import encode, decode
+from ...flask_modules.celery import Scrape
+from ...flask_modules.database import db
+from ...flask_modules.security import csrf
 
 forwards = Blueprint('forwards', __name__)
 forwards.add_url_rule('/jobs/cgo', 'cgo', lambda: redirect('/cdn/img/jobs/cgo.pdf'))

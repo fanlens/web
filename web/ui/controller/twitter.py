@@ -3,11 +3,13 @@
 from flask import redirect
 from flask_security import login_required, current_user
 
-from config import get_config
-from db import insert_or_ignore
-from db.models.users import TwitterAuth, UserTwitterAuth, User
-from flask_modules.database import db
-from flask_modules.twitter import twitter_auth, ExtendedTweepyApi
+from common.config import get_config
+from common.db import insert_or_ignore
+from common.db.models.users import TwitterAuth, UserTwitterAuth, User
+from ...flask_modules.database import db
+from ...flask_modules.twitter import twitter_auth, ExtendedTweepyApi
+from tweepy.error import TweepError
+from ...flask_modules.logging import logger
 
 _config = get_config()
 
@@ -47,10 +49,6 @@ def callback_get(next: str, oauth_token: str, oauth_verifier: str):
                                                                                 synchronize_session=False)
     db.session.commit()
     return redirect(next)
-
-
-from tweepy.error import TweepError
-from flask_modules.logging import logger
 
 
 @login_required

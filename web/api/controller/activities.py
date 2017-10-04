@@ -7,12 +7,13 @@ from flask import redirect
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from db import insert_or_ignore
-from db.models.activities import (Data, Source, SourceUser, Language, Lang, Tag, TagUser, TagSet, TagSetUser, TagTagSet,
-                                  Tagging, Time, Type)
-from db.models.brain import Prediction
-from flask_modules.database import db
+from common.db import insert_or_ignore
+from common.db.models.activities import (Data, Source, SourceUser, Language, Lang, Tag, TagUser, TagSet, TagSetUser,
+                                         TagTagSet,
+                                         Tagging, Time, Type)
+from common.db.models.brain import Prediction
 from . import defaults, current_user_dao, table_names
+from ...flask_modules.database import db
 
 _best_models_for_user_sql = text('''
 SELECT id FROM (
@@ -227,7 +228,7 @@ def source_id_activity_id_tags_patch(source_id: int, activity_id: str, body: dic
                           add=add or tuple([None]),
                           remove=remove or tuple([None]))
 
-    data = source_id_activity_id_get(source_id, activity_id, _internal=True)  # type: Data
+    data: Data = source_id_activity_id_get(source_id, activity_id, _internal=True)
     if isinstance(data, tuple):  # error
         return data
     return {'id': activity_id, 'tags': [tag.tag for tag in data.tags]}

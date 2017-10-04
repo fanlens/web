@@ -1,9 +1,10 @@
 import typing
+
 from flask import Flask, jsonify
 from flask_jwt_simple import JWTManager, get_jwt_identity, create_jwt
-from config import get_config
 
-from db.models.users import User
+from common.config import get_config
+from common.db.models.users import User
 
 jwt = JWTManager()
 

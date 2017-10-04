@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import requests
-from config import get_config
-from flask import Blueprint, flash, redirect, render_template, request
+from flask import Blueprint, flash, render_template, request
 from flask_mail import Message
-from flask_modules.mail import mail
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, HiddenField
+from wtforms import StringField, TextAreaField, HiddenField
 from wtforms.validators import Email, InputRequired
+
+from common.config import get_config
+from ...flask_modules.mail import mail
 
 config = get_config()
 

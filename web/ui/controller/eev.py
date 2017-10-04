@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 import requests
 from flask_security import login_required, roles_accepted, current_user
-from config import get_config
-from flask_modules.jwt import create_jwt_for_user
+
+from common.config import get_config
+from ...flask_modules.jwt import create_jwt_for_user
 
 config = get_config()
 

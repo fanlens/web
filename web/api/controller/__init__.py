@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from flask_jwt_simple import jwt_required
-from flask_modules import annotation_composer
-from flask_modules.jwt import roles_any, current_user_id
-from flask_modules.database import db
 from sqlalchemy.orm import Query
-from db.models.activities import Source, SourceUser, Data, Tag, TagUser, TagSet, TagSetUser
-from db.models.brain import ModelUser, Model
-from db.models.users import User
+
+from common.db.models.activities import Source, SourceUser, Data, Tag, TagUser, TagSet, TagSetUser
+from common.db.models.brain import ModelUser, Model
+from common.db.models.users import User
+from ...flask_modules import annotation_composer
+from ...flask_modules.database import db
+from ...flask_modules.jwt import roles_any, current_user_id
 
 defaults = annotation_composer(
     jwt_required,
