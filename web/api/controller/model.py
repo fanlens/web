@@ -1,92 +1,98 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import typing
+"""Implementations for the activities.yaml Swagger definition. See yaml / Swagger UI for documentation."""
+# see swagger pylint: disable=missing-docstring
+
+from contextlib import suppress
+from typing import Optional
 
 from sqlalchemy import text
+from sqlalchemy.orm import Query
+from sqlalchemy.orm.exc import NoResultFound
 
 from common.config import get_config
-from common.db.models.activities import Source, TagSetUser, SourceUser
+from common.db.models.activities import Source, SourceUser, TagSetUser
 from common.db.models.brain import Model
-from . import defaults, CurrentUserDao, table_names
-from .activities import source_to_json, tagset_to_json
-from ...flask_modules.celery import Brain
+from . import defaults
+from ..model import table_names
+from ..model.model import ModelQueryDto, model_query_dto, model_to_json, prediction_query_dto
+from ..model.user import current_user_dao
+from ...flask_modules import TJson, TJsonResponse, bad_arg
+from ...flask_modules.celery import brain
 from ...flask_modules.database import db
-from ...flask_modules.jwt import is_admin, roles_all, current_user_id
+from ...flask_modules.jwt import current_user_id, roles_all
 
-current_user_dao = CurrentUserDao()
-
-_config = get_config()
-
-
-def _model_to_result(model: Model):
-    result = dict(
-        id=str(model.id),
-        trained_ts=model.trained_ts,
-        tagset=tagset_to_json(model.tagset),
-        sources=[source_to_json(source) for source in model.sources])
-    if is_admin():
-        result['score'] = model.score
-        result['params'] = model.params
-    return result
+_CONFIG = get_config()
 
 
 @defaults
-def root_get() -> dict:
-    return dict(models=[_model_to_result(model) for model in current_user_dao.models])
+def root_get() -> TJsonResponse:
+    return dict(models=[model_to_json(model) for model in current_user_dao.models])
 
 
 @defaults
-def model_id_get(model_id: str) -> tuple:
+def model_id_get(model_id: str) -> TJsonResponse:
     model = current_user_dao.models.filter(Model.id == model_id).one_or_none()
     if not model:
         return dict(error='Model not associated to user'), 404
-    return _model_to_result(model), 200
+    return model_to_json(model), 200
 
 
-@defaults
-def search_post(body: dict, internal=False, evaluate=True) -> typing.Union[tuple, dict]:
-    tagset_id = body.get('tagset_id')
-    source_ids = body.get('source_ids')
-    assert not internal or tagset_id or source_ids
-    if tagset_id is None and source_ids is None:
-        return dict(error='No criterium specified'), 400
+def _best_model_query_by_id(model_id: str) -> Query:
+    return current_user_dao.models.filter(Model.id == model_id).limit(1)
+
+
+def _best_model_query_by_dto(query: ModelQueryDto) -> Query:
     matching = current_user_dao.models
-    if tagset_id:
-        matching = matching.filter(Model.tagset_id == tagset_id)
-    if source_ids:
-        matching = matching.filter(Model.sources.any(Source.id.in_(source_ids)))
-    model_query = matching.order_by(Model.score.desc(), Model.trained_ts.desc())
-
-    if internal and not evaluate:
-        return model_query
-
-    model = model_query.first()
-    if model is None:
-        return None if internal else (dict(error='No model found for this query'), 404)
-    if internal:
-        return _model_to_result(model)
-    return _model_to_result(model), 200
+    if query.tagset_id:
+        matching = matching.filter(Model.tagset_id == query.tagset_id)
+    if query.source_ids:
+        matching = matching.filter(Model.sources.any(Source.id.in_(query.source_ids)))
+    return matching.order_by(Model.score.desc(), Model.trained_ts.desc()).limit(1)
 
 
 @defaults
-def prediction_post(body: dict, model_id=None) -> dict:
-    if model_id:
-        model_query = current_user_dao.models.filter(Model.id == model_id).one_or_none()
-    else:
-        model_query = search_post(body, internal=True, evaluate=False)
+def search_post(body: TJson) -> TJsonResponse:
+    try:
+        dto = model_query_dto(body)
+    except ValueError as err:
+        return bad_arg(err)
 
-    model = model_query.first()
-    text = body['text']
-    prediction = Brain.predict_text(str(model.id), text).get()
-    prediction = dict((model.tags.filter_by(id=k).one().tag, v) for k, v in prediction)
-    return dict(text=text, prediction=prediction)
+    model_query = _best_model_query_by_dto(query=dto)
+
+    try:
+        model = model_query.one()
+        return model_to_json(model)
+    except NoResultFound:
+        return dict(error='No model found for this query'), 404
+
+
+@defaults
+def prediction_post(body: TJson, model_id: Optional[str] = None) -> TJsonResponse:
+    dto = prediction_query_dto(body)
+
+    try:
+        if model_id:
+            model_query = _best_model_query_by_id(model_id)
+        else:
+            model_query = _best_model_query_by_dto(model_query_dto(body))
+        model: Model = model_query.one()
+        prediction = brain.predict_text(model['id'], dto.text).get()
+        prediction = dict((model.tags.filter_by(id=k).one().tag, v) for k, v in prediction)
+        return dict(text=dto.text, prediction=prediction)
+    except NoResultFound:
+        return dict(error='No model found for this query'), 404
+    except ValueError as err:
+        return bad_arg(err)
 
 
 @defaults
 @roles_all('admin')  # limited atm
-def train_post(body: dict, fast=True) -> tuple:
-    tagset_id = body['tagset_id']
-    source_ids = body['source_ids']
+def train_post(body: TJson, fast: bool = True) -> TJsonResponse:
+    try:
+        dto = model_query_dto(body)
+    except ValueError as err:
+        return bad_arg(err)
 
     tagset_source_check_sql = text("""
     SELECT count(*) = array_length(:source_ids, 1)	
@@ -97,8 +103,8 @@ def train_post(body: dict, fast=True) -> tuple:
           source_user.source_id = ANY (:source_ids)
     """ % table_names(tagset_user_table=TagSetUser, source_user_table=SourceUser))
     valid = db.engine.execute(tagset_source_check_sql,
-                              tagset_id=tagset_id,
-                              source_ids=source_ids,
+                              tagset_id=dto.tagset_id,
+                              source_ids=dto.source_ids,
                               user_id=current_user_id()).scalar()
     if not valid:
         return dict(error="user does not have access to all specified ressources"), 403
@@ -107,14 +113,21 @@ def train_post(body: dict, fast=True) -> tuple:
     score = None
     model_id = None
     if fast:
-        best_model = search_post(dict(tagset_id=tagset_id, source_ids=source_ids), internal=True) or dict()
-        model_id = best_model.get('id')
-        params = best_model.get('params')
-        score = best_model.get('score')
-    job = Brain.train_model(current_user_dao.id, tagset_id, tuple(source_ids), n_estimators=10, _params=params,
+        model_query = _best_model_query_by_dto(dto)
+        with suppress(NoResultFound):  # if nothing found, ignore the fast params
+            best_model = model_query.one()
+            model_id = best_model.id
+            params = best_model.params
+            score = best_model.score
+
+    job = brain.train_model(current_user_dao.user_id,
+                            dto.tagset_id,
+                            tuple(dto.source_ids or []),
+                            n_estimators=10,
+                            _params=params,
                             _score=score)
     if fast and model_id is not None:
-        redir_url = '/%s/model/%s' % (_config.get('DEFAULT', 'version'), str(model_id))
+        redir_url = '/%s/model/%s' % (_CONFIG.get('DEFAULT', 'version'), str(model_id))
     else:
-        redir_url = '/%s/search' % _config.get('DEFAULT', 'version')
+        redir_url = '/%s/search' % _CONFIG.get('DEFAULT', 'version')
     return dict(job=job.id, url=redir_url), 202

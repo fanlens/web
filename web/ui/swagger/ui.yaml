@@ -60,12 +60,6 @@ paths:
       summary: get all enquiries grouped by tag
       tags: [enquiries]
       consumes: [application/json]
-      parameters:
-      - name: filter_done
-        in: query
-        type: boolean
-        required: false
-        default: false
       responses:
         200:
           description: all enquiries grouped by tag

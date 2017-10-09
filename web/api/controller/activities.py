@@ -1,113 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import typing
-from contextlib import suppress
+"""Implementations for the activities.yaml Swagger definition. See yaml / Swagger UI for documentation."""
+# see swagger pylint: disable=missing-docstring,too-many-arguments
 
-from flask import redirect
+from contextlib import suppress
+from typing import Optional, Tuple, Union, cast
+
+from flask import Response, redirect
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Query
 
 from common.db import insert_or_ignore
-from common.db.models.activities import (Data, Source, SourceUser, Language, Lang, Tag, TagUser, TagSet, TagSetUser,
-                                         TagTagSet,
-                                         Tagging, Time, Type)
-from common.db.models.brain import Prediction
-from . import defaults, current_user_dao, table_names
+from common.db.models.activities import Data, Language, Source, SourceUser, Tag, TagSet, TagSetUser, TagTagSet, \
+    TagUser, Tagging, Time
+from . import defaults
+from ..model import table_names
+from ..model.activities import parse, source_to_json, tagset_to_json
+from ..model.user import current_user_dao
+from ...flask_modules import TJson, TJsonResponse, updated_response, deleted_response
 from ...flask_modules.database import db
 
-_best_models_for_user_sql = text('''
-SELECT id FROM (
-SELECT DISTINCT ON (tagset_id, sources)
-    model.id, model.score, model.trained_ts, model.tagset_id, jsonb_agg(DISTINCT src_mdl.source_id ORDER BY src_mdl.source_id) AS sources
-FROM activity.model AS model
-JOIN activity.source_model AS src_mdl ON src_mdl.model_id = model.id
-JOIN activity.model_user AS model_user ON model_user.model_id = model.id
-WHERE model_user.user_id = :user_id 
-GROUP BY model.tagset_id, model.id, model.score, model.trained_ts
-ORDER BY model.tagset_id, sources, score DESC, model.trained_ts DESC) AS best_models''')
 
-
-def _activity_id_query(source_id, activity_id):
+def _activity_id_query(source_id: int, activity_id: str) -> Query:
     return current_user_dao.data_ids.filter((Source.id == source_id) & (Data.object_id == activity_id))
 
 
-def _activity_query(source_id, activity_id):
+def _activity_query(source_id: int, activity_id: str) -> Query:
     return current_user_dao.data.filter((Source.id == source_id) & (Data.object_id == activity_id))
 
 
-def source_to_json(source: Source):
-    return dict(
-        id=source.id,
-        type=source.type,
-        uri=source.uri,
-        slug=source.slug)
-
-
-def tagset_to_json(tagset: TagSet):
-    return dict(
-        id=tagset.id,
-        title=tagset.title,
-        tags=[tag.tag for tag in tagset.tags])
-
-
-def generic_parser(data: Data) -> dict:
-    # todo for large amount of rows this is very inefficient
-    return dict(
-        text=data.text.text if data.text else "",
-        source=dict(id=data.source.id,
-                    type=data.source.type,
-                    uri=data.source.uri,
-                    slug=data.source.slug),
-        tags=[tag.tag for tag in data.tags],
-        created_time=data.time.time.isoformat() if data.time else '1970-01-01T00:00:00+00:00',
-        language=data.language.language.name if data.language else Lang.un.name,
-        prediction=dict(
-            (prediction.model.tags.filter_by(id=k).one().tag, v)
-            for prediction in data.predictions.filter(
-                Prediction.model_id.in_(_best_models_for_user_sql.bindparams(user_id=current_user_dao.id)))
-            for k, v in prediction.prediction)
-        if data.predictions else dict())
-
-
-_parsers = {
-    Type.facebook: lambda data: dict(
-        id=data.data['id'],
-        user=data.data.get('from', dict(id=data.data['id'].split('_')[0])),
-        **generic_parser(data)
-    ),
-    Type.twitter: lambda data: dict(
-        id=data.data['id_str'],
-        user=dict(id=data.data['user']['screen_name'], name=data.data['user']['name']),
-        **generic_parser(data)
-    ),
-    Type.twitter_dm: lambda data: dict(
-        id=data.data['id'],
-        user=dict(id=data.data['message_create']['sender_id'], name=data.data['message_create']['sender_id']),
-        **generic_parser(data)
-    ),
-    Type.crunchbase: lambda _: None,
-    Type.generic: lambda data: dict(
-        id=str(data.data['comment_id']),
-        user=dict(id=str(data.data['user']['id']), name=data.data['user']['id']),
-        **generic_parser(data)
-    ),
-}
-
-
-def parser(data: Data) -> dict:
-    return _parsers[Type(data.source.type)](data)
-
-
 @defaults
-def root_get(count: int = None,
-             max_id: str = None,
-             since: str = None,
-             until: str = None,
-             source_ids: list = None,
-             tagset_ids: list = None,
-             tags: list = None,
-             languages: list = None,
-             random: bool = False) -> typing.Union[dict, tuple]:
+def root_get(count: int,
+             max_id: Optional[str] = None,
+             since: Optional[str] = None,
+             until: Optional[str] = None,
+             source_ids: Optional[list] = None,
+             tagset_ids: Optional[list] = None,
+             tags: Optional[list] = None,
+             languages: Optional[list] = None,
+             random: Optional[bool] = False) -> TJsonResponse:
     data_query = (db.session.query(Data)
                   .filter(Data.source_id.in_(current_user_dao.source_ids)))
 
@@ -131,7 +63,7 @@ def root_get(count: int = None,
                       .join(TagTagSet, TagTagSet.tag_id == Tagging.tag_id)
                       .join(TagSetUser,
                             (TagSetUser.tagset_id == TagTagSet.tagset_id) &
-                            (TagSetUser.user_id == current_user_dao.id))
+                            (TagSetUser.user_id == current_user_dao.user_id))
                       .filter(TagTagSet.tagset_id.in_(tuple(tagset_ids))))
     if tags:
         data_query = (data_query
@@ -139,7 +71,7 @@ def root_get(count: int = None,
                       .join(Tag, Tag.id == Tagging.tag_id)
                       .join(TagUser,
                             (TagUser.tag_id == Tag.id) &
-                            (TagUser.user_id == current_user_dao.id))
+                            (TagUser.user_id == current_user_dao.user_id))
                       .filter(Tag.tag.in_(tags)))
 
     if random:
@@ -155,12 +87,12 @@ def root_get(count: int = None,
 
     data_query = data_query.limit(count)
 
-    data = [parser(data) for data in data_query]
+    data = [parse(data) for data in data_query]
     return dict(activities=list(data))
 
 
 @defaults
-def root_post(import_activities: dict) -> typing.Union[dict, tuple]:
+def root_post(import_activities: dict) -> TJsonResponse:
     ids = set()
     for activity in import_activities['activities']:
         if 'id' not in activity:
@@ -168,7 +100,7 @@ def root_post(import_activities: dict) -> typing.Union[dict, tuple]:
         if 'source_id' not in activity:
             return dict(error='no source_id found for ' + activity['id']), 400
         ids.add((activity['source_id'], activity['id']))
-        err = source_id_activity_id_put(activity['source_id'], activity['id'], activity, False)
+        err: TJsonResponse = source_id_activity_id_put(activity['source_id'], activity['id'], activity, False)
         if err:
             db.session.rollback()
             return err
@@ -177,17 +109,19 @@ def root_post(import_activities: dict) -> typing.Union[dict, tuple]:
 
 
 @defaults
-def source_id_activity_id_get(source_id: int, activity_id: str, _internal=False) -> typing.Union[dict, tuple, Data]:
+def source_id_activity_id_get(source_id: int, activity_id: str, _internal: bool = False) -> Union[TJsonResponse, Data]:
     data = _activity_query(source_id, activity_id).one_or_none()
     if not data:
         return dict(error='No activity found for user and %d -> %s' % (source_id, activity_id)), 404
     if _internal:
         return data
-    return parser(data)
+    return parse(data)
 
 
 @defaults
-def source_id_activity_id_tags_patch(source_id: int, activity_id: str, body: dict) -> typing.Union[dict, tuple]:
+def source_id_activity_id_tags_patch(source_id: int,  # pylint: disable=invalid-name
+                                     activity_id: str,
+                                     body: dict) -> TJsonResponse:
     remove = tuple(set(body.get('remove', [])))
     add = tuple(set(body.get('add', [])))
 
@@ -224,23 +158,23 @@ def source_id_activity_id_tags_patch(source_id: int, activity_id: str, body: dic
                               source_user_table=SourceUser))
         db.engine.execute(sql,
                           object_id=activity_id,
-                          user_id=current_user_dao.id,
+                          user_id=current_user_dao.user_id,
                           add=add or tuple([None]),
                           remove=remove or tuple([None]))
 
     data: Data = source_id_activity_id_get(source_id, activity_id, _internal=True)
     if isinstance(data, tuple):  # error
-        return data
+        return cast(Tuple[TJson, int], data)
     return {'id': activity_id, 'tags': [tag.tag for tag in data.tags]}
 
 
 @defaults
 def source_id_activity_id_put(source_id: int,
                               activity_id: str,
-                              activity_import: dict,
-                              commit=True) -> typing.Union[dict, tuple]:
-    if ('source_id' in activity_import and source_id != activity_import['source_id']) or (
-                    'id' in activity_import and activity_id != activity_import['id']):
+                              activity_import: TJson,
+                              commit: bool = True) -> TJsonResponse:
+    if ('source_id' in activity_import and source_id != activity_import['source_id']) \
+            or ('id' in activity_import and activity_id != activity_import['id']):
         db.session.rollback()
         return dict(error="source_id does not match activity"), 400
 
@@ -252,23 +186,27 @@ def source_id_activity_id_put(source_id: int,
                      Data(source_id=source_id,
                           object_id=activity_id,
                           data=activity_import['data']))
-    commit and db.session.commit()
+    if commit:
+        db.session.commit()
+    return updated_response()
 
 
 @defaults
-def source_id_activity_id_delete(source_id: int, activity_id: str, commit=True):
+def source_id_activity_id_delete(source_id: int, activity_id: str, commit: bool = True) -> TJsonResponse:
     db.session.query(Data).filter(Data.id.in_(_activity_id_query(source_id, activity_id))).delete(
         synchronize_session=False)
-    commit and db.session.commit()
+    if commit:
+        db.session.commit()
+    return deleted_response()
 
 
 @defaults
-def sources_get() -> dict:
+def sources_get() -> TJsonResponse:
     return dict(sources=[source_to_json(source) for source in current_user_dao.sources.all()])
 
 
 @defaults
-def sources_post(source: dict) -> tuple:
+def sources_post(source: dict) -> Union[TJsonResponse, Response]:
     if 'id' in source:
         return dict(error='id not allowed, will be assigned'), 400
 
@@ -290,12 +228,12 @@ def sources_post(source: dict) -> tuple:
                                    type=source['type'],
                                    uri=source['type'],
                                    slug=source['slug'],
-                                   user_id=current_user_dao.id).first()
+                                   user_id=current_user_dao.user_id).first()
     return redirect('/sources/%d' % source_id, code=201)
 
 
 @defaults
-def sources_source_id_get(source_id: int) -> typing.Union[dict, tuple]:
+def sources_source_id_get(source_id: int) -> TJsonResponse:
     source = current_user_dao.sources.filter_by(id=source_id).one_or_none()
     return (dict(id=source.id,
                  type=source.type,
@@ -305,7 +243,7 @@ def sources_source_id_get(source_id: int) -> typing.Union[dict, tuple]:
 
 
 @defaults
-def sources_source_id_patch(source_id: int, source: dict) -> typing.Union[dict, tuple]:
+def sources_source_id_patch(source_id: int, source: dict) -> TJsonResponse:
     user_source = current_user_dao.sources.filter_by(id=source_id).one_or_none()
     if user_source is None:
         return dict(error="source does not exist"), 404
@@ -318,19 +256,21 @@ def sources_source_id_patch(source_id: int, source: dict) -> typing.Union[dict, 
     if 'slug' in source:
         user_source.slug = source['slug']
     db.session.commit()
+    return source_to_json(user_source)
 
 
 @defaults
-def sources_source_id_delete(source_id: int) -> dict:
+def sources_source_id_delete(source_id: int) -> TJsonResponse:
     db.session.query(Source).filter((Source.id == source_id) & Source.id.in_(current_user_dao.source_ids)).delete(
         synchronize_session=False)
     db.session.commit()
+    return deleted_response()
 
 
 @defaults
-def tags_get(with_count: bool = False) -> dict:
+def tags_get(with_count: bool = False) -> TJsonResponse:
     if with_count:
-        tags = {}
+        tags: TJson = TJson()
         with_count_sql = text("""
         SELECT tag.tag, count(*)
         FROM %(data_table)s as data
@@ -342,8 +282,8 @@ def tags_get(with_count: bool = False) -> dict:
                           tagging_table=Tagging,
                           tag_table=Tag,
                           tag_user_table=TagUser))
-        tags['counts'] = dict(
-            (tag, tag_count) for tag, tag_count in db.engine.execute(with_count_sql, user_id=current_user_dao.id))
+        tags['counts'] = dict((tag, tag_count)
+                              for tag, tag_count in db.engine.execute(with_count_sql, user_id=current_user_dao.user_id))
         tags['tags'] = list(tags['counts'].keys())
     else:
         tags = dict(tags=[tag.tag for tag in current_user_dao.tags])
@@ -351,7 +291,7 @@ def tags_get(with_count: bool = False) -> dict:
 
 
 @defaults
-def tags_tag_get(tag: str, with_count: bool = False) -> typing.Union[dict, tuple]:
+def tags_tag_get(tag: str, with_count: bool = False) -> TJsonResponse:
     the_tag = current_user_dao.tags.filter(Tag.tag == tag).one_or_none()
     if the_tag is None:
         return dict(error="Tag not found"), 404
@@ -363,30 +303,32 @@ def tags_tag_get(tag: str, with_count: bool = False) -> typing.Union[dict, tuple
 
 
 @defaults
-def tags_tag_put(tag: str, commit=True) -> tuple:
-    tag = Tag(tag=tag, created_by_user_id=current_user_dao.id)
+def tags_tag_put(tag: str, commit: bool = True) -> TJsonResponse:
+    tag_obj = Tag(tag=tag, created_by_user_id=current_user_dao.user_id)
     with suppress(IntegrityError):
-        db.session.add(tag)
+        db.session.add(tag_obj)
         # todo: performance - one unnecessary roundtrip. ignore until relevant
-        current_user_dao.self.one().tags.append(tag)
-        commit and db.session.commit()
-    return dict(tag=tag.tag), 201
+        current_user_dao.self.one().tags.append(tag_obj)
+        if commit:
+            db.session.commit()
+    return dict(tag=tag_obj.tag), 201
 
 
 @defaults
-def tags_tag_delete(tag: str):
+def tags_tag_delete(tag: str) -> TJsonResponse:
     current_user_dao.created_tags.filter(Tag.tag == tag).delete()
     db.session.commit()
+    return deleted_response()
 
 
 @defaults
-def tagsets_get() -> dict:
+def tagsets_get() -> TJsonResponse:
     tagsets = [tagset_to_json(tagset) for tagset in current_user_dao.tagsets]
     return dict(tagSets=tagsets)
 
 
 @defaults
-def tagsets_post(tagset: dict):
+def tagsets_post(tagset: TJson) -> Union[TJsonResponse, Response]:
     insert_tagset_sql = text("""
     -- create tagset and associate to user
     WITH inserted_tagset_id as (
@@ -415,17 +357,17 @@ def tagsets_post(tagset: dict):
                       tagset_user_table=TagSetUser,
                       tag_tagset_table=TagTagSet))
     result = list(db.engine.execute(insert_tagset_sql.execution_options(autocommit=True),
-                                    user_id=current_user_dao.id,
+                                    user_id=current_user_dao.user_id,
                                     tags=tagset['tags'],
                                     title=tagset['title']))
-    if result:
-        return redirect('/tagset/%d' % result[0][0], code=201)
-    else:
+    if not result:
         return dict(error='no tagset created'), 200
+
+    return redirect('/tagset/%d' % result[0][0], code=201)
 
 
 @defaults
-def tagsets_tagset_id_get(tagset_id: int) -> typing.Union[dict, tuple]:
+def tagsets_tagset_id_get(tagset_id: int) -> TJsonResponse:
     tagset = current_user_dao.tagsets.filter(TagSet.id == tagset_id).one_or_none()
     if not tagset:
         return dict(error="tagset does not exist"), 404
@@ -435,7 +377,7 @@ def tagsets_tagset_id_get(tagset_id: int) -> typing.Union[dict, tuple]:
 
 
 @defaults
-def tagsets_tagset_id_patch(tagset_id: int, tagset: dict) -> typing.Union[dict, tuple]:
+def tagsets_tagset_id_patch(tagset_id: int, tagset: dict) -> TJsonResponse:
     user_tagset = current_user_dao.tagsets.filter_by(id=tagset_id).one_or_none()
     if user_tagset is None:
         return dict(error="tagset does not exist"), 404
@@ -448,33 +390,35 @@ def tagsets_tagset_id_patch(tagset_id: int, tagset: dict) -> typing.Union[dict, 
         for tag in tags:  # make sure all tags are in DB
             tags_tag_put(tag, commit=False)
         user_tagset.tags.update(
-            db.session.query(Tag).filter(Tag.user.any(id=current_user_dao.id)).filter(Tag.tag.in_(tags)))
+            db.session.query(Tag).filter(Tag.user.any(id=current_user_dao.user_id)).filter(Tag.tag.in_(tags)))
     db.session.commit()
-    if user_tagset:
-        return dict(id=user_tagset.id,
-                    title=user_tagset.title,
-                    tags=[tag.tag for tag in user_tagset.tags]), 200
-    else:
+    if not user_tagset:
         return dict(error="tagset does not exist"), 404
 
+    return dict(id=user_tagset.id,
+                title=user_tagset.title,
+                tags=[tag.tag for tag in user_tagset.tags]), 200
+
 
 @defaults
-def tagsets_tagset_id_delete(tagset_id: int) -> dict:
+def tagsets_tagset_id_delete(tagset_id: int) -> TJsonResponse:
     current_user_dao.tagsets.filter(TagSet.id == tagset_id).delete(synchronize_session=False)
     db.session.commit()
+    return deleted_response()
 
 
 @defaults
-def tagsets_tagset_id_tag_delete(tagset_id: int, tag: str) -> typing.Union[dict, tuple]:
+def tagsets_tagset_id_tag_delete(tagset_id: int, tag: str) -> TJsonResponse:
     db.session.query(TagTagSet).filter(
         TagTagSet.tagset_id.in_(current_user_dao.tagset_ids) &
         (TagTagSet.tagset_id == tagset_id) &
         (TagTagSet.tag.has(tag=tag))).delete(synchronize_session=False)
     db.session.commit()
+    return deleted_response()
 
 
 @defaults
-def tagsets_tagset_id_tag_put(tagset_id: int, tag: str) -> typing.Union[dict, tuple]:
+def tagsets_tagset_id_tag_put(tagset_id: int, tag: str) -> TJsonResponse:
     add_tag_to_tagset_sql = text("""
     INSERT INTO %(tag_tagset_table)s (tag_id, tagset_id)
     SELECT tag.id as tag_id, :tagset_id as tagset_id
@@ -485,8 +429,9 @@ def tagsets_tagset_id_tag_put(tagset_id: int, tag: str) -> typing.Union[dict, tu
     RETURNING id;
     """ % table_names(tag_tagset_table=TagTagSet, tag_table=Tag, tag_user_table=TagUser))
     result = list(db.engine.execute(add_tag_to_tagset_sql.execution_options(autocommit=True),
-                                    user_id=current_user_dao.id,
+                                    user_id=current_user_dao.user_id,
                                     tagset_id=tagset_id,
                                     tag=tag))
     if len(result) != 1:
         return dict(error="could not add tag to tagset"), 400
+    return updated_response()
