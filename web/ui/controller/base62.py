@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""Simple base 62 encoding, useful for converting ints into strings with less characters"""
+# based on https://stackoverflow.com/a/1119769/4354645
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-def encode(num, alphabet=ALPHABET):
-    """Encode a number in Base X
-
-    `num`: The number to encode
-    `alphabet`: The alphabet to use for encoding
+def encode(num: int, alphabet: str = ALPHABET) -> str:
+    """
+    Encode a number in Base 62 (or different alphabet)
+    :param num: The number to encode
+    :param alphabet: The alphabet to use for encoding
+    :return: num converted to base62
     """
     if num == 0:
         return alphabet[0]
@@ -21,12 +24,11 @@ def encode(num, alphabet=ALPHABET):
     return ''.join(arr)
 
 
-def decode(string, alphabet=ALPHABET):
-    """Decode a Base X encoded string into the number
-
-    Arguments:
-    - `string`: The encoded string
-    - `alphabet`: The alphabet to use for encoding
+def decode(string: str, alphabet: str = ALPHABET) -> int:
+    """
+    Decode a Base 62 (or different alphabet) encoded string into the number
+    :param string: The encoded string
+    :param alphabet: The alphabet to use for encoding
     """
     base = len(alphabet)
     strlen = len(string)

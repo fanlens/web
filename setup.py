@@ -18,6 +18,7 @@ setup(
         'msgpack-python',
         'requests',
         'Tweepy',
+        'sqlalchemy',
         'psycopg2',
         'redis',
         'Flask',
