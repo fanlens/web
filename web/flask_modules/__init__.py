@@ -98,9 +98,16 @@ def annotation_composer(*decs: _TDecorator) -> _TDecorator:
         :param fun: function to decorate
         :return: decorated function
         """
+        wrapped = fun
+
         for dec in reversed(decs):
-            fun = wraps(fun)(dec(fun))
-        return fun
+            wrapped = dec(wrapped)
+
+        @wraps(fun)
+        def _wrapper(*args: Any, **kwargs: Any) -> TJsonResponse:
+            return wrapped(*args, **kwargs)
+
+        return _wrapper
 
     return deco
 

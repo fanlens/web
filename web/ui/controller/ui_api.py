@@ -15,15 +15,15 @@ from ...flask_modules.database import db
 from ...flask_modules.mail import mail
 from ...flask_modules.security import csrf
 
-default = annotation_composer(csrf.exempt)  # pylint: disable=invalid-name
+defaults = annotation_composer(csrf.exempt)
 
-strict = annotation_composer(  # pylint: disable=invalid-name
+strict = annotation_composer(
     auth_token_required,
     roles_required('admin'),
     csrf.exempt)
 
 
-@default
+@defaults
 def enquiries_tag_email_put(tag: str, email: str) -> TJsonResponse:
     try:
         db.session.add(Enquiry(email=email, tag=tag.strip().lower()))
@@ -43,7 +43,7 @@ def enquiries_get() -> TJsonResponse:
     return enquiries_by_tag
 
 
-@default
+@defaults
 def email_post(email: Dict[str, str]) -> TJsonResponse:
     msg = Message(subject=email.get('subject', 'Message From: %s' % email['from']),
                   body="%(sender)s\n%(message)s" % dict(

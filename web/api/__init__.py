@@ -4,12 +4,13 @@
 """API microservice porviding the activities and model APIs"""
 
 from connexion import App
+from flask import Flask
 
 
-def setup_app(new_app: App) -> None:
+def setup_app(flask_app: Flask) -> None:
     """
     Setup the flask modules used in the app
-    :param new_app: the app
+    :param flask_app: the app
     """
     from ..flask_modules.celery import setup_celery
     from ..flask_modules.database import setup_db
@@ -18,19 +19,19 @@ def setup_app(new_app: App) -> None:
     from ..flask_modules.cors import setup_cors
     from ..flask_modules.logging import setup_logging
 
-    setup_logging(new_app.app)
-    setup_db(new_app.app)
-    setup_mail(new_app.app)
-    setup_jwt(new_app.app)
-    setup_cors(new_app.app)
-    setup_celery(new_app.app)
+    setup_logging(flask_app)
+    setup_db(flask_app)
+    setup_mail(flask_app)
+    setup_jwt(flask_app)
+    setup_cors(flask_app)
+    setup_celery(flask_app)
 
 
 def create_app() -> App:
     """:return: lazily created and initialized app"""
 
     new_app = App(__name__, specification_dir='swagger')
-    setup_app(new_app)
+    setup_app(new_app.app)
 
     from ..flask_modules import SimpleResolver
     from .controller import activities, model

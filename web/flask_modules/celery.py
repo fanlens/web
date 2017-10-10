@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """`Celery` background tasks module and Proxies"""
 from abc import ABC, abstractmethod
-from typing import Callable, cast, Any
+from typing import Any, Callable, cast
 
 from celery import Celery
 from celery.result import AsyncResult
@@ -25,12 +25,12 @@ class FlaskCelery(FlaskModule, Celery):
     """
 
     def init_app(self: 'FlaskCelery', app: Flask) -> None:
-        app.config.setdefault['CELERY_ALWAYS_EAGER'] = False  # important so it doesn't get executed locally!
-        app.config.setdefault['CELERY_TASK_SERIALIZER'] = 'msgpack'
-        app.config.setdefault['CELERY_RESULT_SERIALIZER'] = 'msgpack'
-        app.config.setdefault['CELERY_ACCEPT_CONTENT'] = ['msgpack']
-        app.config.setdefault['CELERY_IGNORE_RESULT'] = False
-        app.config.setdefault['CELERY_TRACK_STARTED'] = True
+        app.config.setdefault('CELERY_ALWAYS_EAGER', False)  # important so it doesn't get executed locally!
+        app.config.setdefault('CELERY_TASK_SERIALIZER', 'msgpack')
+        app.config.setdefault('CELERY_RESULT_SERIALIZER', 'msgpack')
+        app.config.setdefault('CELERY_ACCEPT_CONTENT', ['msgpack'])
+        app.config.setdefault('CELERY_IGNORE_RESULT', False)
+        app.config.setdefault('CELERY_TRACK_STARTED', True)
 
         config = get_config()
         Celery.__init__(cast(Celery, self), app.import_name,

@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 """User interface layer of the web tier."""
 from connexion import App
+from flask import Flask
 
 
-def setup_app(new_app: App) -> None:
+def setup_app(flask_app: Flask) -> None:
     """
     Setup the flask modules used in the app
-    :param new_app: the app
+    :param flask_app: the app
     """
     from ..flask_modules.mail import setup_mail
     from ..flask_modules.jwt import setup_jwt
@@ -18,21 +19,21 @@ def setup_app(new_app: App) -> None:
     from ..flask_modules.celery import setup_celery
     from ..flask_modules.twitter import setup_twitter
 
-    setup_logging(new_app.app)
-    setup_db(new_app.app)
-    setup_mail(new_app.app)
-    setup_jwt(new_app.app)
-    setup_security(new_app.app, allow_login=True)
-    setup_cors(new_app.app, resources={"/static/fonts/*": {"origins": "*"}})
-    setup_celery(new_app.app)
-    setup_twitter(new_app.app)
+    setup_logging(flask_app)
+    setup_db(flask_app)
+    setup_mail(flask_app)
+    setup_jwt(flask_app)
+    setup_security(flask_app, allow_login=True)
+    setup_cors(flask_app, resources={"/static/fonts/*": {"origins": "*"}})
+    setup_celery(flask_app)
+    setup_twitter(flask_app)
 
 
 def create_app() -> App:
     """:return: lazily created and initialized app"""
 
     new_app = App(__name__, specification_dir='swagger')
-    setup_app(app)
+    setup_app(new_app.app)
 
     from ..flask_modules import SimpleResolver
     from .controller.ui import UI_BP, UI_NONAUTH_BP

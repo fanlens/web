@@ -143,7 +143,7 @@ function-name-hint=(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$
 function-rgx=(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=i,j,k,ex,Run,_,X,xs,x,Y,ys,y,app,cache,celery,cors,db,jwt,logger,mail,csrf,security,twitter,brain,scrape,defaults,current_user_dao,app
+good-names=i,j,k,ex,Run,_,X,xs,x,Y,ys,y,app,cache,celery,cors,db,jwt,logger,mail,csrf,security,twitter,brain,scrape,defaults,strict,current_user_dao,app
 
 # Include a hint for the correct naming format with invalid-name
 include-naming-hint=no
