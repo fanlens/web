@@ -231,7 +231,7 @@ def setup_security(app: Flask, allow_login: bool = False) -> None:
                                  roles=[role.name for role in user.roles])
         return user_json
 
-    @app.route('%s/token' % prefix, methods=['POST'])
+    @app.route('%s/token' % prefix, methods=['GET', 'POST'])
     @csrf.exempt
     def get_jwt() -> Tuple[str, int]:
         """
