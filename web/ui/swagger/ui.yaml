@@ -1,0 +1,133 @@
+swagger: "2.0"
+
+info:
+  title: "Fanlens General App API"
+  version: "4.0.0"
+  description: "Handles app related calls"
+
+schemes:
+  - https
+
+basePath: /v4/ui
+
+securityDefinitions:
+  auth_token:
+    type: apiKey
+    name: Authorization
+    in: header
+
+security:
+  - auth_token: []
+
+produces:
+  - application/json
+
+paths:
+  /email:
+    post:
+      summary: send a mail
+      tags: [email]
+      consumes: [application/json]
+      parameters:
+      - name: email
+        in: body
+        required: true
+        schema:
+          type: object
+          required: [from, message]
+          properties:
+            from:
+              type: string
+              format: email
+            subject:
+              type: string
+              format: string
+              minLength: 3
+            message:
+              type: string
+              format: string
+              minLength: 3
+      responses:
+        202:
+          description: email will be sent
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /enquiries/:
+    get:
+      summary: get all enquiries grouped by tag
+      tags: [enquiries]
+      consumes: [application/json]
+      responses:
+        200:
+          description: all enquiries grouped by tag
+          schema:
+            $ref: '#/definitions/EnquiriesByTag'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /enquiries/{tag}/{email}:
+    put:
+      summary: add an enquiry to the enquiries list
+      tags: [enquiries]
+      consumes: [application/json]
+      parameters:
+      - name: email
+        in: path
+        type: string
+        format: email
+        required: true
+        description: email address to use
+      - name: tag
+        in: path
+        type: string
+        required: true
+        description: tag to use
+      responses:
+        200:
+          description: email added
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
+
+  Tag:
+    type: string
+    format: string
+    minLength: 1
+
+  Email:
+    type: string
+    format: email
+
+  Timestamp:
+    type: string
+    format: date-time
+
+  Enquiry:
+    type: object
+    properties:
+      email:
+        $ref: '#/definitions/Email'
+      timestamp:
+        $ref: '#/definitions/Timestamp'
+
+  EnquiriesByTag:
+    type: object
+    additionalProperties:
+      type: array
+      items:
+        $ref: '#/definitions/Enquiry'
+      uniqueItems: true
+

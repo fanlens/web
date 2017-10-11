@@ -1,0 +1,23 @@
+Fanlens Web/REST tier / Microservices.
+
+Based on customized Flask in connection with connexion.
+API first driven via the respective swagger YMLs.
+
+Houses the UI layer:
+* Landing page
+* Emails and Enquiries
+* Login flow
+ * Session/HTTP Token based
+ * Twitter Signin
+ * User info and JWT creation for API interaction
+* Single page Fanlens app
+
+and the API layer:
+* Interaction with the "activities" and its meta data (e.g. Facebook data)
+* Interaction with the prediction engine via "model"
+
+To interact with the API layer one needs to first "exchange" an HTTP login token (or a logged in session) for a JWT,
+i.e. call the /{version}/user or /{version}/user/jwt endpoint. The JWT is valid for 1 hour.
+Both a login token and a JWT are transmitted via the "Authorization" Header.
+
+The different layers can be run via a dev server which monitors file changes using `python -mui` or `python -mapi`.
