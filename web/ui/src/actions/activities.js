@@ -2,17 +2,9 @@ import keyMirror from "keymirror";
 import _ from "lodash";
 import defaults from "lodash/fp/defaults";
 import flow from "lodash/fp/flow";
-import Swagger from "swagger-client";
 import {orNop} from "./nop";
 
-import resolveToSelf from "./resolveToSelf";
-
-export const activitiesApi = new Swagger({
-  url: resolveToSelf('/activities/swagger.json', 'api'),
-  authorizations: {
-    jwt: JWT
-  }
-});
+import apiClient from "./apiClient";
 
 export const ActivitiesActionType = keyMirror({
   ACTIVITIES_RECEIVE_TAGS: null,
@@ -49,7 +41,7 @@ export const initActivities = (force = false) => orNop(!initialized || force)(
 );
 
 export const fetchTagSets = () =>
-  (dispatch) => activitiesApi.then(
+  (dispatch) => apiClient.then(
     (client) => client.apis.tagsets.get_tagsets_()
       .then(({status, obj}) => obj)
       .then(({tagSets}) => dispatch(receiveTagSets(tagSets)))
@@ -57,14 +49,14 @@ export const fetchTagSets = () =>
 
 
 export const fetchSources = () =>
-  (dispatch) => activitiesApi.then(
+  (dispatch) => apiClient.then(
     (client) => client.apis.sources.get_sources_()
       .then(({status, obj}) => obj)
       .then(({sources}) => dispatch(receiveSources(sources)))
       .catch((error) => console.log(error)));
 
 export const fetchTagCounts = () =>
-  (dispatch, getState) => activitiesApi.then(
+  (dispatch, getState) => apiClient.then(
     (client) => client.apis.tags.get_tags_({with_count: true})
       .then(({status, obj}) => obj)
       .then(({counts}) => dispatch(receiveTagCounts(counts)))
@@ -80,7 +72,7 @@ const conditionalDefaults = (condition) =>
 const definedDefaults = (value) => conditionalDefaults(!_.isUndefined(value) && !_.isNull(value))(value);
 
 export const fetchComments = ({count, sources, since, until, tagSets = [], random = false}) =>
-  (dispatch) => activitiesApi.then(
+  (dispatch) => apiClient.then(
     (client) => client.apis.activity.get_(
       flow(
         definedDefaults(since)('since'),
@@ -96,7 +88,7 @@ export const fetchComments = ({count, sources, since, until, tagSets = [], rando
   );
 
 export const fetchCommentsTagSet = (count, tagSetId, random = true) =>
-  (dispatch) => activitiesApi.then(
+  (dispatch) => apiClient.then(
     (client) => client.apis.activity.get_({
       tagset_ids: tagSetId,
       count: count,
@@ -106,7 +98,7 @@ export const fetchCommentsTagSet = (count, tagSetId, random = true) =>
       .catch((error) => console.log(error)));
 
 const manipulateTags = (comment, add, remove) =>
-  (dispatch) => activitiesApi.then(
+  (dispatch) => apiClient.then(
     (client) => client.apis.activity.patch__source_id___activity_id__tags({
       source_id: comment.source.id,
       activity_id: comment.id,

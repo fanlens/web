@@ -1,0 +1,1344 @@
+swagger: "2.0"
+
+info:
+  title: "Fanlens API"
+  version: "4.0.0"
+  description: '
+Fanlens API to handle "activities". Predictions are performed automatically and can be managed here
+
+## Concepts
+
+The API consists of 4 main concepts: sources, activities and tags (bundled in tagsets) and models used for predictions.
+
+* An activity is a text based action performed by a user, e.g. a Facebook Comment or a Tweet.
+
+* A source is the originator of these activities and is used for importing. Currently Facebook, Twitter, and Generic Sources are supported.
+
+* A tag is a piece of meta information that is used to build specialized speech models, e.g. "positive", or "negative". They are bundled in tagsets for convenience, e.g. "Emotion".'
+
+schemes:
+  - https
+
+basePath: /v4
+
+securityDefinitions:
+  jwt:
+    type: apiKey
+    name: Authorization
+    in: header
+
+security:
+  - jwt: []
+
+produces:
+  - application/json
+consumes:
+  - application/json
+
+
+####################################
+# Activity and Import related APIs #
+####################################
+
+paths:
+  /:
+    get:
+      summary: Get a list of activities.
+      tags: [activity]
+      parameters:
+      - name: source_ids
+        in: query
+        required: false
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
+        collectionFormat: csv
+        maxItems: 10
+      - name: tagset_ids
+        in: query
+        required: false
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
+        collectionFormat: csv
+        maxItems: 10
+      - name: tags
+        in: query
+        required: false
+        type: array
+        items:
+          type: string
+          minLength: 1
+          maxLength: 32
+        uniqueItems: true
+        collectionFormat: csv
+        maxItems: 30
+      - name: languages
+        in: query
+        description: Inferred language of text
+        required: false
+        default: 'en'
+        type: array
+        items:
+          type: string
+          minLength: 2
+          maxLength: 12
+        uniqueItems: true
+        collectionFormat: csv
+        maxItems: 30
+      - name: count
+        in: query
+        description: number of activities to fetch
+        required: false
+        type: integer
+        format: int32
+        default: 8
+        minimum: 0
+        maximum: 500
+      - name: max_id
+        in: query
+        description: used for cursoring
+        type: string
+        minLength: 1
+        maxLength: 128
+        required: false
+      - name: since
+        in: query
+        description: DateTime of oldest entry
+        type: string
+        format: date-time
+        required: false
+      - name: until
+        in: query
+        description: DateTime of newest entry
+        type: string
+        format: date-time
+        required: false
+      - name: random
+        in: query
+        description: should a random sample be drawn
+        type: boolean
+        required: false
+        default: false
+      responses:
+        200:
+          description: A list of Activitys
+          schema:
+            $ref: '#/definitions/ActivityList'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    post:
+      summary: Import a bulk of activities
+      description: The data field format is source dependent
+      tags: [import]
+      parameters:
+      - name: import_activities
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ImportList'
+      responses:
+        201:
+          description: The list of created activities
+          schema:
+            $ref: '#/definitions/ActivityList'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /{source_id}/{activity_id}:
+    get:
+      summary: Get this activity
+      tags: [activity]
+      parameters:
+      - $ref: '#/parameters/SourceId'
+      - $ref: '#/parameters/ActivityId'
+      responses:
+        200:
+          description: The activity
+          schema:
+           $ref: '#/definitions/Activity'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Activity not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    put:
+      summary: Create or update this activity
+      description: The data field format is source dependent
+      tags: [activity, import]
+      parameters:
+      - $ref: '#/parameters/SourceId'
+      - $ref: '#/parameters/ActivityId'
+      - name: activity_import
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Import'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Ok'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: User has no access to source, or JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    delete:
+      summary: Delete this activity
+      tags: [activity, import]
+      parameters:
+      - $ref: '#/parameters/SourceId'
+      - $ref: '#/parameters/ActivityId'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Ok'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /{source_id}/{activity_id}/tags:
+    patch:
+      summary: Modify tags of activity
+      tags: [activity]
+      parameters:
+      - $ref: '#/parameters/SourceId'
+      - $ref: '#/parameters/ActivityId'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/TagChangeSet'
+      responses:
+        200:
+          description: Simplified activity containing the new tags
+          schema:
+           $ref: '#/definitions/Activity'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+
+#######################
+# Source related APIs #
+#######################
+
+  /sources/:
+    get:
+      summary: Get sources of current user
+      tags: [sources]
+      responses:
+        200:
+          description: List of sources for current user
+          schema:
+           $ref: '#/definitions/SourcesList'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    post:
+      summary: Create a new Source
+      description: 'Currently supported types: facebook, twitter, generic'
+      tags: [sources]
+      parameters:
+      - name: source
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Source'
+      responses:
+        201:
+          description: Redirect to created source
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /sources/{source_id}:
+    get:
+      summary: Get source
+      tags: [sources]
+      parameters:
+      - $ref: '#/parameters/SourceId'
+      responses:
+        200:
+          description: The source
+          schema:
+            $ref: '#/definitions/Source'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Source does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    patch:
+      summary: Update the source.
+      tags: [sources]
+      parameters:
+      - $ref: '#/parameters/SourceId'
+      - name: source
+        description: Fields can be a subset of a full source. Will update only the specified fields.
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Source'
+      responses:
+        200:
+          description: Source updated
+          schema:
+            $ref: '#/definitions/Source'
+        400:
+          description: Updating immutable field, or bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Source does not exist, please use POST /sources/ to create a new source
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    delete:
+      summary: 'Remove the source, **WARNING!** This will remove all data associated with the source!'
+      description: '**WARNING!** This will remove all data associated with the source!'
+      tags: [sources]
+      parameters:
+      - $ref: '#/parameters/SourceId'
+      responses:
+        200:
+          description: Source removed from the system
+          schema:
+            $ref: '#/definitions/Ok'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+
+####################
+# Tag related APIs #
+####################
+
+  /tags/:
+    get:
+      summary: Get all tags of current user
+      tags: [tags]
+      parameters:
+      - name: with_count
+        in: query
+        description: should the tag counts be included
+        type: boolean
+        required: false
+        default: false
+      responses:
+        200:
+          description: All tags of current user
+          schema:
+            $ref: '#/definitions/TagInfo'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /tags/{tag}:
+    get:
+      summary: Get this tag
+      tags: [tags]
+      parameters:
+      - $ref: '#/parameters/Tag'
+      - name: with_count
+        in: query
+        description: should the tag count be included
+        type: boolean
+        required: false
+        default: false
+      responses:
+        200:
+          description: The tag and optionally it's count
+          schema:
+            $ref: '#/definitions/SingleTagInfo'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Tag not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    put:
+      summary: Add tag to the system
+      tags: [tags]
+      parameters:
+      - $ref: '#/parameters/Tag'
+      responses:
+        201:
+          description: Tag added
+          schema:
+            $ref: '#/definitions/SingleTagInfo'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    delete:
+      summary: Remove tag and all it's associations from the system
+      tags: [tags]
+      parameters:
+      - $ref: '#/parameters/Tag'
+      responses:
+        200:
+          description: Tag removed from the system
+          schema:
+            $ref: '#/definitions/Ok'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+
+#######################
+# Tagset related APIs #
+#######################
+
+  /tagsets/:
+    get:
+      summary: Get tagsets of current user
+      tags: [tagsets]
+      responses:
+        200:
+          description: A list of TagSets
+          schema:
+            $ref: '#/definitions/TagSetList'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    post:
+      summary: Create new tagset
+      tags: [tagsets]
+      parameters:
+      - name: tagset
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/TagSet'
+      responses:
+        201:
+          description: Redirect to created TagSet
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /tagsets/{tagset_id}:
+    get:
+      summary: Get tagset
+      tags: [tagsets]
+      parameters:
+      - $ref: '#/parameters/TagsetId'
+      responses:
+        200:
+          description: The tagset
+          schema:
+            $ref: '#/definitions/TagSet'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: TagSet does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    patch:
+      summary: Update the tagset
+      tags: [tagsets]
+      parameters:
+      - $ref: '#/parameters/TagsetId'
+      - name: tagset
+        description: Can be a subset of the TagSet fields. Only the specified fields will be updated.
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/TagSet'
+      responses:
+        200:
+          description: TagSet updated
+          schema:
+            $ref: '#/definitions/TagSet'
+        400:
+          description: Updating immutable field, or bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: TagSet does not exist, please use POST /tagsets/ to create a new tagset
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    delete:
+      summary: Remove the tagset
+      tags: [tagsets]
+      parameters:
+      - $ref: '#/parameters/TagsetId'
+      responses:
+        200:
+          description: Tagset removed from the system
+          schema:
+            $ref: '#/definitions/Ok'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /tagsets/{tagset_id}/{tag}:
+    put:
+      summary: Add tag to the tagset
+      tags: [tagsets]
+      parameters:
+      - $ref: '#/parameters/TagsetId'
+      - $ref: '#/parameters/Tag'
+      responses:
+        200:
+          description: Tag added
+          schema:
+            $ref: '#/definitions/Ok'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    delete:
+      summary: Remove tag from tagset
+      tags: [tagsets]
+      parameters:
+      - $ref: '#/parameters/TagsetId'
+      - $ref: '#/parameters/Tag'
+      responses:
+        200:
+          description: Tag removed from the tagset
+          schema:
+            $ref: '#/definitions/Ok'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+######################
+# Model related APIs #
+######################
+
+  /model/:
+    get:
+      summary: Get all models of user
+      tags: [model]
+      responses:
+        200:
+          description: Information about the trained model
+          schema:
+            $ref: '#/definitions/ModelList'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /model/{model_id}:
+    get:
+      summary: Get meta information about a trained model
+      tags: [model]
+      parameters:
+      - name: model_id
+        description: The id of this model
+        in: path
+        type: string
+        format: uuid
+        required: true
+      responses:
+        200:
+          description: Information about the trained model
+          schema:
+            $ref: '#/definitions/Model'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Model not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /model/train:
+    post:
+      summary: Train a new model for a tagset
+      description: If now sources are specified it will be trained on all sources
+      tags: [model]
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ModelTrainJob'
+      - name: fast
+        in: query
+        type: boolean
+        required: false
+        default: true
+        description: Reuse model parameters and only use data
+      responses:
+        202:
+          description: Model creation has been initiated.
+          schema:
+            $ref: '#/definitions/Job'
+        400:
+          description: Bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: User has no access to at least one required resource, or JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /model/search:
+    post:
+      summary: Get meta information about a trained model
+      tags: [model]
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ModelQuery'
+      responses:
+        200:
+          description: Information about the best trained model
+          schema:
+            $ref: '#/definitions/Model'
+        400:
+          description: No criterium specified, or bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No model found for this query
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /model/prediction:
+    post:
+      summary: Get prediction for a provided text based on the best model for source/tagset
+      tags: [model]
+      consumes: [application/json]
+      parameters:
+      - name: model_id
+        in: query
+        type: string
+        format: uuid
+        required: false
+        description: The id of this model
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/TextPredictionQuery'
+      responses:
+        200:
+          description: Prediction for the text
+          schema:
+            $ref: '#/definitions/TextPrediction'
+        400:
+          description: No criterium specified, or bad request, or invalid JWT
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized for this endpoint
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: JWT expired
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: Model not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+
+parameters:
+  ActivityId:
+    name: activity_id
+    in: path
+    type: string
+    minLength: 1
+    maxLength: 128
+    required: true
+
+  SourceId:
+    name: source_id
+    in: path
+    required: true
+    type: integer
+
+  Tag:
+    name: tag
+    in: path
+    type: string
+    minLength: 1
+    maxLength: 32
+    required: true
+
+  TagsetId:
+    name: tagset_id
+    in: path
+    required: true
+    type: integer
+
+
+
+definitions:
+  Import:
+    type: object
+    required: [data]
+    properties:
+      id:
+        type: string
+        minLength: 1
+        maxLength: 128
+      data:
+        type: object
+        description: The original data, e.g. Facebook JSON comment. Format depends on source type.
+      source_id:
+        description: Id of the source this import belongs to. Required only for bulk imports.
+        type: integer
+
+  ImportList:
+    description: A list of raw data items to be imported
+    type: object
+    properties:
+      activities:
+        type: array
+        items:
+          $ref: '#/definitions/Import'
+
+  Activity:
+    type: object
+    required: [id]
+    properties:
+      id:
+        type: string
+        minLength: 1
+        maxLength: 128
+      text:
+        type: string
+      source:
+        $ref: '#/definitions/Source'
+      tags:
+        $ref: '#/definitions/Tags'
+      prediction:
+        $ref: '#/definitions/Prediction'
+      user:
+        $ref: '#/definitions/User'
+      language:
+        description: Inferred language of text
+        type: string
+        minLength: 2
+        maxLength: 12
+      created_time:
+        description: DateTime of creation
+        type: string
+        format: date-time
+
+  ActivityList:
+    description: a list of activities
+    type: object
+    properties:
+      activities:
+        type: array
+        items:
+          $ref: '#/definitions/Activity'
+
+  Prediction:
+    type: object
+    description: 'A dict object of the form "Tag: Predicted Score in %"'
+    additionalProperties:
+      type: number
+      format: float
+      minimum: 0.0
+      maximum: 1.0
+      description: Probability of prediction
+
+  User:
+    description: The user causing the activitiy
+    type: object
+    required: [id]
+    properties:
+      id:
+        type: string
+        description: A consistent, machine readable user id
+      name:
+        type: string
+        description: A human readable user name
+
+  Tag:
+    description: Tags are arbitrary strings
+    type: string
+    minLength: 1
+    maxLength: 32
+
+  Tags:
+    type: array
+    description: A set of tags
+    items:
+      $ref: '#/definitions/Tag'
+    uniqueItems: true
+
+  TagChangeSet:
+    type: object
+    properties:
+      add:
+        $ref: '#/definitions/Tags'
+      remove:
+        $ref: '#/definitions/Tags'
+
+  TagSet:
+    type: object
+    description: A set of tags
+    properties:
+      id:
+        type: integer
+        description: Assigned by the system
+      title:
+        type: string
+        format: string
+        description: Human readable title of this tag set
+      tags:
+        $ref: '#/definitions/Tags'
+
+  TagSetList:
+    type: object
+    properties:
+      tagSets:
+        type: array
+        items:
+          $ref: '#/definitions/TagSet'
+        uniqueItems: true
+
+  TagCounts:
+    type: object
+    description: 'A dict object of the form "Tag: Count"'
+    additionalProperties:
+      type: integer
+      minimum: 0
+
+  SingleTagInfo:
+    type: object
+    required: [tag]
+    properties:
+      tag:
+        $ref: '#/definitions/Tag'
+      count:
+        type: integer
+        minimum: 0
+
+  TagInfo:
+    type: object
+    required: [tags]
+    properties:
+      tags:
+        $ref: '#/definitions/Tags'
+      count:
+        $ref: '#/definitions/TagCounts'
+
+  Source:
+    type: object
+    description: Source representation
+    properties:
+      id:
+        type: integer
+        description: Assigned by the system
+      type:
+        type: string
+        description: Source type (forces specific data format)
+        enum:
+        - facebook
+        - twitter
+#        - crunchbase
+        - generic
+      uri:
+        type: string
+        format: url
+        description: Canoncial URI of the source, e.g. Twitter account URI.
+      slug:
+        type: string
+        minLength: 1
+        maxLength: 128
+        description: Identifier for the URI. Required for Twitter and Facebook sources.
+
+  SourcesList:
+    type: object
+    properties:
+      sources:
+        type: array
+        items:
+          $ref: '#/definitions/Source'
+        uniqueItems: True
+
+  Model:
+    type: object
+    required: [id, trained_ts]
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Assigned by the system
+      trained_ts:
+        type: string
+        format: date-time
+        description: The timestamp when this model was created
+      score:
+        type: number
+        format: float
+        minimum: 0.0
+        maximum: 1.0
+        description: The f1 score of the model, restricted access
+      params:
+        type: object
+        description: The model parameters, restricted access
+      tagset:
+        $ref: '#/definitions/TagSet'
+      sources:
+        description: The sources this model is trained on
+        type: array
+        items:
+          $ref: '#/definitions/Source'
+        uniqueItems: true
+
+  ModelList:
+    type: object
+    required: [models]
+    properties:
+      models:
+        type: array
+        items:
+          $ref: '#/definitions/Model'
+        uniqueItems: true
+
+  ModelTrainJob:
+    type: object
+    required: [source_ids, tagset_id]
+    properties:
+      source_ids:
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
+        description: list of sources to use, empty list means all
+      tagset_id:
+        type: number
+        format: int32
+        description: the taset id to find, must be accessible by user
+
+  ModelQuery:
+    type: object
+    description: must have at least one of source_ids or tagset_id
+    properties:
+      source_ids:
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
+        description: list of sources to use, empty list means all
+      tagset_id:
+        type: number
+        format: int32
+        description: the tagset id to find, must be accessible by user
+
+  TextPredictionQuery:
+    type: object
+    required: [text]
+    properties:
+      text:
+        type: string
+        minLength: 24
+        maxLength: 7000
+        description: The text to fetch prediction for. English only atm.
+      model_query:
+        $ref: '#/definitions/ModelQuery'
+
+  TextPrediction:
+    type: object
+    required: [text, prediction]
+    properties:
+      text:
+        type: string
+      prediction:
+        $ref: '#/definitions/Prediction'
+
+  Job:
+    type: object
+    required: [job]
+    properties:
+      job:
+        type: string
+        format: uuid
+      url:
+        type: string
+        format: url
+        description: You can get info about the currently running job or cancel it under this url
+
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
+        description: Error message
+
+  Ok:
+    type: object
+    properties:
+      ok:
+        type: string
+        description: Ok message

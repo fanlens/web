@@ -26,69 +26,21 @@ _CONFIG = get_config()
 
 
 @defaults
-def root_get() -> TJsonResponse:
+def model_get() -> TJsonResponse:
     return dict(models=[model_to_json(model) for model in current_user_dao.models])
 
 
 @defaults
-def model_id_get(model_id: str) -> TJsonResponse:
+def model_model_id_get(model_id: str) -> TJsonResponse:
     model = current_user_dao.models.filter(Model.id == model_id).one_or_none()
     if not model:
-        return dict(error='Model not associated to user'), 404
-    return model_to_json(model), 200
-
-
-def _best_model_query_by_id(model_id: str) -> Query:
-    return current_user_dao.models.filter(Model.id == model_id).limit(1)
-
-
-def _best_model_query_by_dto(query: ModelQueryDto) -> Query:
-    matching = current_user_dao.models
-    if query.tagset_id:
-        matching = matching.filter(Model.tagset_id == query.tagset_id)
-    if query.source_ids:
-        matching = matching.filter(Model.sources.any(Source.id.in_(query.source_ids)))
-    return matching.order_by(Model.score.desc(), Model.trained_ts.desc()).limit(1)
-
-
-@defaults
-def search_post(body: TJson) -> TJsonResponse:
-    try:
-        dto = model_query_dto(body)
-    except ValueError as err:
-        return bad_arg(err)
-
-    model_query = _best_model_query_by_dto(query=dto)
-
-    try:
-        model = model_query.one()
-        return model_to_json(model)
-    except NoResultFound:
-        return dict(error='No model found for this query'), 404
-
-
-@defaults
-def prediction_post(body: TJson, model_id: Optional[str] = None) -> TJsonResponse:
-    dto = prediction_query_dto(body)
-
-    try:
-        if model_id:
-            model_query = _best_model_query_by_id(model_id)
-        else:
-            model_query = _best_model_query_by_dto(model_query_dto(body))
-        model: Model = model_query.one()
-        prediction = brain.predict_text(model['id'], dto.text).get()
-        prediction = dict((model.tags.filter_by(id=k).one().tag, v) for k, v in prediction)
-        return dict(text=dto.text, prediction=prediction)
-    except NoResultFound:
-        return dict(error='No model found for this query'), 404
-    except ValueError as err:
-        return bad_arg(err)
+        return dict(error='Model not found'), 404
+    return model_to_json(model)
 
 
 @defaults
 @roles_all('admin')  # limited atm
-def train_post(body: TJson, fast: bool = True) -> TJsonResponse:
+def model_train_post(body: TJson, fast: bool = True) -> TJsonResponse:
     try:
         dto = model_query_dto(body)
     except ValueError as err:
@@ -131,3 +83,52 @@ def train_post(body: TJson, fast: bool = True) -> TJsonResponse:
     else:
         redir_url = '/%s/search' % _CONFIG.get('DEFAULT', 'version')
     return dict(job=job.id, url=redir_url), 202
+
+
+def _best_model_query_by_id(model_id: str) -> Query:
+    return current_user_dao.models.filter(Model.id == model_id).limit(1)
+
+
+def _best_model_query_by_dto(query: ModelQueryDto) -> Query:
+    matching = current_user_dao.models
+    if query.tagset_id:
+        matching = matching.filter(Model.tagset_id == query.tagset_id)
+    if query.source_ids:
+        matching = matching.filter(Model.sources.any(Source.id.in_(query.source_ids)))
+    return matching.order_by(Model.score.desc(), Model.trained_ts.desc()).limit(1)
+
+
+@defaults
+def model_search_post(body: TJson) -> TJsonResponse:
+    try:
+        dto = model_query_dto(body)
+    except ValueError as err:
+        return bad_arg(err)
+
+    model_query = _best_model_query_by_dto(query=dto)
+
+    try:
+        model = model_query.one()
+        return model_to_json(model)
+    except NoResultFound:
+        return dict(error='No model found for this query'), 404
+
+
+@defaults
+def model_prediction_post(body: TJson, model_id: Optional[str] = None) -> TJsonResponse:
+    dto = prediction_query_dto(body)
+
+    try:
+        if model_id:
+            model_query = _best_model_query_by_id(model_id)
+        else:
+            query_dto = model_query_dto(body.get('model_query', dict()))
+            model_query = _best_model_query_by_dto(query_dto)
+        model: Model = model_query.one()
+        prediction = brain.predict_text(model['id'], dto.text).get()
+        prediction = dict((model.tags.filter_by(id=k).one().tag, v) for k, v in prediction)
+        return dict(text=dto.text, prediction=prediction)
+    except NoResultFound:
+        return dict(error='No model found for this query'), 404
+    except ValueError as err:
+        return bad_arg(err)

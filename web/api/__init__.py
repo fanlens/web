@@ -33,10 +33,12 @@ def create_app() -> App:
     new_app = App(__name__, specification_dir='swagger')
     setup_app(new_app.app)
 
-    from ..flask_modules import SimpleResolver
-    from .controller import activities, model
-    new_app.add_api('activities.yaml', validate_responses=True, resolver=SimpleResolver(activities))
-    new_app.add_api('model.yaml', validate_responses=True, resolver=SimpleResolver(model))
+    from ..flask_modules.connexion import TaggedSimpleResolver
+    from . import controller
+    new_app.add_api('api.yaml',
+                    validate_responses=True,
+                    resolver=TaggedSimpleResolver(controller),
+                    swagger_url='/api')
     new_app.add_url_rule('/', 'health', lambda: 'ok')
 
     return new_app
