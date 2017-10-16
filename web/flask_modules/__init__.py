@@ -5,8 +5,6 @@ from abc import ABC, abstractmethod
 from functools import wraps
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
-from connexion.operation import Operation
-from connexion.resolver import Resolution, Resolver
 from flask import Flask, Response, request
 
 TJson = Dict[str, Any]
@@ -45,47 +43,10 @@ def request_wants_json() -> bool:
     return bool(best == 'application/json' and request.accept_mimetypes[best] > request.accept_mimetypes['text/html'])
 
 
-class SimpleResolver(Resolver):
-    """
-    A custom `connexion` `Resolver` that works without relying on operation ids
-    paths are translated into methods by joining the path with '_', removing '{}'s
-    e.g. /hello/world:
-            get
-    will be resolved to
-    hello_world_get()
-    a plain / will be resolved to 'root'
-    """
-
-    def __init__(self, controller_module: object) -> None:
-        """
-        :param controller_module: the python module where the path implementations can be found
-        """
-        super().__init__(lambda _: _)  # we do it our own way, see resolve
-        self._controller_module = controller_module
-
-    def resolve(self, operation: Operation) -> Resolution:
-        """
-        :param operation: operation which will be resolved for this module
-        :return: a resolved endpoint
-        """
-        parts = []
-        if operation.path == '/':
-            parts.append('root')
-        else:
-            for part in operation.path.split('/'):
-                if part:
-                    parts.append(part)
-        parts.append(operation.method)
-        func_name = '_'.join(parts).replace('{', '').replace('}', '')
-        func = getattr(self._controller_module, func_name)
-
-        return Resolution(func, func_name)
+TAnnotation = Callable[[Callable[..., TJsonResponse]], Callable[..., TJsonResponse]]
 
 
-_TDecorator = Callable[[Callable[..., TJsonResponse]], Callable[..., TJsonResponse]]
-
-
-def annotation_composer(*decs: _TDecorator) -> _TDecorator:
+def annotation_composer(*decs: TAnnotation) -> TAnnotation:
     """
     small helper that combines multiple decorators into a single one
     :param decs: the decorators to combine, will be applied right to left, e.g.:
