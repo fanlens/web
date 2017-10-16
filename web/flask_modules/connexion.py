@@ -1,5 +1,8 @@
 """Supporting tools for connexion"""
 
+from types import ModuleType
+import inspect
+
 import importlib
 
 from connexion.operation import Operation
@@ -31,11 +34,12 @@ def simple_resolve(operation: Operation) -> str:
 class SimpleResolver(Resolver):
     """A custom `connexion` `Resolver` that works without relying on operation ids. See also `simple_resolve`"""
 
-    def __init__(self, controller_module: object) -> None:
+    def __init__(self, controller_module: ModuleType) -> None:
         """
         :param controller_module: the python module where the path implementations can be found
         """
         super().__init__(lambda _: _)  # we do it our own way, see resolve
+        assert inspect.ismodule(controller_module), "controller_module must be a module"
         self._controller_module = controller_module
 
     def resolve(self, operation: Operation) -> Resolution:
@@ -56,12 +60,13 @@ class TaggedSimpleResolver(Resolver):
     `{controller_root}.default` by default.
     """
 
-    def __init__(self, controller_root: object, default_tag: str = 'default') -> None:
+    def __init__(self, controller_root: ModuleType, default_tag: str = 'default') -> None:
         """
         :param controller_root: root for the controller modules
         :param default_tag: the tag to use if there is none specified
         """
         super().__init__(lambda _: _)  # we do it our own way, see resolve
+        assert inspect.ismodule(controller_root), "controller_root must be a module"
         self._controller_root = controller_root
         self._default = [default_tag]
 
