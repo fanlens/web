@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Blueprints for url shortening and other redirects"""
 from typing import Dict, Any
 from flask import Blueprint, jsonify, redirect, render_template, request

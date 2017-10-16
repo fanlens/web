@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """ Models and helpers for activities api """
 
 from typing import Any, Callable, Dict, Union, List

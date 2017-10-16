@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """User interface layer of the web tier."""
 from connexion import App
 from flask import Flask
@@ -35,7 +33,7 @@ def create_app() -> App:
     new_app = App(__name__, specification_dir='swagger')
     setup_app(new_app.app)
 
-    from ..flask_modules import SimpleResolver
+    from ..flask_modules.connexion import SimpleResolver
     from .controller.ui import UI_BP, UI_NONAUTH_BP
     from .controller.landing import LANDING_BP
     from .controller.forwards import FORWARDS_BP

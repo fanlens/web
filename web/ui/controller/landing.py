@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Blueprints for the landing page."""
 import requests
 from flask import Blueprint, Response, flash, render_template, request

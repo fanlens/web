@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """ Models and helpers for user api """
 from sqlalchemy.orm import Query
 

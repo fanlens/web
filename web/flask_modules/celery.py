@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """`Celery` background tasks module and Proxies"""
 from abc import ABC, abstractmethod
 from typing import Any, Callable, cast

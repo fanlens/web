@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# pylint: disable=invalid-name
-
 """web entry point for local dev server"""
+# pylint: disable=invalid-name
 
 import os
 import sys

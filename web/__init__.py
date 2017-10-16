@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """The main web tier module and helper methods to run a dev server"""
 import argparse
 import os

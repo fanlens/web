@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Simple base 62 encoding, useful for converting ints into strings with less characters"""
 # based on https://stackoverflow.com/a/1119769/4354645
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

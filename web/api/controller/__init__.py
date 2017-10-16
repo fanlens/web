@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Controllers implementing the Swagger specification"""
 
 from flask_jwt_simple import jwt_required

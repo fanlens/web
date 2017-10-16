@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 The model Module provides domain specific helpers and data models in addition to the ones provided in the main
 common.db.models package
