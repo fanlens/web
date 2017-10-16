@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Wrapping the app logger into a module for easier access in non standard `Flask` controllers"""
 from logging import LoggerAdapter
 

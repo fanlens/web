@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """User interface layer of the web tier."""
 from connexion import App
 from flask import Flask

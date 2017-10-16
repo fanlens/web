@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Implementations for the activities.yaml Swagger definition. See yaml / Swagger UI for documentation."""
 # see swagger pylint: disable=missing-docstring,too-many-arguments
 from . import defaults

@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """API microservice porviding the activities and model APIs"""
 
 from connexion import App

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """This package contains ready configured and set up flask modules"""
 from abc import ABC, abstractmethod
 from functools import wraps

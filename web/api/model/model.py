@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """ Models and helpers for model api """
 from typing import Any, Dict, Iterable, NamedTuple, Optional
 

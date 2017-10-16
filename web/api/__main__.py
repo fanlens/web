@@ -1,4 +1,4 @@
-# dc#, tagger, eev!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """web entry point for local dev server"""

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Security relevant modules and configurations."""
 
 from typing import Optional, Tuple

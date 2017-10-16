@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Implementations for the twitter.yaml Swagger definition. See yaml / Swagger UI for documentation."""
 from typing import Optional
 

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Blueprint for user interface (the single page app) entry points"""
 from flask import Blueprint, Response, g, redirect, render_template, request, send_file
 from flask_security import current_user, login_required
