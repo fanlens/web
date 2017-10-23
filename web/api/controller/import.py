@@ -16,8 +16,8 @@ def root_post(import_activities: dict) -> TJsonResponse:
             return dict(error='no source_id found for ' + activity['id']), 404
         ids.add((activity['source_id'], activity['id']))
         err: TJsonResponse = source_id_activity_id_put(activity['source_id'], activity['id'], activity, False)
-        if err:
+        if 'error' in err:
             db.session.rollback()
             return err
     db.session.commit()
-    return dict(activities=[dict(id=activity_id, source_id=source_id) for source_id, activity_id in ids]), 201
+    return dict(activities=[dict(id=activity_id, source=dict(id=source_id)) for source_id, activity_id in ids]), 201

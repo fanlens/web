@@ -123,7 +123,7 @@ def model_prediction_post(body: TJson, model_id: Optional[str] = None) -> TJsonR
             query_dto = model_query_dto(body.get('model_query', dict()))
             model_query = _best_model_query_by_dto(query_dto)
         model: Model = model_query.one()
-        prediction = brain.predict_text(model['id'], dto.text).get()
+        prediction = brain.predict_text(str(model.id), dto.text).get()
         prediction = dict((model.tags.filter_by(id=k).one().tag, v) for k, v in prediction)
         return dict(text=dto.text, prediction=prediction)
     except NoResultFound:
