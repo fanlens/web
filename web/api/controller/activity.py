@@ -1,4 +1,5 @@
 """Implementations for the activities.yaml Swagger definition. See yaml / Swagger UI for documentation."""
+from operator import itemgetter
 # see swagger pylint: disable=missing-docstring,too-many-arguments
 from typing import Optional, Tuple, Union, cast
 
@@ -105,9 +106,9 @@ def source_id_activity_id_put(source_id: int,
         db.session.rollback()
         return dict(error="source_id does not match activity"), 400
 
-    if source_id not in current_user_dao.source_ids.all():
+    if source_id not in map(itemgetter(0), current_user_dao.source_ids.all()):
         db.session.rollback()
-        return dict(error="user not associated to source"), 403
+        return dict(error=f"user {current_user_dao.user_id} not associated to source {source_id}"), 403
 
     insert_or_ignore(db.session,
                      Data(source_id=source_id,

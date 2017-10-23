@@ -11,28 +11,29 @@ from ..model import table_names
 from ..model.user import current_user_dao
 from ...flask_modules import TJson, TJsonResponse, deleted_response
 from ...flask_modules.database import db
+from ...flask_modules.logging import logger
 
 
 @defaults
 def tags_get(with_count: bool = False) -> TJsonResponse:
     if with_count:
-        tags: TJson = TJson()
+        tags: TJson = dict()
         with_count_sql = text("""
         SELECT tag.tag, count(*)
-        FROM %(data_table)s as data
-        JOIN %(tagging_table)s as tagging ON tagging.data_id = data.id
-        JOIN %(tag_table)s  as tag ON tagging.tag_id = tag.id
+        FROM %(tag_table)s as tag
         JOIN %(tag_user_table)s as tag_user ON tag_user.tag_id = tag.id AND tag_user.user_id = :user_id
+        LEFT OUTER JOIN %(tagging_table)s as tagging ON tagging.tag_id = tag.id
         GROUP BY tag.tag  -- tag is unique per user
         """ % table_names(data_table=Data,
                           tagging_table=Tagging,
                           tag_table=Tag,
                           tag_user_table=TagUser))
-        tags['counts'] = dict((tag, tag_count)
-                              for tag, tag_count in db.engine.execute(with_count_sql, user_id=current_user_dao.user_id))
-        tags['tags'] = list(tags['counts'].keys())
+        tags['count'] = dict((tag, tag_count)
+                             for tag, tag_count in db.engine.execute(with_count_sql, user_id=current_user_dao.user_id))
+        tags['tags'] = list(tags['count'].keys())
     else:
         tags = dict(tags=[tag.tag for tag in current_user_dao.tags])
+
     return tags
 
 

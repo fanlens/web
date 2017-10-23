@@ -81,15 +81,11 @@ def tagsets_tagset_id_patch(tagset_id: int, tagset: dict) -> TJsonResponse:
         user_tagset.title = tagset['title']
     if 'tags' in tagset:
         tags = set(tagset['tags'])
-        for tag in tags:  # make sure all tags are in DB
-            tags_tag_put(tag, commit=False)
-        user_tagset.tags.update(
-            db.session.query(Tag).filter(Tag.user.any(id=current_user_dao.user_id)).filter(Tag.tag.in_(tags)))
+        for tag in tags:
+            tagsets_tagset_id_tag_put(user_tagset.id, tag)
     db.session.commit()
 
-    return dict(id=user_tagset.id,
-                title=user_tagset.title,
-                tags=[tag.tag for tag in user_tagset.tags]), 200
+    return tagsets_tagset_id_get(user_tagset.id)
 
 
 @defaults
